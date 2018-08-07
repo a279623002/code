@@ -14,6 +14,9 @@ class Index extends Controller
         $view = new \think\View();
         return $view->fetch('index');
     }
+    public function demo(){
+        
+    }
     public function check_login(){
             $data=input('post.');  
             $user = model('Index');
