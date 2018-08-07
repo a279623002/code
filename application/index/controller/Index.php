@@ -11,18 +11,15 @@ class Index extends Controller
 
     public function hello()
     {
-        echo 'hello,world!';
+        
         return view('hello');
     }
-    
-    public function json()
+
+    public function errorMsg()
     {
-        return json_encode($data);
+        $this->error('错误提示！返回上一页！');
     }
     
-    public function read()
-    {
-        return view();
-    }
+
 
 }
