@@ -18,3 +18,4 @@ require __DIR__ . './thinkphp/start.php';
 
 \think\Build::module('index');
 
+

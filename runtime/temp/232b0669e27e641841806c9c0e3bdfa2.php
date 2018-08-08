@@ -1,4 +1,4 @@
-<?php if (!defined('THINK_PATH')) exit(); /*a:1:{s:61:"D:\phpStudy\WWW\code./application/index\view\index\hello.html";i:1533630758;}*/ ?>
+<?php if (!defined('THINK_PATH')) exit(); /*a:1:{s:61:"D:\phpStudy\WWW\code./application/index\view\index\hello.html";i:1533695172;}*/ ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,7 +8,6 @@
     <title>Document</title>
 </head>
 <body>
-    <h1>test</h1>
-    <h1><a href="<?php echo url('index/index/errorMsg','',''); ?>">错误提示</a></h1>
+    <h1>hello world!</h1>
 </body>
 </html>

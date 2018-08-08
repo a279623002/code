@@ -5,6 +5,7 @@ use think\Controller;
 class Index extends Controller
 {
 
+
     // 测试
     public function index()
     {
@@ -20,6 +21,11 @@ class Index extends Controller
     public function errorMsg()
     {
         $this->error('错误提示！返回上一页！');
+    }
+
+    public function returnAjax() {
+        $data = ['name'=>'test', 'sex'=>'man'];
+        return json(['data'=>$data, 'code'=>1]);
     }
     
 
