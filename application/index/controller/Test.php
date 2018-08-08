@@ -19,9 +19,8 @@ class Test extends Controller
         $list = $Tests->getTest();
         // $Model = model('Test');
         // $list = $Model->getTest();
-        echo '<pre>';
-        print_r($list);
-        echo '</pre>';
+        $this->assign('list', $list);
+        return $this->fetch('getTest');
     }
 
     // 添加

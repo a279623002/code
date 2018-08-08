@@ -8,6 +8,9 @@ class Test extends Model
     public function getTest()
     {
         $result = Db::table('test')->order('id desc')->select();
+        foreach ($result as $key => $value) {
+            $result[$key]['addtime'] = date('Y-m-d H:i:s', $result[$key]['addtime']);
+        }
         return $result;
     }
 
