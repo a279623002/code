@@ -17,7 +17,7 @@ class Index extends Controller
     public function demo(){
         
     }
-    public function check_login(){
+    public function checkLogin(){
             $data=input('post.');  
             $user = model('Index');
             $arr = $user->getAdmin($data['name'],$data['pass']);

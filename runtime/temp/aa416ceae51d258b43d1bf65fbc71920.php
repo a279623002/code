@@ -1,4 +1,4 @@
-<?php if (!defined('THINK_PATH')) exit(); /*a:1:{s:62:"D:\phpStudy\WWW\code./application/index\view\test\getTest.html";i:1533716071;}*/ ?>
+<?php if (!defined('THINK_PATH')) exit(); /*a:1:{s:62:"D:\phpStudy\WWW\code./application/index\view\test\getTest.html";i:1533882151;}*/ ?>
 <!DOCTYPE html>
 <html lang="en">
 
