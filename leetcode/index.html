@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>leetcode</title>
+    <script src="./assets/js/font.js"></script>
+    <link rel="stylesheet" href="assets/css/index.css">
+</head>
+<body>
+<header>catalogue</header>
+<main>
+    <ul>
+        <li data-path="1to25/project01">1. 两数之和</li>
+        <li data-path="1to25/project02">2. 两数相加!</li>
+        <li data-path="1to25/project03">3. 无重复的最长字符串!</li>
+        <li data-path="1to25/project04">4. 寻找两个正序数组的中位数!!</li>
+        <li data-path="1to25/project05">5. 最长回文子串!</li>
+        <li data-path="1to25/project06">6. Z 字形变换!</li>
+        <li data-path="1to25/project07">7. 整数反转</li>
+        <li data-path="1to25/project08">8. 字符串转换整数 (atoi)!</li>
+        <li data-path="1to25/project09">9. 回文数</li>
+        <li data-path="1to25/project10">10. 正则表达式匹配!!</li>
+        <li data-path="1to25/project11">11. 盛最多水的容器!!</li>
+        <li data-path="1to25/project12">12. 整数转罗马数字!!</li>
+        <li data-path="1to25/project13">13. 罗马数字转整数!!</li>
+        <li data-path="1to25/project14">14. 最长公共前缀</li>
+        <li data-path="1to25/project15">15. 三数之和!!</li>
+        <li data-path="1to25/project16">16. 最接近的三数之和!!</li>
+        <li data-path="1to25/project17">17. 电话号码的字母组合!!</li>
+        <li data-path="1to25/project18">18. 四数之和!!</li>
+        <li data-path="1to25/project19">19. 删除链表的倒数第 N 个结点!!</li>
+        <li data-path="1to25/project20">20. 有效的括号</li>
+        <li data-path="1to25/project21">21. 合并两个有序链表</li>
+        <li data-path="1to25/project22">22. 括号生成!!</li>
+        <li data-path="1to25/project23">23. 合并K个升序链表!!</li>
+        <li data-path="1to25/project24">24. 两两交换链表中的节点!</li>
+        <li data-path="1to25/project25">25. K 个一组翻转链表!!</li>
+        <li data-path="26to50/project26">26. 删除有序数组中的重复项</li>
+        <li data-path="26to50/project27">27. 移除元素</li>
+        <li data-path="26to50/project28">28. 实现 strStr()</li>
+        <li data-path="26to50/project29">29. 两数相除!!</li>
+        <li data-path="26to50/project30">30. 串联所有单词的子串!!?</li>
+        <li data-path="26to50/project31">31. 下一个排列!</li>
+        <li data-path="26to50/project32">32. 最长有效括号!!</li>
+        <li data-path="26to50/project33">33. 搜索旋转排序数组!</li>
+        <li data-path="26to50/project34">34. 在排序数组中查找元素的第一个和最后一个位置!</li>
+        <li data-path="26to50/project35">35. 搜索插入位置</li>
+        <li data-path="26to50/project36">36. 有效的数独!</li>
+        <li data-path="26to50/project37">37. 解数独!!</li>
+        <li data-path="26to50/project38">38. 外观数列!</li>
+        <li data-path="26to50/project39">39. 组合总和!</li>
+        <li data-path="26to50/project40">40. 组合总和 II !</li>
+        <li data-path="26to50/project41">41. 缺失的第一个正数!!</li>
+        <li data-path="26to50/project42">42. 接雨水!!</li>
+        <li data-path="26to50/project43">43. 字符串相乘!</li>
+        <li data-path="26to50/project44">44. 通配符匹配 !!</li>
+        <li data-path="26to50/project45">45. 跳跃游戏 II !</li>
+        <li data-path="26to50/project46">46. 全排列 !</li>
+        <li data-path="26to50/project47">47. 全排列 II !</li>
+        <li data-path="26to50/project48">48. 旋转图像 !</li>
+        <li data-path="26to50/project49">49. 字母异位词分组 !</li>
+        <li data-path="26to50/project50">50. Pow(x, n) x^n !</li>
+        <li data-path="51to75/project51">51. N 皇后 !!</li>
+        <li data-path="51to75/project52">52. N皇后 II !!</li>
+        <li data-path="51to75/project53">53. 最大子数组和</li>
+        <li data-path="51to75/project54">54. 螺旋矩阵 !</li>
+        <li data-path="51to75/project55">55. 跳跃游戏 !</li>
+        <li data-path="51to75/project56">56. 合并区间 !</li>
+        <li data-path="51to75/project57">57. 插入区间 !</li>
+        <li data-path="51to75/project58">58. 最后一个单词的长度</li>
+        <li data-path="51to75/project59">59. 螺旋矩阵 II !</li>
+        <li data-path="51to75/project60">60. 排列序列 !!</li>
+        <li data-path="51to75/project61">61. 旋转链表</li>
+    </ul>
+</main>
+<footer></footer>
+<div id="cover"></div>
+<div id="code">
+    <pre></pre>
+</div>
+<script src="./assets/js/jquery-3.6.0.min.js"></script>
+<script type="text/javascript">
+    $('li').on('click', function () {
+        var path = $(this).data('path') + '/main.go'
+
+        $.ajax({
+            url: path, success: function (data) {
+                $('#code pre').html(data)
+                $('#cover').show()
+                $('#code').fadeIn()
+            }
+        })
+    })
+    $('#cover').on('click', function () {
+        $('#code').fadeOut()
+        $(this).hide()
+    })
+</script>
+</body>
+</html>
