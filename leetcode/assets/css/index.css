@@ -11,12 +11,20 @@ body {
 
 header {
     text-align: center;
-    margin: 0 0 .2rem 0;
     font-size: .56rem;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    display: block;
+    width: 100%;
+    background: #FFF;
+    cursor: pointer;
 }
 
 main {
     overflow: hidden;
+    margin-top: .64rem
 }
 
 main ul {
