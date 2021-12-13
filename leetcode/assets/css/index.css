@@ -20,6 +20,7 @@ header {
     width: 100%;
     background: #FFF;
     cursor: pointer;
+    padding: .2rem 0;
 }
 
 main {

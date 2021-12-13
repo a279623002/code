@@ -13,23 +13,25 @@ import "fmt"
 //dp[i][j]=dp[i-1][j]+dp[i][j-1] => dp[j] = dp[j] + dp[j-1]
 func uniquePathsWithObstacles(obstacleGrid [][]int) int {
 	n, m := len(obstacleGrid), len(obstacleGrid[0])
-	f := make([]int, m)
-	if obstacleGrid[0][0] == 0 {
-		f[0] = 1
-	}
+	// 使用滚动数组
+	// 如遍历到A时 a[0] = 1, a[j-1] = 1, a[j] = 1
+	// 下一个遍历B a[0] = 1, a[j-1] = 2, a[j] = 3
+	// B[j] = B[j] + B[j-1] ==> A[j] + B[j-1]
+	arr := make([]int, m)
+	// 初始化为1，后面遍历用-1获取
+	arr[0] = 1
 	for i := 0; i < n; i++ {
 		for j := 0; j < m; j++ {
 			if obstacleGrid[i][j] == 1 {
-				f[j] = 0
+				arr[j] = 0
 				continue
 			}
-			if j - 1 >= 0 && obstacleGrid[i][j-1] == 0 {
-				f[j] += f[j-1]
+			if j > 0 {
+				arr[j] += arr[j-1]
 			}
 		}
-		fmt.Println(f)
 	}
-	return f[len(f)-1]
+	return arr[m-1]
 }
 
 func uniquePathsWithObstacles2(obstacleGrid [][]int) int {
@@ -101,7 +103,5 @@ func uniquePathsWithObstacles1(obstacleGrid [][]int) int {
 }
 
 func main() {
-	fmt.Println(uniquePathsWithObstacles([][]int{{0, 0, 0}, {0, 0, 0}, {0, 1, 0}}))
-	//fmt.Println(uniquePathsWithObstacles([][]int{{1, 0}, {0, 0}}))
-	//fmt.Println(uniquePathsWithObstacles([][]int{{0}}))
+	fmt.Println(uniquePathsWithObstacles([][]int{{0, 0, 0}, {0, 1, 0}, {0, 0, 0}}))
 }
