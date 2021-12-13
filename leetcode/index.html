@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="assets/css/index.css">
 </head>
 <body>
-<header>catalogue</header>
+<header data-path="README.md">mark</header>
 <main>
     <ul>
         <li data-path="1to25/project01">1. 两数之和</li>
@@ -80,6 +80,17 @@
 </div>
 <script src="./assets/js/jquery-3.6.0.min.js"></script>
 <script type="text/javascript">
+    $('header').on('click', function () {
+        var path = $(this).data('path')
+
+        $.ajax({
+            url: path, success: function (data) {
+                $('#code pre').html(data)
+                $('#cover').show()
+                $('#code').fadeIn()
+            }
+        })
+    })
     $('li').on('click', function () {
         var path = $(this).data('path') + '/main.go'
 
