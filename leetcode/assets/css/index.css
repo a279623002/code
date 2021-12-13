@@ -54,6 +54,7 @@ main ul li:nth-child(odd) {
     filter:alpha(opacity=60);  /*设置透明度为60%*/
     opacity:0.6;  /*非IE浏览器下设置透明度为60%*/
     display: none;
+    z-index: 9;
 }
 
 #code {
