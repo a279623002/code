@@ -77,3 +77,6 @@ main ul li:nth-child(odd) {
     width: 0 !important
 }
 
+.alert {
+    color: red;
+}
