@@ -95,6 +95,7 @@
 
         $.ajax({
             url: path, success: function (data) {
+                console.log(data)
                 $('#code pre').html(data)
                 $('#cover').show()
                 $('#code').fadeIn()
