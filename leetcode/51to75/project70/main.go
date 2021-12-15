@@ -17,11 +17,11 @@ func climbStairs(n int) int {
 	// 5 =》 8
 	// dp|i| = dp|i-1| + dp|i-2|
 	o, t, res := 0, 0, 1
-	for i:=0; i<n; i++ {
+	for i := 0; i < n; i++ {
 		// 滚动数组
 		o = t
 		t = res
-		res = o+t
+		res = o + t
 	}
 	return res
 }
