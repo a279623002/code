@@ -13,6 +13,33 @@ import "fmt"
 //[1,4],
 //]
 func combine(n int, k int) [][]int {
+	res := [][]int{}
+	carry := []int{}
+	var fn func(int)
+	fn = func(cur int) {
+		if cur > n+1 {
+			return
+		}
+		// 剪枝
+		if len(carry) == k {
+			res = append(res, append([]int(nil), carry...))
+			return
+		}
+		// 正常分枝伸展
+		//if cur == n+1 {
+		//	res = append(res, append([]int(nil), carry...))
+		//	return
+		//}
+		carry = append(carry, cur)
+		fn(cur + 1)
+		carry = carry[:len(carry)-1]
+		fn(cur + 1)
+	}
+	fn(1)
+	return res
+}
+
+func combine1(n int, k int) [][]int {
 	arr := []int{}
 	for i := 1; i <= n; i++ {
 		arr = append(arr, i)
