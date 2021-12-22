@@ -20,17 +20,24 @@ func printList(node *ListNode) {
 // 1 2	4 3
 // 122 435
 func partition(head *ListNode, x int) *ListNode {
-	tmp := &ListNode{Val:0}
-	cur := head
-	for cur != nil {
-		if cur.Val >= x {
-			tmp.Next = cur
-			tmp = tmp.Next
-		}
-		cur = cur.Next
-	}
 
-	return head
+	small := &ListNode{}
+	smallCur := small
+	large := &ListNode{}
+	largeCur := large
+	for head != nil {
+		if head.Val < x {
+			smallCur.Next = head
+			smallCur = smallCur.Next
+		} else {
+			largeCur.Next = head
+			largeCur = largeCur.Next
+		}
+		head = head.Next
+	}
+	largeCur.Next = nil
+	smallCur.Next = large.Next
+	return small.Next
 }
 
 func main() {
