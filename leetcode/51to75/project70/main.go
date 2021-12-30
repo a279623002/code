@@ -9,6 +9,18 @@ import "fmt"
 //2.  1 阶 + 2 阶
 //3.  2 阶 + 1 阶
 func climbStairs(n int) int {
+	// dp|i| = dp|i-1| + dp|i-2|
+	dp := make([]int, n+1)
+	dp[0] = 1
+	for i := 1; i <= n; i++ {
+		dp[i] += dp[i-1]
+		if i > 1 {
+			dp[i] += dp[i-2]
+		}
+	}
+	return dp[n]
+}
+func climbStairs1(n int) int {
 	// 0 =》 1
 	// 1 =》 1
 	// 2 =》 2
