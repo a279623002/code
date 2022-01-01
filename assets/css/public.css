@@ -23,6 +23,7 @@ a,a:hover,a:active{
     display: flex;
     justify-content: space-around;
     flex-wrap: nowrap;
+    margin-bottom: 1rem;
 }
 
 .col {
