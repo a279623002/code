@@ -44,3 +44,11 @@ a,a:hover,a:active{
     text-align: center;
     z-index: 9999;
 }
+
+.title {
+    box-shadow: 0.05rem 0.05rem 0.05rem purple;
+}
+
+.one_indent {
+    text-indent: 1em;
+}
