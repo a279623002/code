@@ -13,7 +13,8 @@ func printList(node *ListNode) {
 		node = node.Next
 	}
 }
-
+//输入：head = [1,2,3,4,5], left = 2, right = 4
+//输出：[1,4,3,2,5]
 func reverseBetween1(head *ListNode, left int, right int) *ListNode {
 	run := head
 	tmp := &ListNode{}
