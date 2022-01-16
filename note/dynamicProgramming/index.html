@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>动态规划</title>
+    <script src="../../assets/js/font.js"></script>
+    <link rel="stylesheet" href="../../assets/css/public.css">
+    <link rel="stylesheet" href="../../assets/css/note.css">
+</head>
+<body>
+<header></header>
+<main>
+    <p>
+        可划分为求最优子结构，计数
+    </p>
+    <p class="col">计数类--经典路径问题</p>
+    <p class="one_indent">如70，爬楼梯，每次可以爬 1 或 2 个台阶，到达n阶有多少方法</p>
+    <p class="one_indent">定义dp|n|为到达n阶的方法数</p>
+    <p class="one_indent">到达n的上一步，可以爬1阶、或2阶到达</p>
+    <p class="one_indent">所以转移方程为dp|n| = dp|n-1| + dp|n-2| (n > 1)</p>
+    <p class="one_indent">定义初始边界值dp|0| = 1, 既爬第一阶时dp[1] = dp[0]</p>
+    <a href="javascript:history.go(-1);" class="back"></a>
+</main>
+</body>
+</html>
