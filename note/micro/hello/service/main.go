@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/micro/go-micro/v2"
+	"github.com/micro/micro/v3/service"
 	proto "service/proto"
 )
 
@@ -15,8 +15,8 @@ func (g *Greeter) Hello(ctx context.Context, req *proto.Request, rsp *proto.Resp
 }
 
 func main() {
-	service := micro.NewService(
-		micro.Name("greeter"),
+	service := service.New(
+		service.Name("greeter"),
 		)
 	service.Init()
 
