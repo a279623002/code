@@ -9,32 +9,53 @@ import (
 //输出：["255.255.11.135","255.255.111.35"]
 func restoreIpAddresses(s string) []string {
 	// 用小数点正确分割
-	// 1. 只能有三个小数点
-	// 2. 分组只有4个元素
-	// 3. 元素不超过3个
-	// 4. 元素不大于255
-	// 5. 元素0开头只能强制分割，不能01这种
 	res := []string{}
+	totalNum := 4
+	ipAddrs := make([]int, totalNum)
 
-	var fn func(int)
-	fn = func(i int) {
-		if i == len(s) {
+	var fn func(int, int)
+	fn = func(total, start int) {
+		if total == totalNum { // 遍历到最后一段
+			if start == len(s) { // 遍历完字符串
+				ipAddr := ""
+				for i := 0; i < len(ipAddrs); i++ {
+					ipAddr += strconv.Itoa(ipAddrs[i])
+					if i < len(ipAddrs) - 1 {
+						ipAddr += "."
+					}
+				}
+				res = append(res, ipAddr)
+			}
+			return
+		}
 
-		} else {
+		if start == len(s) {
+			// 遍历完但是不够ip的长度
+			return
+		}
 
+		if s[start] == '0' {
+			// 该ip段以0开头的话，这一段只能为0
+			ipAddrs[total] = 0
+			fn(total+1, start+1)
+		}
+
+		addr := 0
+		for end := start; end < len(s); end++ {
+			addr = addr * 10 + int(s[end]-'0')
+			if addr > 0 && addr <= 255 {
+				ipAddrs[total] = addr
+				fn(total+1, end+1)
+			} else {
+				break
+			}
 		}
 	}
-	fn(0)
+	fn(0, 0)
 	return res
 }
 
-func check(s string) bool {
-	i, _ := strconv.Atoi(s)
-	if i > 255 {
-		return true
-	}
-	return false
-}
+
 
 func main() {
 	fmt.Println(restoreIpAddresses("010010"))
