@@ -3,7 +3,7 @@ package handler
 import (
 	"context"
 
-	pb "user-srv/proto"
+	pb "usersrv/proto"
 )
 
 type UserHandler struct {

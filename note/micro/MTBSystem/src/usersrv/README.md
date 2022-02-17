@@ -1,11 +1,11 @@
-# UserSrv Service
+# Usersrv Service
 
-This is the UserSrv service
+This is the Usersrv service
 
 Generated with
 
 ```
-micro new user-srv
+micro new usersrv
 ```
 
 ## Usage

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"user-srv/handler"
-	pb "user-srv/proto"
+	"usersrv/handler"
+	pb "usersrv/proto"
 
 	"github.com/micro/micro/v3/service"
 	"github.com/micro/micro/v3/service/logger"
@@ -11,7 +11,8 @@ import (
 func main() {
 	// Create service
 	srv := service.New(
-		service.Name("user-srv"),
+		service.Name("go.micro.srv.user"),
+		//service.Name("usersrv"),
 		service.Version("latest"),
 	)
 
@@ -28,7 +29,7 @@ func main() {
 	)
 
 	// Register handler
-	pb.RegisterUserServiceHandler(srv.Server(), new(handler.UserHandler))
+	pb.RegisterUsersrvHandler(srv.Server(), new(handler.UserHandler))
 
 	// Run service
 	if err := srv.Run(); err != nil {

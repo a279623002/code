@@ -1,4 +1,4 @@
-module user-srv
+module usersrv
 
 go 1.15
 

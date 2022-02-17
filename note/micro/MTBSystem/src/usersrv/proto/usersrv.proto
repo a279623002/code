@@ -1,8 +1,10 @@
 syntax = "proto3";
 
-package pb;service
+package usersrv;
 
-UserService {
+option go_package = "./proto;usersrv";
+
+service Usersrv {
     rpc InsertUser (InsertUserReq) returns (InsertUserRep){}
     rpc DeletetUser (DeletetUserReq) returns (DeletetUserRep){}
     rpc SelectUser (SelectUserReq) returns (SelectUserRep){}

@@ -9,15 +9,15 @@ init:
 
 .PHONY: api
 api:
-	protoc --openapi_out=. --proto_path=. proto/user-srv.proto
+	protoc --openapi_out=. --proto_path=. proto/usersrv.proto
 
 .PHONY: proto
 proto:
-	protoc --proto_path=. --micro_out=. --go_out=:. proto/user-srv.proto
+	protoc --proto_path=. --micro_out=. --go_out=:. proto/usersrv.proto
 	
 .PHONY: build
 build:
-	go build -o user-srv *.go
+	go build -o usersrv *.go
 
 .PHONY: test
 test:
@@ -25,4 +25,4 @@ test:
 
 .PHONY: docker
 docker:
-	docker build . -t user-srv:latest
+	docker build . -t usersrv:latest
