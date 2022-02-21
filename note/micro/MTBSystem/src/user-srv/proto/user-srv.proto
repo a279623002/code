@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package usersrv;
+
+option go_package = "./;usersrv";
+
+service UserSrv {
+	rpc InsertUser (InsertUserReq) returns (InsertUserResp){}
+	rpc DeleteUser (DeleteUserReq) returns (DeleteUserResp){}
+	rpc SelectUser (SelectUserReq) returns (SelectUserResp){}
+	rpc UpdateUser (UpdateUserReq) returns (UpdateUserResp){}
+}
+
+message User {
+    int32 id = 1;
+    string name = 2;
+    string Address = 3;
+    string Phone = 4;
+}
+
+message UpdateUserReq {
+    User user = 1;
+}
+
+message UpdateUserResp {
+
+}
+
+message SelectUserReq {
+    int32 id = 1;
+}
+
+message SelectUserResp {
+    User user = 1;
+}
+
+message DeleteUserReq {
+    int32 id = 1;
+}
+
+message DeleteUserResp {
+
+}
+
+message InsertUserReq {
+    User user = 1;
+}
+
+message InsertUserResp {
+    User user = 1;
+}
