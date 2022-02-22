@@ -10,7 +10,7 @@ import (
 func main() {
 	// Create service
 	srv := service.New(
-		service.Name("go.micro.user-srv"),
+		service.Name("go.micro.user-srv1"),
 		service.Version("latest"),
 	)
 
