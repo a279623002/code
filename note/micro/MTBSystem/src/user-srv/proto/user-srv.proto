@@ -1,25 +1,28 @@
 syntax = "proto3";
 
-package usersrv;
+package user;
 
-option go_package = "./;usersrv";
+option go_package = "./;user";
 
-service UserSrv {
+service User {
 	rpc InsertUser (InsertUserReq) returns (InsertUserResp){}
 	rpc DeleteUser (DeleteUserReq) returns (DeleteUserResp){}
 	rpc SelectUser (SelectUserReq) returns (SelectUserResp){}
 	rpc UpdateUser (UpdateUserReq) returns (UpdateUserResp){}
 }
 
-message User {
-    int32 id = 1;
+message UserData {
+    int64 id = 1;
     string name = 2;
     string Address = 3;
     string Phone = 4;
 }
 
 message UpdateUserReq {
-    User user = 1;
+    int64 id = 1;
+    string name = 2;
+    string Address = 3;
+    string Phone = 4;
 }
 
 message UpdateUserResp {
@@ -27,15 +30,15 @@ message UpdateUserResp {
 }
 
 message SelectUserReq {
-    int32 id = 1;
+    int64 id = 1;
 }
 
 message SelectUserResp {
-    User user = 1;
+    UserData user = 1;
 }
 
 message DeleteUserReq {
-    int32 id = 1;
+    int64 id = 1;
 }
 
 message DeleteUserResp {
@@ -43,9 +46,12 @@ message DeleteUserResp {
 }
 
 message InsertUserReq {
-    User user = 1;
+    int64 id = 1;
+    string name = 2;
+    string Address = 3;
+    string Phone = 4;
 }
 
 message InsertUserResp {
-    User user = 1;
+    UserData user = 1;
 }

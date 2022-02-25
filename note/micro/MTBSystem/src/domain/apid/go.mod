@@ -1,8 +1,8 @@
 module apid
 
-go 1.16
+go 1.14
 
 require (
-	github.com/micro/go-micro v1.18.0
-	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd
+	github.com/micro/go-micro/v2 v2.9.1
+	golang.org/x/net v0.0.0-20200520182314-0ba52f642ac2
 )

@@ -22,7 +22,8 @@ func (c *UserHandler) DeleteUser(ctx context.Context, req *pb.DeleteUserReq, res
 }
 
 func (c *UserHandler) SelectUser(ctx context.Context, req *pb.SelectUserReq, resp *pb.SelectUserResp) error {
-	resp = &pb.SelectUserResp{User:&pb.User{Id:1}}
+	user := &pb.UserData{Id:req.Id}
+	resp.User = user
 	return nil
 }
 
@@ -30,5 +31,3 @@ func (c *UserHandler) UpdateUser(ctx context.Context, req *pb.UpdateUserReq, res
 	return nil
 }
 
-
-var _ pb.UserSrvHandler = (*UserHandler)(nil)

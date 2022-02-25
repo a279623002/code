@@ -1,32 +1,33 @@
 package main
 
 import (
-	"github.com/micro/micro/v3/service"
-	"github.com/micro/micro/v3/service/logger"
-	pb "user-srv/proto"
+	"github.com/micro/cli/v2"
+	"github.com/micro/go-micro/v2"
+	"log"
 	"user-srv/handler"
+	pb "user-srv/proto"
 )
 
 func main() {
 	// Create service
-	srv := service.New(
-		service.Name("go.micro.user-srv1"),
-		service.Version("latest"),
+	srv := micro.NewService(
+		micro.Name("go.micro.user"),
+		micro.Version("latest"),
 	)
 
-	// Register handler
-	err := pb.RegisterUserSrvHandler(srv.Server(), new(handler.UserHandler))
-	if err != nil {
-		panic(err)
-	}
-
 	srv.Init(
-		service.AfterStop(func() error {
-			logger.Info("user-srv stot")
+		micro.Action(func(c *cli.Context) error {
+			pb.RegisterUserHandler(srv.Server(), new(handler.UserHandler))
 			return nil
 		}),
-		service.AfterStart(func() error {
-			logger.Info("user-srv start")
+		micro.AfterStart(func() error {
+
+			log.Println("user-srv start")
+			return nil
+		}),
+		micro.AfterStop(func() error {
+
+			log.Println("user-srv stop")
 			return nil
 		}),
 	)
@@ -34,6 +35,6 @@ func main() {
 
 	// Run service
 	if err := srv.Run(); err != nil {
-		logger.Fatal(err)
+		log.Fatal(err)
 	}
 }
