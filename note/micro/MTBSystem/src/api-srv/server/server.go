@@ -29,7 +29,10 @@ func (a *Api) Run(port string) {
 
 	user := a.route.Group("/user")
 	{
-		user.GET("/selectUser", GrpcHandler)
+		user.POST("/registAccount", GrpcHandler)
+		user.POST("/loginAccount", GrpcHandler)
+		user.POST("/wantScore", GrpcHandler)
+		user.POST("/updateUserProfile", GrpcHandler)
 	}
 	a.route.Run(port)
 }
@@ -60,7 +63,7 @@ var GrpcHandler = func(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusOK, gin.H{
 			"code": 1,
-			"data": grpc.Req,
+			"data": grpc.Rsp,
 		})
 	}
 }

@@ -1,0 +1,39 @@
+supervisor: couldn't setuid to 0: Can't drop privilege as nonroot user
+supervisor: child process was not spawned
+supervisor: couldn't setuid to 0: Can't drop privilege as nonroot user
+supervisor: child process was not spawned
+supervisor: couldn't setuid to 0: Can't drop privilege as nonroot user
+supervisor: child process was not spawned
+supervisor: couldn't setuid to 0: Can't drop privilege as nonroot user
+supervisor: child process was not spawned
+supervisor: couldn't setuid to 0: Can't drop privilege as nonroot user
+supervisor: child process was not spawned
+supervisor: couldn't setuid to 0: Can't drop privilege as nonroot user
+supervisor: child process was not spawned
+supervisor: couldn't setuid to 0: Can't drop privilege as nonroot user
+supervisor: child process was not spawned
+supervisor: couldn't setuid to 0: Can't drop privilege as nonroot user
+supervisor: child process was not spawned
+[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /                         --> api-srv/server.glob..func1 (3 handlers)
+[GIN-debug] GET    /user/selectUser          --> api-srv/server.glob..func2 (3 handlers)
+[GIN-debug] [WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.
+Please check https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-proxies for details.
+[GIN-debug] Listening and serving HTTP on :8099
+[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /                         --> api-srv/server.glob..func1 (3 handlers)
+[GIN-debug] GET    /user/selectUser          --> api-srv/server.glob..func2 (3 handlers)
+[GIN-debug] [WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.
+Please check https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-proxies for details.
+[GIN-debug] Listening and serving HTTP on :8099
+[GIN] 2022/02/26 - 16:50:24 | 200 |  127.371926ms |             ::1 | GET      "/user/selectUser?id=22"

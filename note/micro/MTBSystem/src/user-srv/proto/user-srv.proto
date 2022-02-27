@@ -5,53 +5,68 @@ package user;
 option go_package = "./;user";
 
 service User {
-	rpc InsertUser (InsertUserReq) returns (InsertUserResp){}
-	rpc DeleteUser (DeleteUserReq) returns (DeleteUserResp){}
-	rpc SelectUser (SelectUserReq) returns (SelectUserResp){}
-	rpc UpdateUser (UpdateUserReq) returns (UpdateUserResp){}
+   // 注册用户
+   rpc RegistAccount(RegistAccountReq) returns(RegistAccountRsp) {}
+   // 用户登录
+   rpc LoginAccount(LoginAccountReq) returns(LoginAccountRsp) {}
+   // 密码重置
+   rpc ResetAccount(ResetAccountReq) returns(ResetAccountRsp) {}
+   // 评分
+   rpc WantScore(WantScoreReq) returns (WantScoreRsp) {}
+   // 修改用户信息
+   rpc UpdateUserProfile(UpdateUserProfileReq) returns (UpdateUserProfileRsp) {}
 }
 
-message UserData {
-    int64 id = 1;
-    string name = 2;
-    string Address = 3;
-    string Phone = 4;
+
+
+message RegistAccountReq {
+    string email = 1 ;
+    string userName = 2 ;
+    string password = 3 ;
 }
 
-message UpdateUserReq {
-    int64 id = 1;
-    string name = 2;
-    string Address = 3;
-    string Phone = 4;
+message RegistAccountRsp {
 }
 
-message UpdateUserResp {
-
+message LoginAccountReq {
+    string email = 1 ;
+    string password = 2 ;
 }
 
-message SelectUserReq {
-    int64 id = 1;
+message LoginAccountRsp {
+    int64 userID = 1;
+    string userName = 2;
+    string email = 3;
+    string phone = 4;
 }
 
-message SelectUserResp {
-    UserData user = 1;
-}
-
-message DeleteUserReq {
-    int64 id = 1;
-}
-
-message DeleteUserResp {
+message ResetAccountReq {
 
 }
 
-message InsertUserReq {
-    int64 id = 1;
-    string name = 2;
-    string Address = 3;
-    string Phone = 4;
+message ResetAccountRsp {
+
 }
 
-message InsertUserResp {
-    UserData user = 1;
+message WantScoreReq {
+    int64 userId = 1 ;
+    int64 movieId = 2 ; // 订单编号
+    int64 score = 3 ;
+}
+
+message WantScoreRsp {
+
+}
+
+message UpdateUserProfileReq {
+
+    string userImage = 1;
+    string userName = 2;
+    string userEmail = 3;
+    string userPhone = 4;
+    int64 userID = 5;
+}
+
+message UpdateUserProfileRsp {
+
 }
