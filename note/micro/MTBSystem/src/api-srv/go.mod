@@ -3,6 +3,7 @@ module api-srv
 go 1.16
 
 require (
+	cinema-srv v0.0.0-00010101000000-000000000000
 	config v0.0.0-00010101000000-000000000000
 	github.com/gin-gonic/gin v1.7.7
 	github.com/micro/go-micro/v2 v2.9.1
@@ -11,6 +12,8 @@ require (
 )
 
 replace (
+	cinema-srv => ../cinema-srv
 	config => ../../config
 	user-srv => ../user-srv
+	utils => ../../utils
 )

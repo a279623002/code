@@ -34,6 +34,12 @@ func (a *Api) Run(port string) {
 		user.POST("/wantScore", GrpcHandler)
 		user.POST("/updateUserProfile", GrpcHandler)
 	}
+	cinema := a.route.Group("/cinema")
+	{
+		cinema.GET("/locationCinema", GrpcHandler)
+		cinema.GET("/getCinemaMessageByCid", GrpcHandler)
+		cinema.GET("/getMovieHallByMHId", GrpcHandler)
+	}
 	a.route.Run(port)
 }
 
