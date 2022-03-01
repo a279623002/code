@@ -40,6 +40,21 @@ func (a *Api) Run(port string) {
 		cinema.GET("/getCinemaMessageByCid", GrpcHandler)
 		cinema.GET("/getMovieHallByMHId", GrpcHandler)
 	}
+	place := a.route.Group("/place")
+	{
+		place.GET("/hotCitiesByCinema", GrpcHandler)
+	}
+	film := a.route.Group("/film")
+	{
+		film.GET("/hotPlayMovies", GrpcHandler)
+		film.GET("/movieDetail", GrpcHandler)
+		film.GET("/movieCreditsWithTypes", GrpcHandler)
+		film.GET("/imageAll", GrpcHandler)
+		film.GET("/locationMovies", GrpcHandler)
+		film.GET("/movieComingNew", GrpcHandler)
+		film.GET("/getFilmsByCidADay", GrpcHandler)
+		film.GET("/search", GrpcHandler)
+	}
 	a.route.Run(port)
 }
 

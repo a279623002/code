@@ -4,7 +4,9 @@ import (
 	cinema "cinema-srv/proto"
 	"config"
 	"errors"
+	film "film-srv/proto"
 	"github.com/gin-gonic/gin"
+	place "place-srv/proto"
 	"strconv"
 	"strings"
 	user "user-srv/proto"
@@ -48,10 +50,141 @@ func GetGrpc(c *gin.Context) (grpc *Grpc, err error) {
 			grpc = GetMovieHallByMHId(c, config.Namespace+config.ServiceNameCinema, "Cinema.GetMovieHallByMHId")
 		}
 	}
+	if paths[1] == "place" {
+		if paths[2] == "hotCitiesByCinema" {
+			grpc = HotCitiesByCinema(c, config.Namespace+config.ServiceNamePlace, "Place.HotCitiesByCinema")
+		}
+	}
+
+	if paths[1] == "film" {
+		if paths[2] == "hotPlayMovies" {
+			grpc = HotPlayMovies(c, config.Namespace+config.ServiceNameFilm, "Film.HotPlayMovies")
+		}
+		if paths[2] == "movieDetail" {
+			grpc = MovieDetail(c, config.Namespace+config.ServiceNameFilm, "Film.MovieDetail")
+		}
+		if paths[2] == "movieCreditsWithTypes" {
+			grpc = MovieCreditsWithTypes(c, config.Namespace+config.ServiceNameFilm, "Film.MovieCreditsWithTypes")
+		}
+		if paths[2] == "imageAll" {
+			grpc = ImageAll(c, config.Namespace+config.ServiceNameFilm, "Film.ImageAll")
+		}
+		if paths[2] == "locationMovies" {
+			grpc = LocationMovies(c, config.Namespace+config.ServiceNameFilm, "Film.LocationMovies")
+		}
+		if paths[2] == "movieComingNew" {
+			grpc = MovieComingNew(c, config.Namespace+config.ServiceNameFilm, "Film.MovieComingNew")
+		}
+		if paths[2] == "getFilmsByCidADay" {
+			grpc = GetFilmsByCidADay(c, config.Namespace+config.ServiceNameFilm, "Film.GetFilmsByCidADay")
+		}
+		if paths[2] == "search" {
+			grpc = Search(c, config.Namespace+config.ServiceNameFilm, "Film.Search")
+		}
+	}
+
 	if grpc == nil {
 		err = errors.New("couldn`t found services")
 	}
 	return
+}
+
+
+func Search(c *gin.Context, service, endpoint string) *Grpc {
+	return &Grpc{
+		Service:  service,
+		Endpoint: endpoint,
+		Req:      &film.SearchReq{},
+		Rsp:      &film.SearchRep{},
+	}
+}
+
+func GetFilmsByCidADay(c *gin.Context, service, endpoint string) *Grpc {
+	cinemaId, _ := strconv.Atoi(c.Query("cinemaId"))
+	filmId, _ := strconv.Atoi(c.Query("filmId"))
+	dayNum, _ := strconv.Atoi(c.Query("dayNum"))
+	return &Grpc{
+		Service:  service,
+		Endpoint: endpoint,
+		Req: &film.GetFilmsByCidADayReq{
+			CinemaId: int64(cinemaId),
+			FilmId:   int64(filmId),
+			DayNum:   int64(dayNum),
+		},
+		Rsp: &film.GetFilmsByCidADayRsp{},
+	}
+}
+
+func MovieComingNew(c *gin.Context, service, endpoint string) *Grpc {
+	return &Grpc{
+		Service:  service,
+		Endpoint: endpoint,
+		Req:      &film.MovieComingNewReq{},
+		Rsp:      &film.MovieComingNewRep{},
+	}
+}
+
+func LocationMovies(c *gin.Context, service, endpoint string) *Grpc {
+	return &Grpc{
+		Service:  service,
+		Endpoint: endpoint,
+		Req:      &film.LocationMoviesReq{},
+		Rsp:      &film.LocationMoviesRep{},
+	}
+}
+
+func ImageAll(c *gin.Context, service, endpoint string) *Grpc {
+	movieId, _ := strconv.Atoi(c.Query("movieId"))
+	return &Grpc{
+		Service:  service,
+		Endpoint: endpoint,
+		Req: &film.ImageAllReq{
+			MovieId: int64(movieId),
+		},
+		Rsp: &film.ImageAllRep{},
+	}
+}
+
+func MovieCreditsWithTypes(c *gin.Context, service, endpoint string) *Grpc {
+	movieId, _ := strconv.Atoi(c.Query("movieId"))
+	return &Grpc{
+		Service:  service,
+		Endpoint: endpoint,
+		Req: &film.MovieCreditsWithTypesReq{
+			MovieId: int64(movieId),
+		},
+		Rsp: &film.MovieCreditsWithTypesRep{},
+	}
+}
+
+func MovieDetail(c *gin.Context, service, endpoint string) *Grpc {
+	movieId, _ := strconv.Atoi(c.Query("movieId"))
+	return &Grpc{
+		Service:  service,
+		Endpoint: endpoint,
+		Req: &film.MovieDetailReq{
+			MovieId: int64(movieId),
+		},
+		Rsp: &film.MovieDetailRep{},
+	}
+}
+
+func HotPlayMovies(c *gin.Context, service, endpoint string) *Grpc {
+	return &Grpc{
+		Service:  service,
+		Endpoint: endpoint,
+		Req:      &film.HotPlayMoviesReq{},
+		Rsp:      &film.HotPlayMoviesRep{},
+	}
+}
+
+func HotCitiesByCinema(c *gin.Context, service, endpoint string) *Grpc {
+	return &Grpc{
+		Service:  service,
+		Endpoint: endpoint,
+		Req:      &place.HotCitiesByCinemaReq{},
+		Rsp:      &place.HotCitiesByCinemaRep{},
+	}
 }
 
 func GetMovieHallByMHId(c *gin.Context, service, endpoint string) *Grpc {
