@@ -1,16 +1,15 @@
 package server
 
 import (
-	"context"
+	"api-srv/server/handler"
 	"github.com/gin-gonic/gin"
 	"github.com/micro/go-micro/v2"
 	"github.com/micro/go-micro/v2/client"
-	"net/http"
 )
 
 type Api struct {
 	client *client.Client
-	route *gin.Engine
+	route  *gin.Engine
 }
 
 func NewApi() *Api {
@@ -29,31 +28,31 @@ func (a *Api) Run(port string) {
 
 	user := a.route.Group("/user")
 	{
-		user.POST("/registAccount", GrpcHandler)
-		user.POST("/loginAccount", GrpcHandler)
-		user.POST("/wantScore", GrpcHandler)
-		user.POST("/updateUserProfile", GrpcHandler)
+		user.POST("/registAccount", handler.RegistAccount)
+		user.POST("/loginAccount", handler.LoginAccount)
+		user.POST("/wantScore", handler.WantScore)
+		user.POST("/updateUserProfile", handler.UpdateUserProfile)
 	}
 	cinema := a.route.Group("/cinema")
 	{
-		cinema.GET("/locationCinema", GrpcHandler)
-		cinema.GET("/getCinemaMessageByCid", GrpcHandler)
-		cinema.GET("/getMovieHallByMHId", GrpcHandler)
+		cinema.GET("/locationCinema", handler.LocationCinema)
+		cinema.GET("/getCinemaMessageByCid", handler.GetCinemaMessageByCid)
+		cinema.GET("/getMovieHallByMHId", handler.GetMovieHallByMHId)
 	}
 	place := a.route.Group("/place")
 	{
-		place.GET("/hotCitiesByCinema", GrpcHandler)
+		place.GET("/hotCitiesByCinema", handler.HotCitiesByCinema)
 	}
 	film := a.route.Group("/film")
 	{
-		film.GET("/hotPlayMovies", GrpcHandler)
-		film.GET("/movieDetail", GrpcHandler)
-		film.GET("/movieCreditsWithTypes", GrpcHandler)
-		film.GET("/imageAll", GrpcHandler)
-		film.GET("/locationMovies", GrpcHandler)
-		film.GET("/movieComingNew", GrpcHandler)
-		film.GET("/getFilmsByCidADay", GrpcHandler)
-		film.GET("/search", GrpcHandler)
+		film.GET("/hotPlayMovies", handler.HotPlayMovies)
+		film.GET("/movieDetail", handler.MovieDetail)
+		film.GET("/movieCreditsWithTypes", handler.MovieCreditsWithTypes)
+		film.GET("/imageAll", handler.ImageAll)
+		film.GET("/locationMovies", handler.LocationMovies)
+		film.GET("/movieComingNew", handler.MovieComingNew)
+		film.GET("/getFilmsByCidADay", handler.GetFilmsByCidADay)
+		film.GET("/search", handler.Search)
 	}
 	a.route.Run(port)
 }
@@ -63,28 +62,4 @@ var DefaultHandler = func(c *gin.Context) {
 		"code": 1,
 		"msg":  "hello",
 	})
-}
-
-var GrpcHandler = func(c *gin.Context) {
-	grpc, err := GetGrpc(c)
-	if err != nil {
-		c.JSON(http.StatusBadGateway, gin.H{
-			"code": -1,
-			"msg":  err.Error(),
-		})
-		return
-	}
-	req := client.NewRequest(grpc.Service, grpc.Endpoint, grpc.Req)
-
-	if err := client.Call(context.Background(), req, grpc.Rsp); err != nil {
-		c.JSON(http.StatusBadGateway, gin.H{
-			"code": -1,
-			"msg":  err,
-		})
-	} else {
-		c.JSON(http.StatusOK, gin.H{
-			"code": 1,
-			"data": grpc.Rsp,
-		})
-	}
 }

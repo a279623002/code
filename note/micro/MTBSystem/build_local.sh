@@ -9,7 +9,7 @@ run() {
   fi
 
   go build -o $project
-  chmod -x $project
+  chmod +x $project
 
   sudo supervisorctl restart $srv:*
   cd ../../
