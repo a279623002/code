@@ -28,10 +28,10 @@ func (a *Api) Run(port string) {
 
 	user := a.route.Group("/user")
 	{
-		user.POST("/registAccount", handler.RegistAccount)
-		user.POST("/loginAccount", handler.LoginAccount)
-		user.POST("/wantScore", handler.WantScore)
-		user.POST("/updateUserProfile", handler.UpdateUserProfile)
+		user.GET("/registAccount", handler.RegistAccount)
+		user.GET("/loginAccount", handler.LoginAccount)
+		user.GET("/wantScore", handler.WantScore)
+		user.GET("/updateUserProfile", handler.UpdateUserProfile)
 	}
 	cinema := a.route.Group("/cinema")
 	{
@@ -53,6 +53,25 @@ func (a *Api) Run(port string) {
 		film.GET("/movieComingNew", handler.MovieComingNew)
 		film.GET("/getFilmsByCidADay", handler.GetFilmsByCidADay)
 		film.GET("/search", handler.Search)
+	}
+	comment := a.route.Group("/comment")
+	{
+		comment.GET("/hotComment", handler.HotComment)
+		comment.GET("/makeComment", handler.MakeComment)
+		comment.GET("/upNumComment", handler.UpNumComment)
+		comment.GET("/myComments", handler.MyComments)
+		comment.GET("/deleteComment", handler.DeleteComment)
+	}
+	order := a.route.Group("/order")
+	{
+		order.GET("/WantTicket", handler.WantTicket)
+		order.GET("/Ticket", handler.Ticket)
+		order.GET("/PayOrder", handler.PayOrder)
+		order.GET("/UndoOrder", handler.UndoOrder)
+		order.GET("/LookOrders", handler.LookOrders)
+		order.GET("/LookAlreadyOrders", handler.LookAlreadyOrders)
+		order.GET("/OrderComment", handler.OrderComment)
+		order.GET("/GetOrderMessage", handler.GetOrderMessage)
 	}
 	a.route.Run(port)
 }
