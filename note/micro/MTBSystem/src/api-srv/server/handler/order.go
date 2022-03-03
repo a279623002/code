@@ -19,6 +19,7 @@ var (
 	endpointLookAlreadyOrders = "Order.LookAlreadyOrders"
 	endpointOrderComment      = "Order.OrderComment"
 	endpointGetOrderMessage   = "Order.GetOrderMessage"
+	endpointPayOrder          = "Order.PayOrder"
 )
 
 func GetOrderMessage(c *gin.Context) {

@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	cinema-srv v0.0.0-00010101000000-000000000000
+	cms-srv v0.0.0-00010101000000-000000000000
 	comment-srv v0.0.0-00010101000000-000000000000
 	config v0.0.0-00010101000000-000000000000
 	film-srv v0.0.0-00010101000000-000000000000
@@ -17,6 +18,7 @@ require (
 
 replace (
 	cinema-srv => ../cinema-srv
+	cms-srv => ../cms-srv
 	comment-srv => ../comment-srv
 	config => ../../config
 	film-srv => ../film-srv
