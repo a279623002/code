@@ -72,12 +72,12 @@ func (u *UserHandler) WantScore(ctx context.Context, req *pb.WantScoreReq, rsp *
 		//return errors.ErrorUserFailed
 		return errors.New("操作异常")
 	}
-	if orderNum == 0 {
+	if orderNum == "" {
 		//u.logger.Error("error", zap.Error(err))
 		//return errors.ErrorScoreForbid
 		return errors.New("你没有买过该电影票，无法进行评分")
 	}
-	err = db.UpdateOrderScore(req.MovieId, req.Score)
+	err = db.UpdateOrderScore(orderNum, req.Score)
 	if err != nil {
 		//u.logger.Error("error", zap.Error(err))
 		//return errors.ErrorUserFailed
