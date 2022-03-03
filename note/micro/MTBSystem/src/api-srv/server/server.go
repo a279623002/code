@@ -73,10 +73,11 @@ func (a *Api) Run(port string) {
 		order.POST("/orderComment", handler.OrderComment)
 		order.POST("/getOrderMessage", handler.GetOrderMessage)
 	}
+	// 管理admin，user，order
 	cms := a.route.Group("/cms")
 	{
 		cms.POST("/userLogin", handler.UserLogin)
-		cms.POST("/updateMessage", handler.UpdateMessage)
+		cms.POST("/updateMessage", handler.UpdateMessage) //无操作
 		cms.POST("/allFilms", handler.AllFilms)
 		cms.POST("/allUsers", handler.AllUsers)
 		cms.POST("/allAdminUsers", handler.AllAdminUsers)
@@ -91,12 +92,12 @@ func (a *Api) Run(port string) {
 		cms.POST("/updateAddress", handler.UpdateAddress)
 		cms.POST("/deleteAddress", handler.DeleteAddress)
 		cms.POST("/deleteAdminUser", handler.DeleteAdminUser)
-		cms.POST("/allMovieHall", handler.AllMovieHall)
+		cms.POST("/allMovieHall", handler.AllMovieHall) // 放映厅信息
 		cms.POST("/addMovieHall", handler.AddMovieHall)
 		cms.POST("/updateMovieHall", handler.UpdateMovieHall)
 		cms.POST("/deleteMovieHall", handler.DeleteMovieHall)
 		cms.POST("/allCinemaFilms", handler.AllCinemaFilms)
-		cms.POST("/addCinemaFilm", handler.AddCinemaFilm)
+		cms.POST("/addCinemaFilm", handler.AddCinemaFilm) // 给影院添加影片
 		cms.POST("/updateCinemaFilm", handler.UpdateCinemaFilm)
 		cms.POST("/deleteCinemaFilm", handler.DeleteCinemaFilm)
 		cms.POST("/registerCinema", handler.RegisterCinema)

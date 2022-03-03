@@ -4,6 +4,6 @@ CREATE TABLE admin_user(
     admin_password CHAR(20) NOT NULL DEFAULT '' COMMENT '登录密码',
     admin_cinema_id INT(11) NOT NULL DEFAULT 0 COMMENT 'admin的时候为-1，初始值为0',
     admin_last_login_time CHAR(20) NOT NULL DEFAULT '' COMMENT '上次登录时间',
-    admin_num TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '权限,0为默认值，1为总管',
+    admin_num TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '权限,0为默认值只可以查看所属影院，1为超级管理员可以查看所有的信息',
     PRIMARY KEY(au_id)
 )ENGINE=InnoDB DEFAULT CHARSET = utf8;

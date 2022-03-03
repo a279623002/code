@@ -379,7 +379,7 @@ func (c *CMSServiceExtHandler) AddFilm(ctx context.Context, req *pb.AddFilmReq, 
 		RMonth:           req.RMonth,
 		RYear:            req.RYear,
 	}
-	filmID, err := db.InsertFilm(&film)
+	filmID, err := db.InsertFilm(&film) // 返回的id是由titlecn查询的，但titlecn未指定唯一
 	if err != nil {
 		return errors.New("操作异常")
 	}
@@ -387,6 +387,7 @@ func (c *CMSServiceExtHandler) AddFilm(ctx context.Context, req *pb.AddFilmReq, 
 		NameCN:     req.FilmDirector,
 		ActorPhoto: req.FilmDirectorImg,
 	}
+	// 插入导演
 	err, directorID := db.InsertActor(&director, config.DirectorType)
 	if err != nil {
 		return errors.New("操作异常")
@@ -398,6 +399,7 @@ func (c *CMSServiceExtHandler) AddFilm(ctx context.Context, req *pb.AddFilmReq, 
 	if err != nil {
 		return errors.New("操作异常")
 	}
+	// 插入主演
 	if req.FilmActor1 != "" {
 		filmActor1 := entity.Actor{
 			NameCN:     req.FilmActor1,

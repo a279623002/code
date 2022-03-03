@@ -407,11 +407,13 @@ func UpdateAddress(c *gin.Context) {
 	pinyinFull := c.Query("pinyinFull")
 	pinyinShort := c.Query("pinyinShort")
 	adminID, _ := strconv.Atoi(c.Query("adminID"))
+	id, _ := strconv.Atoi(c.Query("id"))
 	grpcReq := &cms.UpdateAddressReq{
-		AdminID:     int64(adminID),
+		Id:          int64(id),
 		Name:        name,
 		PinyinFull:  pinyinFull,
 		PinyinShort: pinyinShort,
+		AdminID:     int64(adminID),
 	}
 	grpcRsp := &cms.UpdateAddressRsp{}
 
@@ -530,7 +532,6 @@ func UpdateFilm(c *gin.Context) {
 	rDay, _ := strconv.Atoi(c.Query("rDay"))
 	rMonth, _ := strconv.Atoi(c.Query("rMonth"))
 	rYear, _ := strconv.Atoi(c.Query("rYear"))
-	rYMD := c.Query("rYMD")
 	grpcReq := &cms.UpdateFilmReq{
 		MovieID:       int64(movieID),
 		Img:           img,
@@ -547,7 +548,6 @@ func UpdateFilm(c *gin.Context) {
 		RDay:          int64(rDay),
 		RMonth:        int64(rMonth),
 		RYear:         int64(rYear),
-		RYMD:          rYMD,
 		AdminID:       int64(adminID),
 		IsTicking:     int64(isTicking),
 	}
