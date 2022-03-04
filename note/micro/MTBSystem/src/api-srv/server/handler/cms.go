@@ -7,7 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/micro/go-micro/v2/client"
 	"net/http"
-	"net/url"
 	"strconv"
 )
 
@@ -571,13 +570,13 @@ func UpdateFilm(c *gin.Context) {
 
 func AddFilm(c *gin.Context) {
 	adminID, _ := strconv.Atoi(c.Query("adminID"))
-	img:= c.Query("img")
+	img := c.Query("img")
 	length, _ := strconv.Atoi(c.Query("length"))
 	filmPrice, _ := strconv.ParseFloat(c.Query("filmPrice"), 32)
 	filmScreenwriter := c.Query("filmScreenwriter")
 	filmDirector := c.Query("filmDirector")
-	titleCn:= c.Query("titleCn")
-	titleEn:= c.Query("titleEn")
+	titleCn := c.Query("titleCn")
+	titleEn := c.Query("titleEn")
 	t := c.Query("type")
 	filmDrama := c.Query("filmDrama")
 	commonSpecial := c.Query("commonSpecial")
@@ -596,31 +595,31 @@ func AddFilm(c *gin.Context) {
 	filmActor2 := c.Query("filmActor2")
 	filmActor2Img := c.Query("filmActor2Img")
 	grpcReq := &cms.AddFilmReq{
-		AdminID:              int64(adminID),
-		Img:                  img,
-		Length:               int64(length),
-		FilmPrice:            float32(filmPrice),
-		FilmScreenwriter:     filmScreenwriter,
-		FilmDirector:         filmDirector,
-		TitleCn:              titleCn,
-		TitleEn:              titleEn,
-		Type:                 t,
-		FilmDrama:            filmDrama,
-		CommonSpecial:        commonSpecial,
-		CompanyIssued:        companyIssued,
-		Country:              country,
-		Is3D:                 int64(is3D),
-		IsDMAX:               int64(isDMAX),
-		IsIMAX:               int64(isIMAX),
-		IsIMAX3D:             int64(isIMAX3D),
-		RDay:                 int64(rDay),
-		RMonth:               int64(rMonth),
-		RYear:                int64(rYear),
-		FilmDirectorImg:      filmDirectorImg,
-		FilmActor1:           filmActor1,
-		FilmActor1Img:        filmActor1Img,
-		FilmActor2:           filmActor2,
-		FilmActor2Img:        filmActor2Img,
+		AdminID:          int64(adminID),
+		Img:              img,
+		Length:           int64(length),
+		FilmPrice:        float32(filmPrice),
+		FilmScreenwriter: filmScreenwriter,
+		FilmDirector:     filmDirector,
+		TitleCn:          titleCn,
+		TitleEn:          titleEn,
+		Type:             t,
+		FilmDrama:        filmDrama,
+		CommonSpecial:    commonSpecial,
+		CompanyIssued:    companyIssued,
+		Country:          country,
+		Is3D:             int64(is3D),
+		IsDMAX:           int64(isDMAX),
+		IsIMAX:           int64(isIMAX),
+		IsIMAX3D:         int64(isIMAX3D),
+		RDay:             int64(rDay),
+		RMonth:           int64(rMonth),
+		RYear:            int64(rYear),
+		FilmDirectorImg:  filmDirectorImg,
+		FilmActor1:       filmActor1,
+		FilmActor1Img:    filmActor1Img,
+		FilmActor2:       filmActor2,
+		FilmActor2Img:    filmActor2Img,
 	}
 	grpcRsp := &cms.AddFilmRsp{}
 
