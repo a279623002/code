@@ -3,7 +3,8 @@
 3. docker
 2. mysql(in docker)
 4. supervisor(management services in docker)
-5. go-env mod (in docker)
+5. go-vesion 1.14.1 (in docker)
+6. go-env mod (in docker)
 
 ##### micro install
 ```
