@@ -10,6 +10,7 @@ if [ $1 == "chmod" ]; then
     sudo touch /var/run/mysqld/mysqld.sock
     sudo chmod 777 /var/run/supervisor.sock
     sudo chmod 777 /var/run/mysqld/mysqld.sock
+    sudo service mysql restart
     sudo service supervisor restart
 fi
 if [ $1 == "conf" ]; then
@@ -17,6 +18,7 @@ if [ $1 == "conf" ]; then
     cp /data/deploy/mtbsystem/dockerbase/supervisor/*conf /etc/supervisor/conf.d/
     # 将conf的文件复制到指定目录
     cp /data/deploy/mtbsystem/dockerbase/conf/redis.conf /etc/redis/6379.conf
+    cp /data/deploy/mtbsystem/dockerbase/conf/my.cnf /etc/mysql/my.cnf
 
     # 创建数据库和表
     mysql -u root -e "CREATE DATABASE $Database"

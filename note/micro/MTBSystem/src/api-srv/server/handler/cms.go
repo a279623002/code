@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/micro/go-micro/v2/client"
 	"net/http"
+	"net/url"
 	"strconv"
 )
 
@@ -570,35 +571,22 @@ func UpdateFilm(c *gin.Context) {
 
 func AddFilm(c *gin.Context) {
 	adminID, _ := strconv.Atoi(c.Query("adminID"))
-	img := c.Query("img")
+	img:= c.Query("img")
 	length, _ := strconv.Atoi(c.Query("length"))
-	isSelectSeat, _ := strconv.Atoi(c.Query("isSelectSeat"))
 	filmPrice, _ := strconv.ParseFloat(c.Query("filmPrice"), 32)
 	filmScreenwriter := c.Query("filmScreenwriter")
 	filmDirector := c.Query("filmDirector")
-	commentNum, _ := strconv.Atoi(c.Query("commentNum"))
-	titleCn := c.Query("titleCn")
-	titleEn := c.Query("titleEn")
-	isSupportInlineWatch, _ := strconv.Atoi(c.Query("isSupportInlineWatch"))
-	createAt := c.Query("createAt")
+	titleCn:= c.Query("titleCn")
+	titleEn:= c.Query("titleEn")
 	t := c.Query("type")
 	filmDrama := c.Query("filmDrama")
 	commonSpecial := c.Query("commonSpecial")
-	userAccessTimes, _ := strconv.Atoi(c.Query("userAccessTimes"))
-	filmBoxoffice, _ := strconv.ParseFloat(c.Query("filmBoxoffice"), 32)
-	wantedCount, _ := strconv.Atoi(c.Query("wantedCount"))
-	userCommentTimes, _ := strconv.Atoi(c.Query("userCommentTimes"))
 	companyIssued := c.Query("companyIssued")
 	country := c.Query("country")
-	ratingFinal, _ := strconv.ParseFloat(c.Query("ratingFinal"), 32)
 	is3D, _ := strconv.Atoi(c.Query("is3D"))
 	isDMAX, _ := strconv.Atoi(c.Query("isDMAX"))
-	isFilter, _ := strconv.Atoi(c.Query("isFilter"))
-	isHot, _ := strconv.Atoi(c.Query("isHot"))
 	isIMAX, _ := strconv.Atoi(c.Query("isIMAX"))
 	isIMAX3D, _ := strconv.Atoi(c.Query("isIMAX3D"))
-	isNew, _ := strconv.Atoi(c.Query("isNew"))
-	isTicking, _ := strconv.Atoi(c.Query("isTicking"))
 	rDay, _ := strconv.Atoi(c.Query("rDay"))
 	rMonth, _ := strconv.Atoi(c.Query("rMonth"))
 	rYear, _ := strconv.Atoi(c.Query("rYear"))
@@ -611,33 +599,20 @@ func AddFilm(c *gin.Context) {
 		AdminID:              int64(adminID),
 		Img:                  img,
 		Length:               int64(length),
-		IsSelectSeat:         int64(isSelectSeat),
 		FilmPrice:            float32(filmPrice),
 		FilmScreenwriter:     filmScreenwriter,
 		FilmDirector:         filmDirector,
-		CommentNum:           int64(commentNum),
 		TitleCn:              titleCn,
 		TitleEn:              titleEn,
-		IsSupportInlineWatch: int64(isSupportInlineWatch),
-		CreateAt:             createAt,
 		Type:                 t,
 		FilmDrama:            filmDrama,
 		CommonSpecial:        commonSpecial,
-		UserAccessTimes:      int64(userAccessTimes),
-		FilmBoxoffice:        float32(filmBoxoffice),
-		WantedCount:          int64(wantedCount),
-		UserCommentTimes:     int64(userCommentTimes),
 		CompanyIssued:        companyIssued,
 		Country:              country,
-		RatingFinal:          float32(ratingFinal),
 		Is3D:                 int64(is3D),
 		IsDMAX:               int64(isDMAX),
-		IsFilter:             int64(isFilter),
-		IsHot:                int64(isHot),
 		IsIMAX:               int64(isIMAX),
 		IsIMAX3D:             int64(isIMAX3D),
-		IsNew:                int64(isNew),
-		IsTicking:            int64(isTicking),
 		RDay:                 int64(rDay),
 		RMonth:               int64(rMonth),
 		RYear:                int64(rYear),
