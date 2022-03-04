@@ -168,7 +168,7 @@ func (f *FilmServiceExtHandler) ImageAll(ctx context.Context, req *pb.ImageAllRe
 	return nil
 }
 
-// 即将上映的影片
+// 当地上映的影片
 func (f *FilmServiceExtHandler) LocationMovies(ctx context.Context, req *pb.LocationMoviesReq, rsp *pb.LocationMoviesRep) error {
 
 	films, err := db.SelectTickingFilims(config.TickingNow)

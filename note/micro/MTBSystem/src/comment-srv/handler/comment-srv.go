@@ -57,11 +57,12 @@ func (c *CommentServiceExtHandler) HotComment(ctx context.Context, req *pb.HotCo
 func (f *CommentServiceExtHandler) MakeComment(ctx context.Context, req *pb.MakeCommentReq, rsp *pb.MakeCommentRsp) error {
 
 	comment := entity.Comment{
-		Title:    req.Title,
-		Content:  req.Content,
-		HeadImg:  req.HeadImg,
-		FilmId:   req.MovieId,
-		NickName: req.Nickname,
+		FilmId:    req.MovieId,
+		Title:     req.Title,
+		Content:   req.Content,
+		HeadImg:   req.HeadImg,
+		NickName:  req.Nickname,
+		UserId:    0,
 	}
 	err := db.InsertHotComment(&comment)
 	if err != nil {

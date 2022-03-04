@@ -67,7 +67,7 @@ func (a *Api) Run(port string) {
 		order.POST("/wantTicket", handler.WantTicket)
 		order.POST("/ticket", handler.Ticket)
 		order.POST("/payOrder", handler.PayOrder)
-		order.GET("/undoOrder", handler.UndoOrder)
+		order.GET("/undoOrder", handler.UndoOrder) //无操作
 		order.POST("/lookOrders", handler.LookOrders)
 		order.POST("/lookAlreadyOrders", handler.LookAlreadyOrders)
 		order.POST("/orderComment", handler.OrderComment)

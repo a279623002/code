@@ -91,8 +91,10 @@ func MakeComment(c *gin.Context) {
 	headImg := c.Query("headImg")
 	nickname := c.Query("nickname")
 	movieId, _ := strconv.Atoi(c.Query("movieId"))
+	userId, _ := strconv.Atoi(c.Query("userId"))
 	grpcReq := &comment.MakeCommentReq{
 		MovieId:  int64(movieId),
+		UserId:  int64(userId),
 		Title:    title,
 		HeadImg:  headImg,
 		Nickname: nickname,
