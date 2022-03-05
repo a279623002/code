@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>分布式缓存</title>
+    <script src="../../assets/js/font.js"></script>
+    <link rel="stylesheet" href="../../assets/css/public.css">
+    <link rel="stylesheet" href="../../assets/css/note.css">
+</head>
+<body>
+<header></header>
+<main>
+    <p>
+        分布式缓存（Distribute Cache）
+    </p>
+    <p class="col">
+        特点
+    </p>
+    <p class="one_indent">1.一个服务端实现管理和控制</p>
+    <p class="one_indent">2.多个客户端节点存储数据</p>
+    <p class="one_indent">3.通过一致性哈希算法确定数据的存储与读取</p>
+    <p class="one_indent">4.以数据D， 节点N为基础，通过算法计算D对应的哈希值，找到对应节点</p>
+    <p class="one_indent">5.使用该算法可以使节点个数发生变化无需重新计算哈希值，确保存读都能快速找到对应节点</p>
+    <p class="one_indent">6.高性能存储、读取数据</p>
+    <p class="one_indent">7.动态扩展缓存节点</p>
+    <p class="one_indent">8.自动发现、切换故障节点</p>
+    <p class="one_indent">9.自动均衡数据分区</p>
+    <a href="javascript:history.go(-1);" class="back"></a>
+    <p>
+        缓存更新策略
+    </p>
+    <p class="col">策略一</p>
+    <p class="one_indent">1.LRU 淘汰最久没有被访问过的</p>
+    <p class="one_indent">2.LFU 淘汰访问次数最少的</p>
+    <p class="one_indent">3.FIFO 先进先出</p>
+    <p class="one_indent">只能选一种，属于当缓存不够用时采用的更新算法</p>
+    <p class="col">策略二</p>
+    <p class="one_indent">超时剔除，给缓存数据手动设置一个过期时间</p>
+    <p class="col">策略三</p>
+    <p class="one_indent">如果数据源的数据有更新，则主动更新缓存</p>
+</main>
+</body>
+</html>
