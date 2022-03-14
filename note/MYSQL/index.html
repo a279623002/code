@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>mysql</title>
+    <script src="../../assets/js/font.js"></script>
+    <link rel="stylesheet" href="../../assets/css/public.css">
+    <link rel="stylesheet" href="../../assets/css/note.css">
+</head>
+<body>
+<header></header>
+<main>
+    <p class="col">
+        事务ACID属性
+    </p>
+    <p class="one_indent">
+        1.原子性（Actomicity）：事务是一个原子操作单元，其对数据的修改，要么全都执行，要么全都不执行。
+    </p>
+    <p class="one_indent">
+        2.一致性（Consistent）：在事务开始和完成时，数据都必须保持一致状态。这意味着所有相关的数据规则都必须应用于事务的修改，以操持完整性；事务结束时，所有的内部数据结构（如B树索引或双向链表）也都必须是正确的。
+    </p>
+    <p class="one_indent">
+        3.隔离性（Isolation）：数据库系统提供一定的隔离机制，保证事务在不受外部并发操作影响的“独立”环境执行。这意味着事务处理过程中的中间状态对外部是不可见的，反之亦然。
+    </p>
+    <p class="one_indent">
+        4.持久性（Durable）：事务完成之后，它对于数据的修改是永久性的，即使出现系统故障也能够保持。
+    </p>
+    <p class="col">
+        各种锁
+    </p>
+    <p class="one_indent">
+        对于UPDATE、DELETE、INSERT语句，InnoDB会自动给涉及数据集加排他锁（X)，SELECT则无操作 。
+        而MyISAM在执行查询语句SELECT前，会自动给涉及的所有表加读锁，
+        在执行增、删、改操作前，会自动给涉及的表加写锁，
+        这个过程并不需要我们去手动操作
+    </p>
+    <p class="col">
+        表锁
+    </p>
+    <p class="one_indent">读读不阻塞，读写堵塞，写写阻塞</p>
+    <p class="one_indent">
+        在mysql中，写锁是优先与读锁，但可以通过参数调节:
+        max_write_lock_count和low-priority-updates
+    </p>
+    <p class="one_indent">
+        MyISAM支持查询与插入操作的并发进行，也可以通过系统变量concurrent_insert
+        指定哪种模式。在MyISAM中默认：如果MyISAM表的中间没有被删除的行的话，
+        那MyISAM是允许在一个进程读表的同时，另一个进程从表尾做插入记录的。
+        但是INNODB是不支持的。
+    </p>
+    <p class="col">
+        行锁
+    </p>
+    <p class="one_indent">MyISAM不支持</p>
+    <p class="one_indent">InnoDB只有通过索引条件检索数据才使用行锁，否则使用表锁</p>
+    <p class="col one_indent">
+        共享锁【S锁】
+    </p>
+    <p class="one_indent">
+        又称读锁，若事务T对数据对象A加上S锁，则事务T可以读A但不能修改A，
+        其他事务只能再对A加S锁，而不能加X锁，直到T释放A上的S锁。
+        这保证了其他事务可以读A，但在T释放A上的S锁之前不能对A做任何修改
+    </p>
+    <p class="col one_indent">
+        共享锁【X锁】
+    </p>
+    <p class="one_indent">
+        又称写锁。若事务T对数据对象A加上X锁，事务T可以读A也可以修改A，
+        其他事务不能再对A加任何锁，直到T释放A上的锁。
+        这保证了其他事务在T释放A上的锁之前不能再读取和修改A。
+    </p>
+    <p class="col one_indent">
+        意向共享锁（IS）
+    </p>
+    <p class="one_indent">
+        事务打算给数据行加行共享锁，事务在给一个数据行加共享锁前必须先取得该表的IS锁
+    </p>
+    <p class="col one_indent">
+        意向排他锁（IX）
+    </p>
+    <p class="one_indent">
+        事务打算给数据行加行排他锁，事务在给一个数据行加排他锁前必须先取得该表的IX锁
+    </p>
+    <p class="one_indent">
+        这两种意向锁都是表锁,数据库隐式帮我们做了
+    </p>
+    <p class="col">
+        MVCC行级锁
+    </p>
+    <p class="one_indent">
+        多版本并发控制, 可简单认为是行锁的升级版本
+    </p>
+    <p class="one_indent">
+        在表锁中我们读写是阻塞的，基于提升并发性能的考虑，MVCC一般读写是不阻塞的(很多情况下避免了加锁的操作
+    </p>
+    <p class="one_indent">
+        对数据库的任何修改的提交都不会直接覆盖之前的数据，而是产生一个新的版本与老版本共存，使得读取时可以完全不加锁
+    </p>
+
+    <a href="javascript:history.go(-1);" class="back"></a>
+</main>
+</body>
+</html>
