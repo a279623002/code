@@ -48,3 +48,8 @@ $ sudo bash ./build.sh all
 8. ./ctrl.sh login
 9. cd project(docker)
 10. ./build.sh srv
+
+##### start consul
+```
+$ consul agent -dev -client 0.0.0.0
+```
