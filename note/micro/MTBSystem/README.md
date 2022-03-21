@@ -51,5 +51,8 @@ $ sudo bash ./build.sh all
 
 ##### start consul
 ```
+# 该命令启动只能允许本机访问
+$ consul agent -dev
+# 加上-client 0.0.0.0就可以其他机器进行访问了
 $ consul agent -dev -client 0.0.0.0
 ```
