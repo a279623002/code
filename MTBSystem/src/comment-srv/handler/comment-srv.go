@@ -62,7 +62,7 @@ func (f *CommentServiceExtHandler) MakeComment(ctx context.Context, req *pb.Make
 		Content:   req.Content,
 		HeadImg:   req.HeadImg,
 		NickName:  req.Nickname,
-		UserId:    0,
+		UserId:    req.UserId,
 	}
 	err := db.InsertHotComment(&comment)
 	if err != nil {

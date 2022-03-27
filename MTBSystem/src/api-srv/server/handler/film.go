@@ -127,15 +127,8 @@ func LocationMovies(c *gin.Context) {
 }
 
 func MovieComingNew(c *gin.Context) {
-	cinemaId, _ := strconv.Atoi(c.Query("cinemaId"))
-	filmId, _ := strconv.Atoi(c.Query("filmId"))
-	dayNum, _ := strconv.Atoi(c.Query("dayNum"))
 
-	grpcReq := &film.GetFilmsByCidADayReq{
-		CinemaId: int64(cinemaId),
-		FilmId:   int64(filmId),
-		DayNum:   int64(dayNum),
-	}
+	grpcReq := &film.GetFilmsByCidADayReq{}
 	grpcRsp := &film.GetFilmsByCidADayRsp{}
 
 	req := client.NewRequest(serviceFilm, endpointMovieComingNew, grpcReq)
