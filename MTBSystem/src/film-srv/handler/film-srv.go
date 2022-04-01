@@ -265,7 +265,7 @@ func (f *FilmServiceExtHandler) GetFilmsByCidADay(ctx context.Context, req *pb.G
 	if err != nil {
 		//f.logger.Error("error", zap.Error(err))
 		//return errors.ErrorFilmFailed
-		return errors.New("操作异常")
+		return err
 	}
 	if films != nil {
 		dayMoviesPB := []*pb.DayMovie{}

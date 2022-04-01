@@ -3,15 +3,14 @@ package handler
 import (
 	"cms-srv/db"
 	"cms-srv/entity"
+	pb "cms-srv/proto"
+	"config"
 	"context"
 	"errors"
 	"fmt"
-	"config"
-	pb "cms-srv/proto"
 )
 
 type CMSServiceExtHandler struct {
-
 }
 
 func NewCMSServiceExtHandler() *CMSServiceExtHandler {
@@ -948,7 +947,6 @@ func (c *CMSServiceExtHandler) DeleteCinemaFilm(ctx context.Context, req *pb.Del
 }
 
 func (c *CMSServiceExtHandler) RegisterCinema(ctx context.Context, req *pb.RegisterCinemaReq, rsp *pb.RegisterCinemaRsp) error {
-
 	adminID := req.AdminID
 	if adminID == 0 {
 		return errors.New("参数异常")
@@ -976,15 +974,15 @@ func (c *CMSServiceExtHandler) RegisterCinema(ctx context.Context, req *pb.Regis
 	}
 	err = db.InsertCinema(&cinema)
 	if err != nil {
-		return errors.New("操作异常")
+		return errors.New("操作异常1")
 	}
 	cinemaTmp, err := db.SelectCinema(&cinema)
 	if err != nil {
-		return errors.New("操作异常")
+		return errors.New("操作异常2")
 	}
 	err = db.UpdateAdminUser(adminID, req.CinemaName, cinemaTmp.CinemaId)
 	if err != nil {
-		return errors.New("操作异常")
+		return errors.New("操作异常3")
 	}
 	rsp.CinemaID = admin.CinemaID
 	return nil

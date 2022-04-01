@@ -179,6 +179,7 @@ func UpdateCinemaFilm(c *gin.Context) {
 }
 
 func AddCinemaFilm(c *gin.Context) {
+	adminID, _ := strconv.Atoi(c.Query("adminID"))
 	cinemaID, _ := strconv.Atoi(c.Query("cinemaID"))
 	movieID, _ := strconv.Atoi(c.Query("movieID"))
 	hallID, _ := strconv.Atoi(c.Query("hallID"))
@@ -190,7 +191,6 @@ func AddCinemaFilm(c *gin.Context) {
 	releaseTime := c.Query("releaseTime")
 	t := c.Query("type")
 	releaseAdd := c.Query("releaseAdd")
-	adminID, _ := strconv.Atoi(c.Query("adminID"))
 	length, _ := strconv.Atoi(c.Query("length"))
 	releaseDiscount, _ := strconv.ParseFloat(c.Query("releaseDiscount"), 32)
 	grpcReq := &cms.AddCinemaFilmReq{
@@ -765,7 +765,7 @@ func AllFilms(c *gin.Context) {
 		Page:    int64(page),
 		AdminID: int64(adminID),
 	}
-	grpcRsp := &cms.AllAddressRsp{}
+	grpcRsp := &cms.AllFilmsRsp{}
 
 	req := client.NewRequest(serviceCms, endpointAllFilms, grpcReq)
 

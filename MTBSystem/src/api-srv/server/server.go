@@ -41,11 +41,11 @@ func (a *Api) Run(port string) {
 	}
 	place := a.route.Group("/place")
 	{
-		place.GET("/hotCitiesByCinema", handler.HotCitiesByCinema)
+		place.GET("/hotCitiesByCinema", handler.HotCitiesByCinema) //无操作
 	}
 	film := a.route.Group("/film")
 	{
-		film.GET("/hotPlayMovies", handler.HotPlayMovies) // 正在售票列表
+		film.GET("/hotPlayMovies", handler.HotPlayMovies) // 正在售票列表 无操作
 		film.POST("/movieDetail", handler.MovieDetail) // 详情
 		film.POST("/movieCreditsWithTypes", handler.MovieCreditsWithTypes) // 导演演员
 		film.POST("/imageAll", handler.ImageAll) // 剧照

@@ -66,7 +66,7 @@ func (f *CommentServiceExtHandler) MakeComment(ctx context.Context, req *pb.Make
 	}
 	err := db.InsertHotComment(&comment)
 	if err != nil {
-		return errors.New("操作异常")
+		return err
 	}
 	return nil
 }
