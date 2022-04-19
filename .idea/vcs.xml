@@ -2,5 +2,12 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/assets/go-package/src/github.com/go-redis/redis1" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/assets/go-package/src/github.com/go-redis/redis2" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/assets/go-package/src/github.com/gocolly/colly" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/assets/go-package/src/github.com/gocolly/redisstorage" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/assets/go-package/src/github.com/otiai10/gosseract" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/assets/go-package/src/github.com/sirupsen/logrus" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/assets/go-package/src/github.com/wcjs/lib" vcs="Git" />
   </component>
 </project>
