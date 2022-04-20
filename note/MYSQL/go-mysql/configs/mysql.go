@@ -9,10 +9,14 @@ import (
 var Db *sqlx.DB
 
 func InitDb(configs *MysqlConfig) {
-	Db, _ = sqlx.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", configs.UserName, configs.Password, configs.Host, configs.Port, configs.Name))
-	Db.SetMaxIdleConns(configs.MaxOpenConns)
-	Db.SetMaxIdleConns(configs.MaxIdleConns)
-
+	db, err := sqlx.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", configs.UserName, configs.Password, configs.Host, configs.Port, configs.Name))
+	if err != nil {
+		fmt.Println("open mysql failed,", err)
+		return
+	}
+	db.SetMaxIdleConns(configs.MaxOpenConns)
+	db.SetMaxIdleConns(configs.MaxIdleConns)
+	Db = db
 
 
 	//mSql := "select * from user"
