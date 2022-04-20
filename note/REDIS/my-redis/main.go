@@ -1,14 +1,17 @@
 package main
 
 import (
-	"fmt"
 	"my-redis/configs"
+	"my-redis/example"
 )
 
 func main() {
 	session := configs.IniSessionGet()
 	configs.InitDb(session)
 
-	res, _ := configs.RedisDB.SCard("wego_goods_id").Result()
-	fmt.Println(res)
+	example.SetAndGet()
+	example.HMSetAndGet()
+	example.PushAndRange()
+	example.AddAndSmembers()
+	example.ZAddAndZRange()
 }
