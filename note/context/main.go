@@ -15,6 +15,7 @@ func reqTask(ctx context.Context, name string) {
 		default:
 			fmt.Println(name + "wait")
 			time.Sleep(time.Second)
+			go reqTask(ctx, name + "1")
 		}
 	}
 }
