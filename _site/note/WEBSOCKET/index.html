@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WEBSOCKET协议</title>
+    <script src="../../assets/js/font.js"></script>
+    <link rel="stylesheet" href="../../assets/css/public.css">
+    <link rel="stylesheet" href="../../assets/css/note.css">
+</head>
+<body>
+<header></header>
+<main>
+    <p>
+        基于TCP的全双工通信协议
+    </p>
+    <p class="one_indent">一次握手建立持久性连接，服务器可以主动传送数据给客户端，进行双向数据传输</p>
+    <p class="col">
+        握手
+    </p>
+    <p class="one_indent">1. 浏览器与服务器三次握手建立链接</p>
+    <p class="one_indent">2. 浏览器发出请求</p>
+    <p class="one_indent">3. 通过HTTP/1.1协议的101状态码（服务器转换协议：服务器将遵从客户的请求转换到另外一种协议）进行握手</p>
+    <p class="one_indent">4. 服务器响应,建立连接</p>
+    <p class="one_indent">5. 连接建立后，传输不需要HTTP协议，使用TCP协议</p>
+    <a href="javascript:history.go(-1);" class="back"></a>
+</main>
+</body>
+</html>
