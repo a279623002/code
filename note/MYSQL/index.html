@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>mysql</title>
+    <script src="../../assets/js/font.js"></script>
+    <link rel="stylesheet" href="../../assets/css/public.css">
+    <link rel="stylesheet" href="../../assets/css/note.css">
+</head>
+<body>
+<header></header>
+<main>
+    <p class="col">
+        事务ACID属性
+    </p>
+    <p class="one_indent">
+        1.原子性（Actomicity）：事务是一个原子操作单元，其对数据的修改，要么全都执行，要么全都不执行。
+    </p>
+    <p class="one_indent">
+        2.一致性（Consistent）：在事务开始和完成时，数据都必须保持一致状态。这意味着所有相关的数据规则都必须应用于事务的修改，以操持完整性；事务结束时，所有的内部数据结构（如B树索引或双向链表）也都必须是正确的。
+    </p>
+    <p class="one_indent">
+        3.隔离性（Isolation）：数据库系统提供一定的隔离机制，保证事务在不受外部并发操作影响的“独立”环境执行。这意味着事务处理过程中的中间状态对外部是不可见的，反之亦然。
+    </p>
+    <p class="one_indent">
+        4.持久性（Durable）：事务完成之后，它对于数据的修改是永久性的，即使出现系统故障也能够保持。
+    </p>
+    <p class="col">
+        事务的隔离级别
+    </p>
+    <p class="one_indent">
+        脏读：脏读是指某一个事务读取到了其他事务未提交的数据，如果此数据回滚，将导致读取到的数据是错误的数据。
+    </p>
+    <p class="one_indent">
+        不可重复读: 指某个事务在开启后，读取某个范围或者某条数据时，在此事务未结束的时间里内，其他事务对表内的数据进行了添加，
+        或者更改了某一条或者多条数据后进行了提交，此时本事务读取到的数据条数与之前某时间段读取到的条数不相同，
+        或者在读取一条数据时，两个时间段内读取到的数据值不相同
+    </p>
+    <p class="one_indent">
+        幻读: 在一个事务开启后，其他事务对表中的一行或者多行进行了更改操作后进行了提交，本事务读取到的一行或多行的值仍和数量然是相同的，
+        此时并不能读到其他事务在本事务查询时，提交的更改内容，即：其他事务对此表的更改本事务不能读到，
+        这达成了可重复读的目的，但是读取到的数据是虚幻的。如果其他事物在此之间真实的更改了数据，
+        则在本事务提交之前的读操作，读取到的都是未被更改前的数据，造成了读取的数据是虚幻的。
+    </p>
+    <p class="one_indent col">
+        1.Read uncommitted(读未提交)
+    </p>
+    <p class="one_indent">
+        如果一个事务已经开始写数据，则另外一个事务不允许同时进行写操作，但允许其他事务读此行数据，该隔离级别可以通过“排他写锁”，但是不排斥读线程实现。
+        这样就避免了更新丢失，却可能出现脏读，也就是说事务B读取到了事务A未提交的数据
+    </p>
+    <p class="one_indent">
+        解决了更新丢失，但还是可能会出现脏读
+    </p>
+    <p class="one_indent col">
+        2.Read committed(读提交)
+    </p>
+    <p class="one_indent">
+        如果是一个读事务(线程)，则允许其他事务读写，如果是写事务将会禁止其他事务访问该行数据，该隔离级别避免了脏读，
+        但是可能出现不可重复读。事务A事先读取了数据，事务B紧接着更新了数据，并提交了事务，而事务A再次读取该数据时，数据已经发生了改变。
+    </p>
+    <p class="one_indent">
+        解决了更新丢失和脏读问题
+    </p>
+    <p class="one_indent col">
+        3.Repeatable read(可重复读取)
+    </p>
+    <p class="one_indent">
+        可重复读取是指在一个事务内，多次读同一个数据，在这个事务还没结束时，其他事务不能访问该数据(包括了读写)，
+        这样就可以在同一个事务内两次读到的数据是一样的，因此称为是可重复读隔离级别，读取数据的事务将会禁止写事务(但允许读事务)，
+        写事务则禁止任何其他事务(包括了读写)，这样避免了不可重复读和脏读，但是有时可能会出现幻读。
+        (读取数据的事务)可以通过“共享读镜”和“排他写锁”实现。
+    </p>
+    <p class="one_indent">
+        解决了更新丢失、脏读、不可重复读、但是还会出现幻读
+    </p>
+    <p class="one_indent col">
+        4.Serializable(可序化)
+    </p>
+    <p class="one_indent">
+        提供严格的事务隔离，它要求事务序列化执行，事务只能一个接着一个地执行，但不能并发执行，
+        如果仅仅通过“行级锁”是无法实现序列化的，必须通过其他机制保证新插入的数据不会被执行查询操作的事务访问到。
+        序列化是最高的事务隔离级别，同时代价也是最高的，性能很低，一般很少使用，在该级别下，事务顺序执行，不仅可以避免脏读、不可重复读，还避免了幻读
+    </p>
+    <p class="one_indent">
+        解决了更新丢失、脏读、不可重复读、幻读(虚读)
+    </p>
+    <p class="one_indent">
+        以上四种隔离级别最高的是Serializable级别，最低的是Read uncommitted级别，当然级别越高，执行效率就越低，
+        像Serializeble这样的级别，就是以锁表的方式(类似于Java多线程中的锁)使得其他线程只能在锁外等待，
+        所以平时选用何种隔离级别应该根据实际情况来，在MYSQL数据库中默认的隔离级别是Repeatable read（可重复读）
+    </p>
+    <p class="one_indent">
+        在MYSQL数据库中，支持上面四种隔离级别，默认的为Repeatable read(可重复读)；
+        而在Oracle数据库中，只支持Serializeble(串行化)级别和Read committed(读已提交)这两种级别，其中默认的为Read committed级别
+    </p>
+
+    <p class="col">
+        各种锁
+    </p>
+    <p class="one_indent">
+        对于UPDATE、DELETE、INSERT语句，InnoDB会自动给涉及数据集加排他锁（X)，SELECT则无操作 。
+        而MyISAM在执行查询语句SELECT前，会自动给涉及的所有表加读锁，
+        在执行增、删、改操作前，会自动给涉及的表加写锁，
+        这个过程并不需要我们去手动操作
+    </p>
+    <p class="col">
+        表锁
+    </p>
+    <p class="one_indent">读读不阻塞，读写堵塞，写写阻塞</p>
+    <p class="one_indent">
+        在mysql中，写锁是优先与读锁，但可以通过参数调节:
+        max_write_lock_count和low-priority-updates
+    </p>
+    <p class="one_indent">
+        MyISAM支持查询与插入操作的并发进行，也可以通过系统变量concurrent_insert
+        指定哪种模式。在MyISAM中默认：如果MyISAM表的中间没有被删除的行的话，
+        那MyISAM是允许在一个进程读表的同时，另一个进程从表尾做插入记录的。
+        但是INNODB是不支持的。
+    </p>
+    <p class="col">
+        行锁
+    </p>
+    <p class="one_indent">MyISAM不支持</p>
+    <p class="one_indent">InnoDB只有通过索引条件检索数据才使用行锁，否则使用表锁</p>
+    <p class="col one_indent">
+        共享锁【S锁】
+    </p>
+    <p class="one_indent">
+        又称读锁，若事务T对数据对象A加上S锁，则事务T可以读A但不能修改A，
+        其他事务只能再对A加S锁，而不能加X锁，直到T释放A上的S锁。
+        这保证了其他事务可以读A，但在T释放A上的S锁之前不能对A做任何修改
+    </p>
+    <p class="col one_indent">
+        排他锁【X锁】
+    </p>
+    <p class="one_indent">
+        又称写锁。若事务T对数据对象A加上X锁，事务T可以读A也可以修改A，
+        其他事务不能再对A加任何锁，直到T释放A上的锁。
+        这保证了其他事务在T释放A上的锁之前不能再读取和修改A。
+    </p>
+    <p class="col one_indent">
+        意向共享锁（IS）
+    </p>
+    <p class="one_indent">
+        事务打算给数据行加行共享锁，事务在给一个数据行加共享锁前必须先取得该表的IS锁
+    </p>
+    <p class="col one_indent">
+        意向排他锁（IX）
+    </p>
+    <p class="one_indent">
+        事务打算给数据行加行排他锁，事务在给一个数据行加排他锁前必须先取得该表的IX锁
+    </p>
+    <p class="one_indent">
+        这两种意向锁都是表锁,数据库隐式帮我们做了
+    </p>
+    <p class="col">
+        MVCC行级锁
+    </p>
+    <p class="one_indent">
+        多版本并发控制, 可简单认为是行锁的升级版本
+    </p>
+    <p class="one_indent">
+        在表锁中我们读写是阻塞的，基于提升并发性能的考虑，MVCC一般读写是不阻塞的(很多情况下避免了加锁的操作
+    </p>
+    <p class="one_indent">
+        对数据库的任何修改的提交都不会直接覆盖之前的数据，而是产生一个新的版本与老版本共存，使得读取时可以完全不加锁
+    </p>
+    <p class="col">
+        悲观锁(手动添加)
+    </p>
+    <p class="one_indent">
+        分为共享锁和排他锁
+    </p>
+    <p class="one_indent">
+        悲观锁并发控制实际上是先取锁再访问得保守策略
+    </p>
+    <p class="col">
+        乐观锁(手动添加)
+    </p>
+    <p class="one_indent">
+        乐观并发控制相信事务之间的数据竞争(data race)的概率是比较小的，因此尽可能直接做下去，
+        直到提交的时候才去锁定，所以不会产生任何锁和死锁，靠CAS或版本号控制
+    </p>
+    <p class="one_indent">
+        版本号控制：一般是在数据表中加上一个数据版本号 version 字段，表示数据被修改的次数。
+        当数据被修改时，version 值会 +1。当线程 A 要更新数据时，在读取数据的同时也会读取 version 值，
+        在提交更新时，若刚才读取到的 version 值与当前数据库中的 version 值相等时才更新，否则重试更新操作，直到更新成功
+    </p>
+    <p class="one_indent">
+        CAS 即比较并交换。是解决多线程并行情况下使用锁造成性能损耗的一种机制，CAS 操作包含三个操作数——内存位置(V)、预期原值(A)和新值(B)。
+        如果内存位置的值(V)与预期原值(A)相匹配，那么处理器会自动将该位置值更新为新值(B)。
+        否则，处理器不做任何操作。无论哪种情况，它都会在 CAS 指令之前返回该位置的值。
+        CAS 有效地说明了“我认为位置(V)应该包含值(A)。如果包含该值，则将新值(B)放到这个位置；否则，不要更改该位置，只告诉我这个位置现在的值即可
+    </p>
+    <p class="col">
+        间隙锁GAP
+    </p>
+    <p class="one_indent">
+        当我们用范围条件检索数据而不是相等条件检索数据，并请求共享或排他锁时，
+        InnoDB会给符合范围条件的已有数据记录的索引项加锁；对于键值在条件范围内但并不存在 的记录，叫做“间隙（GAP)”
+    </p>
+    <p class="one_indent">
+        例子：假如emp表中只有101条记录，其empid的值分别是1,2,...,100,101
+    </p>
+    <p class="one_indent">
+        sql: Select * from emp where empid > 100 for update;
+    </p>
+    <p class="one_indent">
+        InnoDB不仅会对符合条件的empid值为101的记录加锁，也会对empid大于101（这些记录并不存在）的“间隙”加锁
+    </p>
+    <p class="one_indent">
+        InnoDB使用间隙锁的目的有2个:为了防止幻读, 满足恢复和复制的需要(MySQL的恢复机制要求在一个事务未提交前，
+        其他并发事务不能插入满足其锁定条件的任何记录，也就是不允许出现幻读)
+    </p>
+    <p class="col">
+        死锁
+    </p>
+    <p class="one_indent">
+        是指两个或两个以上的进程在执行过程中,因争夺资源而造成的一种互相等待的现象,若无外力作用，它们都将无法推进下去.
+        此时称系统处于死锁状态或系统产生了死锁，这些永远在互相等待的进程称为死锁进程。表级锁不会产生死锁.所以解决死锁主要还是针对于最常用的InnoDB
+    </p>
+    <p class="one_indent">
+        死锁的关键在于：两个(或以上)的Session加锁的顺序不一致
+    </p>
+    <p class="one_indent">
+        那么对应的解决死锁问题的关键就是：让不同的session加锁有次序
+    </p>
+    <p class="one_indent">
+        案例：投资人投资后，将金额随机分为几份，然后随机从借款人表里面选几个，然后通过一条条select for update 去更新借款人表里面的余额等。
+        两个用户同时投资，A用户金额随机分为2份，分给借款人1，2，
+        B用户金额随机分为2份，分给借款人2，1
+        由于加锁的顺序不一样，死锁当然很快就出现了
+    </p>
+    <p class="one_indent">
+        解决方案：直接把所有分配到的借款人直接一次锁住就行了
+    </p>
+    <p class="one_indent">
+        sql: Select * from xxx where id in (xx,xx,xx) for update
+    </p>
+    <p class="one_indent">
+        在in里面的列表值mysql是会自动从小到大排序，加锁也是一条条从小到大加的锁
+    </p>
+    <p class="col">
+        锁总结
+    </p>
+    <p class="one_indent">表锁其实我们程序员是很少关心它的</p>
+    <p class="one_indent">在MyISAM存储引擎中，当执行SQL语句的时候是自动加的</p>
+    <p class="one_indent">在InnoDB存储引擎中，如果没有使用索引，表锁也是自动加的</p>
+    <p class="one_indent">现在我们大多数使用MySQL都是使用InnoDB，InnoDB支持行锁</p>
+    <p class="one_indent">共享锁->读锁->S锁</p>
+    <p class="one_indent">排它锁->写锁->X锁</p>
+    <p class="one_indent">在默认的情况下，select是不加任何行锁的,事务可以通过以下语句显示给记录集加共享锁或排他锁</p>
+    <p class="one_indent">共享锁（S）sql: SELECT * FROM table_name WHERE ... LOCK IN SHARE MODE</p>
+    <p class="one_indent">排他锁（X) sql: SELECT * FROM table_name WHERE ... FOR UPDATE</p>
+    <p class="one_indent">InnoDB基于行锁还实现了MVCC多版本并发控制，MVCC在隔离级别下的Read committed和Repeatable read下工作。MVCC实现了读写不阻塞</p>
+
+    <a href="javascript:history.go(-1);" class="back"></a>
+</main>
+</body>
+</html>

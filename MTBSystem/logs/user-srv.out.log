@@ -1,0 +1,27 @@
+supervisor: couldn't setuid to 0: Can't drop privilege as nonroot user
+supervisor: child process was not spawned
+supervisor: couldn't setuid to 0: Can't drop privilege as nonroot user
+supervisor: child process was not spawned
+supervisor: couldn't setuid to 0: Can't drop privilege as nonroot user
+supervisor: child process was not spawned
+supervisor: couldn't setuid to 0: Can't drop privilege as nonroot user
+supervisor: child process was not spawned
+supervisor: couldn't setuid to 0: Can't drop privilege as nonroot user
+supervisor: child process was not spawned
+supervisor: couldn't setuid to 0: Can't drop privilege as nonroot user
+supervisor: child process was not spawned
+supervisor: couldn't setuid to 0: Can't drop privilege as nonroot user
+supervisor: child process was not spawned
+supervisor: couldn't setuid to 0: Can't drop privilege as nonroot user
+supervisor: child process was not spawned
+2022-02-26 16:49:44  file=v2@v2.9.1/service.go:200 level=info Starting [service] go.micro.user
+2022-02-26 16:49:44  file=grpc/grpc.go:864 level=info Server [grpc] Listening on [::]:34431
+2022-02-26 16:49:44  file=grpc/grpc.go:697 level=info Registry [mdns] Registering node: go.micro.user-78be58ba-c8e3-4e2c-baa7-e3bfa5272021
+2022-02-26 16:49:44.734630 I | user-srv start
+2022-02-26 16:50:08  file=grpc/grpc.go:791 level=info Deregistering node: go.micro.user-78be58ba-c8e3-4e2c-baa7-e3bfa5272021
+2022-02-26 16:50:08  file=grpc/grpc.go:959 level=info Broker [http] Disconnected from 127.0.0.1:0
+2022-02-26 16:50:08.978703 I | user-srv stop
+2022-02-26 16:50:10  file=v2@v2.9.1/service.go:200 level=info Starting [service] go.micro.user
+2022-02-26 16:50:10  file=grpc/grpc.go:864 level=info Server [grpc] Listening on [::]:36309
+2022-02-26 16:50:10  file=grpc/grpc.go:697 level=info Registry [mdns] Registering node: go.micro.user-a92cd8ab-f91c-4d8a-98ff-80d496869d5c
+2022-02-26 16:50:10.016613 I | user-srv start
