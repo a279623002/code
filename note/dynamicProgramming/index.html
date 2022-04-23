@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>动态规划</title>
+    <script src="../../assets/js/font.js"></script>
+    <link rel="stylesheet" href="../../assets/css/public.css">
+    <link rel="stylesheet" href="../../assets/css/note.css">
+</head>
+<body>
+<header></header>
+<main>
+    <p>
+        可划分为求最优子结构，计数
+    </p>
+    <p class="col">计数类--经典路径问题</p>
+    <p class="one_indent">如70，爬楼梯，每次可以爬 1 或 2 个台阶，到达n阶有多少方法</p>
+    <p class="one_indent">定义dp|n|为到达n阶的方法数</p>
+    <p class="one_indent">到达n的上一步，可以爬1阶、或2阶到达</p>
+    <p class="one_indent">所以转移方程为dp|n| = dp|n-1| + dp|n-2| (n > 1)</p>
+    <p class="one_indent">定义初始边界值dp|0| = 1, 既爬第一阶时dp[1] = dp[0]</p>
+    <p class="col">最优子结构</p>
+    <p class="one_indent">如53，求连续子数组的最大和</p>
+    <p class="one_indent">[-2, 1, 2, 3]</p>
+    <p class="one_indent">连续子数组最大和为 1+2+3 = 6</p>
+    <p class="one_indent">[-2, 1, 2, 3, -1, 2]</p>
+    <p class="one_indent">最大和为 1+2+3+-1+2 = 7</p>
+    <p class="one_indent">[-2, 1, 2, 3, -1, 2, -8, 9]</p>
+    <p class="one_indent">最大和为 9</p>
+    <p class="one_indent">可以发现最大和为当前遍历值加上上次累加的最大的和</p>
+    <p class="one_indent">当前遍历值如果加上累加和后小于本身，说明没有增长，如-1 + 9 < 9 ，这时不累加合</p>
+    <p class="one_indent">定义dp[i] 第i个遍历值的连续最大和</p>
+    <p class="one_indent">转移方程为 dp[i] = max(dp[n-1] + nums[i], nums[i])</p>
+    <a href="javascript:history.go(-1);" class="back"></a>
+</main>
+</body>
+</html>

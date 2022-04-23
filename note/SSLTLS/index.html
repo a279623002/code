@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SSL/TLS</title>
+    <script src="../../assets/js/font.js"></script>
+    <link rel="stylesheet" href="../../assets/css/public.css">
+    <link rel="stylesheet" href="../../assets/css/note.css">
+</head>
+<body>
+<header></header>
+<main>
+    <p>
+        SSL(Secure Sockets Layer 安全套接字协议)
+    </p>
+    <p>
+        TLS(Transport Layer Security 传输层安全性协议)，前身为SSL
+    </p>
+    <p class="col">
+        注意
+    </p>
+    <p class="one_indent">现在浏览器不支持SSL，都是用TLS，只是SSL用久了才会形成SSL/TLS的叫法，两者相当于王老吉与加多宝，在传输层与应用层之间对网络连接进行加密</p>
+    <p class="one_indent">由记录协议、握手协议组成</p>
+    <p class="col">
+        记录协议
+    </p>
+    <p class="one_indent">它建立在可靠的传输协议（如TCP）之上，为高层协议提供数据封装、压缩、加密等基本功能的支持</p>
+    <p class="col">
+        握手协议
+    </p>
+    <p class="one_indent">它建立在记录协议之上，用于在实际的数据传输开始前，通讯双方进行身份认证、协商加密算法、交换加密密钥等</p>
+    <p class="col">
+        工作流程见HTTPS
+    </p>
+    <a href="javascript:history.go(-1);" class="back"></a>
+</main>
+</body>
+</html>
