@@ -1,64 +1,93 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
+    <title>Golang Chat</title>
     <meta charset="UTF-8">
-    <title>Title</title>
-    <script>
-        window.addEventListener('load', function(e) {
-            let ws
-            let output = document.getElementById('output')
-            let intput = document.getElementById('intput')
-            let print = function (msg) {
-                let d = document.createElement('div')
-                d.innerText = msg
-                output.appendChild(d)
-            }
-            document.getElementById('open').onclick = function (e) {
-                ws = new WebSocket('ws://localhost:7777/ws')
-                ws.onmessage = function (e) {
-                    print("receive: " + e.data)
-                }
-                print('open websocket')
-                return false
-            }
-            document.getElementById('send').onclick = function (e) {
-                if (!ws) {
-                    return false
-                }
-                print('send: ' + input.value)
-                ws.send(input.value)
-                return false
-            }
-            document.getElementById('close').onclick = function (e) {
-                if(!ws) {
-                    return false
-                }
-                ws.close()
-                return false
-            }
-        })
-
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js">
     </script>
+    <script type="text/javascript">
+        $(function () {
+
+            var conn;
+            var msg = $("#msg");
+            var log = $("#log");
+
+            function appendLog(msg) {
+                var d = log[0]
+                var doScroll = d.scrollTop == d.scrollHeight - d.clientHeight;
+                msg.appendTo(log)
+                if (doScroll) {
+                    d.scrollTop = d.scrollHeight - d.clientHeight;
+                }
+            }
+
+            $("#form").submit(function () {
+                if (!conn) {
+                    return false;
+                }
+                if (!msg.val()) {
+                    return false;
+                }
+                conn.send(msg.val());
+                msg.val("");
+                return false
+            });
+
+            if (window["WebSocket"]) {
+                conn = new WebSocket("ws://localhost:8011/ws");
+                conn.onclose = function (evt) {
+                    appendLog($("<div><b>Connection Closed.</b></div>"))
+                }
+                conn.onmessage = function (evt) {
+                    appendLog($("<div/>").text(evt.data))
+                }
+            } else {
+                appendLog($("<div><b>WebSockets Not Support.</b></div>"))
+            }
+        });
+    </script>
+    <style type="text/css">
+        html {
+            overflow: hidden;
+        }
+
+        body {
+            overflow: hidden;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            background: gray;
+        }
+
+        #log {
+            background: white;
+            margin: 0;
+            padding: 0.5em 0.5em 0.5em 0.5em;
+            position: absolute;
+            top: 0.5em;
+            left: 0.5em;
+            right: 0.5em;
+            bottom: 3em;
+            overflow: auto;
+        }
+
+        #form {
+            padding: 0 0.5em 0 0.5em;
+            margin: 0;
+            position: absolute;
+            bottom: 1em;
+            left: 0px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+    </style>
 </head>
 <body>
-<table>
-    <tr>
-        <td valign="top" width="50%">
-            <p>Click "Open" to create a connection to the server,
-                "Send" to send a message to the server and "Close" to close the connection.
-                You can change the message and send multiple times.
-            </p>
-            <form>
-                <button id="open">Open</button>
-                <button id="close">Close</button>
-                <input id="input" type="text" value="Hello world!">
-                <button id="send">Send</button>
-            </form>
-        </td>
-        <td valign="top" width="50%">
-            <div id="output"></div>
-        </td>
-    </tr>
-</table>
+<div id="log"></div>
+<form id="form">
+    <input type="submit" value="发送"/>
+    <input type="text" id="msg" size="64"/>
+</form>
 </body>
 </html>
