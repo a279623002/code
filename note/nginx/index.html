@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>nginx</title>
+    <script src="../../assets/js/font.js"></script>
+    <link rel="stylesheet" href="../../assets/css/public.css">
+    <link rel="stylesheet" href="../../assets/css/note.css">
+</head>
+<body>
+<header></header>
+<main>
+    <p class="col">
+        指令简介
+    </p>
+    <p class="one_indent">
+        server : 用于定义服务，http中可以有多个server块
+    </p>
+    <p class="one_indent">
+        listen : 指定服务器侦听请求的IP地址和端口，如果省略地址，服务器将侦听所有地址，如果省略端口，则使用标准端口
+    </p>
+    <p class="one_indent">
+        server_name : 服务名称，用于配置域名
+    </p>
+    <p class="one_indent">
+        location : 用于配置映射路径uri对应的配置，一个server中可以有多个location, location后面跟一个uri,
+        可以是一个正则表达式, / 表示匹配任意路径, 当客户端访问的路径满足这个uri时就会执行location块里面的代码
+    </p>
+    <p class="one_indent">
+        root : 根路径 当访问/test.html 用户访问的资源物理地址=root + uri
+    </p>
+    <p class="one_indent">
+        index : 设置首页，当只访问server_name时后面不跟任何路径是不走root直接走index指令的
+    </p>
+    <p class="col">
+        location uri
+    </p>
+    <p class="one_indent">
+        常见的location路径映射路径有以下几种
+    </p>
+    <p class="one_indent">
+        1. = 进行普通字符精确匹配。也就是完全匹配
+    </p>
+    <p class="one_indent">
+        2. ^~ 前缀匹配。如果匹配成功，则不再匹配其他location
+    </p>
+    <p class="one_indent">
+        3. ~ 表示执行一个正则匹配，区分大小写
+    </p>
+    <p class="one_indent">
+        4. ~* 表示执行一个正则匹配，不区分大小写
+    </p>
+    <p class="one_indent">
+        5. /xxx/ 常规字符串路径匹配
+    </p>
+    <p class="one_indent">
+        6. / 通用匹配，任何请求都会匹配到
+    </p>
+    <p class="one_indent">
+        location优先级
+    </p>
+    <p class="one_indent">
+        以下是按优先级排列说明：
+    </p>
+    <p class="one_indent">
+        1. 等号类型（=）的优先级最高。一旦匹配成功，则不再查找其他匹配项，停止搜索
+    </p>
+    <p class="one_indent">
+        2. ^~类型表达式，不属于正则表达式。一旦匹配成功，则不再查找其他匹配项，停止搜索
+    </p>
+    <p class="one_indent">
+        3. 正则表达式类型（~ ~*）的优先级次之。如果有多个location的正则能匹配的话，则使用正则表达式最长的那个
+    </p>
+    <p class="one_indent">
+        4. 常规字符串匹配类型。按前缀匹配
+    </p>
+    <p class="one_indent">
+        5. / 通用匹配，如果没有匹配到，就匹配通用的
+    </p>
+    <p class="one_indent">
+        优先级搜索问题：不同类型的location映射决定是否继续向下搜索
+    </p>
+    <p class="one_indent">
+        1. 等号类型、^~类型：一旦匹配上就停止搜索了，不会再匹配其他location了
+    </p>
+    <p class="one_indent">
+        2. 正则表达式类型(~ ~*）,常规字符串匹配类型/xxx/ : 匹配到之后，还会继续搜索其他其它location，直到找到优先级最高的，或者找到第一种情况而停止搜索
+    </p>
+    <p class="one_indent">
+        location优先级从高到底：(location =) > (location 完整路径) > (location ^~ 路径) > (location ~,~* 正则顺序) > (location 部分起始路径) > (/)
+    </p>
+    <p class="col">
+        反向代理
+    </p>
+    <p class="one_indent">
+        nginx作为代理服务器，接受internet上的连接请求，然后将请求转发给内部网络上的服务器，并将从服务器得到的结果返回请求的客户端
+    </p>
+    <p class="one_indent">
+        比如go/go.conf, 请求测试机，nginx根据端口转发到线上网络上的服务器
+    </p>
+    <p class="one_indent">
+        反向代理通过proxy_pass指令来实现
+    </p>
+    <p class="col">
+        负载均衡
+    </p>
+    <p class="one_indent">
+        Nginx目前支持自带3种负载均衡策略，还有2种常用的第三方策略
+    </p>
+    <p class="one_indent">
+        1. RR(round robin :轮询 默认)
+    </p>
+    <p class="one_indent">
+        每个请求按时间顺序逐一分配到不同的后端服务器，也就是说第一次请求分配到第一台服务器上，
+        第二次请求分配到第二台服务器上，如果只有两台服务器，第三次请求继续分配到第一台上，这样循环轮询下去，
+        也就是服务器接收请求的比例是 1:1， 如果后端服务器down掉，能自动剔除。
+        轮询是默认配置，不需要太多的配置
+    </p>
+    <p class="one_indent">
+        2. 权重
+    </p>
+    <p class="one_indent">
+        指定轮询几率，weight和访问比率成正比, 也就是服务器接收请求的比例就是各自配置的weight的比例，
+        用于后端服务器性能不均的情况,比如服务器性能差点就少接收点请求，服务器性能好点就多处理点请求
+    </p>
+    <p class="one_indent">
+        3. ip_hash
+    </p>
+    <p class="one_indent">
+        上面的2种方式都有一个问题，那就是下一个请求来的时候请求可能分发到另外一个服务器，
+        当我们的程序不是无状态的时候(采用了session保存数据)，这时候就有一个很大的很问题了，比如把登录信息保存到了session中，
+        那么跳转到另外一台服务器的时候就需要重新登录了，所以很多时候我们需要一个客户只访问一个服务器，那么就需要用iphash了，
+        iphash的每个请求按访问ip的hash结果分配，这样每个访客固定访问一个后端服务器，可以解决session的问题
+    </p>
+    <p class="one_indent">
+        4. fair(第三方)
+    </p>
+    <p class="one_indent">
+        按后端服务器的响应时间来分配请求，响应时间短的优先分配。这个配置是为了更快的给用户响应
+    </p>
+    <p class="one_indent">
+        5. url_hash(第三方)
+    </p>
+    <p class="one_indent">
+        按访问url的hash结果来分配请求，使每个url定向到同一个后端服务器，后端服务器为缓存时比较有效。
+        在upstream中加入hash语句，server语句中不能写入weight等其他的参数，hash_method是使用的hash算法
+    </p>
+    <p class="one_indent">
+        以上5种负载均衡各自适用不同情况下使用，所以可以根据实际情况选择使用哪种策略模式,不过fair和url_hash需要安装第三方模块才能使用
+    </p>
+    <p class="col"><a href="https://zhuanlan.zhihu.com/p/389438482">参考</a></p>
+
+
+    <a href="javascript:history.go(-1);" class="back"></a>
+</main>
+</body>
+</html>

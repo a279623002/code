@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OSI七层网络参考模型</title>
+    <script src="../../assets/js/font.js"></script>
+    <link rel="stylesheet" href="../../assets/css/public.css">
+    <link rel="stylesheet" href="../../assets/css/note.css">
+</head>
+<body>
+<header></header>
+<main>
+    <p>
+        开放式系统互连 (Open Systems Interconnection reference，OSI)
+    </p>
+    <p class="col">7.应用层</p>
+    <p class="one_indent">（如http、https、ftp、ssh）</p>
+    <p class="col">6.表达层</p>
+    <p class="one_indent">把数据转换为能与接收者系统格式兼容并适合传输的格式</p>
+    <p class="col">5.会话层</p>
+    <p class="one_indent">数据传输中的数据、维护两台计算机之间的通信</p>
+    <p class="col">4.传输层</p>
+    <p class="one_indent">把包含所使用传输协议（如tcp）的传输表头（TH）加至数据形成数据包</p>
+    <p class="col">3.网络层</p>
+    <p class="one_indent">决定数据的路径选择和转寄，将包含网络协议（如ip）的网络表头（NH）加至数据包，形成分组</p>
+    <p class="col">2.数据链路层</p>
+    <p class="one_indent">负责网络寻址、错误侦测和改错。当表头和表尾被加至数据包时，会形成帧。数据链表头（DLH）是包含了物理地址和错误侦测及改错的方法。数据链表尾（DLT）是一串指示数据包末端的字符串。例如以太网、无线局域网（Wi-Fi）和通用分组无线服务（GPRS）等</p>
+    <p class="col">1.物理层</p>
+    <p class="one_indent">在局部局域网上传送数据帧，它负责管理计算机通信设备和网络媒体之间的互通。包括了针脚、电压、线缆规范、集线器、中继器、网卡、主机适配器等</p>
+
+    <a href="javascript:history.go(-1);" class="back"></a>
+</main>
+</body>
+</html>
