@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>docker</title>
+    <script src="../../assets/js/font.js"></script>
+    <link rel="stylesheet" href="../../assets/css/public.css">
+    <link rel="stylesheet" href="../../assets/css/note.css">
+</head>
+<body>
+<header></header>
+<main>
+    <p class="col">
+        常用命令
+    </p>
+    <p class="one_indent">
+        获取镜像: docker pull ubuntu
+    </p>
+    <p class="one_indent">
+        启动容器: docker run -it ubuntu /bin/bash
+    </p>
+    <p class="one_indent">
+        注：-i: 交互式操作 -t: 终端 -d 参数默认不会进入容器 --name 容器名 -p 容器内部端口绑定到指定的主机端口 (主机:docker) -P 容器内部端口随机映射到主机的端口
+    </p>
+    <p class="one_indent">
+        端口绑定，默认都是绑定 tcp 端口，如果要绑定 UDP 端口，可以在端口后面加上 /udp
+    </p>
+    <p class="one_indent">
+        -p 5000:5000/udp
+    </p>
+    <p class="one_indent">
+        进入容器: docker exec -it <容器名/id> /bin/bash
+    </p>
+    <p class="one_indent">
+        注： 如果从这个容器退出，容器不会停止
+    </p>
+    <p class="col">
+        Dockerfile
+    </p>
+    <p class="one_indent">
+        构建镜像: docker build -t nginx:v3 .
+    </p>
+    <p class="one_indent">
+        在 Dockerfile 文件的存放目录下，执行构建动作
+    </p>
+    <p class="col">
+        Docker Compose
+    </p>
+    <p class="one_indent">
+        1. 使用 Dockerfile 定义应用程序的环境
+    </p>
+    <p class="one_indent">
+        2. 使用 docker-compose.yml 定义构成应用程序的服务，这样它们可以在隔离环境中一起运行
+    </p>
+    <p class="one_indent">
+        3. 最后，执行 docker-compose up 命令来启动并运行整个应用程序
+    </p>
+    <p class="one_indent">
+        启动应用程序 docker-compose up
+    </p>
+    <p class="one_indent">
+        在后台启动 docker-compose up -d
+    </p>
+
+    <a href="javascript:history.go(-1);" class="back"></a>
+</main>
+</body>
+</html>

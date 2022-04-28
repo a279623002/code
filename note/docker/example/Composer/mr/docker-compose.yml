@@ -1,0 +1,33 @@
+version: '3'
+services:
+  mysql:
+    image: mysql:latest
+    restart: always
+    hostname: mysql
+    container_name: 'shiro-mysql'
+    ports:
+      - '9096:3306'
+    volumes:
+      - './mysql/config/my.cnf:/etc/mysql/my.cnf'
+      - './mysql/log:/var/log/mysql'
+      - './mysql/data:/var/lib/mysql'
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: 'shiro-myadmin'
+    ports:
+      - '9080:80'
+    links:
+      - mysql:db
+
+  redis:
+    image: redis
+    container_name: 'shiro-go-redis'
+    ports:
+      - '9079:6379'
+    volumes:
+      - './redis/conf:/usr/local/etc/redis'
+      - './redis/data:/data'
+    command: redis-server
