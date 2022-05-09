@@ -55,6 +55,22 @@
     <p class="one_indent">3.添加互斥锁，但收到一个请求时，其他请求需要等待，一个个轮流查询，避免数据库压力过大</p>
     <p class="col"><a href="https://blog.csdn.net/weixin_44143114/article/details/119878271">主从复制</a></p><br />
 
+    <p class="col">
+        主节点选举
+    </p>
+    <p class="one_indent">
+        每一个Sentinel节点都可以成为Leader
+    </p>
+    <p class="one_indent">
+        1. 当一个Sentinel节点确认redis集群的主节点主观下线后，会请求其他Sentinel节点要求将自己选举为Leader
+    </p>
+    <p class="one_indent">
+        2. 被请求的Sentinel节点如果没有同意过其他Sentinel节点的选举请求，则同意该请求(选举票数+1)，否则不同意
+    </p>
+    <p class="one_indent">
+        3. 如果一个Sentinel节点获得的选举票数达到Leader最低票数(quorum和Sentinel节点数/2+1的最大值)，则该Sentinel节点选举为Leader；否则重新进行选举
+    </p>
+
     <a href="javascript:history.go(-1);" class="back"></a>
 </main>
 </body>

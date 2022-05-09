@@ -251,7 +251,26 @@
 
     <p class="col"><a href="https://www.cnblogs.com/yinzhengjie/p/7898275.html">日志</a></p><br />
     <p class="col"><a href="https://blog.csdn.net/cy973071263/article/details/104508211">主从复制实现原理</a></p><br />
-    <p class="col"><a href="https://blog.csdn.net/weixin_39875028/article/details/114828891">主从复制数据一致性</a></p>
+    <p class="col"><a href="https://blog.csdn.net/weixin_39875028/article/details/114828891">主从复制数据一致性</a></p><br />
+
+    <p class="col">
+        主节点选举
+    </p>
+    <p class="one_indent">
+        1、主节点挂了，在从节点中重新选举一个新备选主节点，原则是binlog最新最近更新的从节点作为新备选主节点。
+    </p>
+    <p class="one_indent">
+        2、在备选主节点和其他从节点之间同步差异中继日志（relay log）
+    </p>
+    <p class="one_indent">
+        3、应用从原来的主节点上保存二进制日志
+    </p>
+    <p class="one_indent">
+        4、提升备选主节点为新主节点
+    </p>
+    <p class="one_indent">
+        5、迁移集群其他从节点 作为 新主节点的 从节点
+    </p>
     <a href="javascript:history.go(-1);" class="back"></a>
 </main>
 </body>
