@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>php常用设计模式</title>
+    <script src="../../assets/js/font.js"></script>
+    <link rel="stylesheet" href="../../assets/css/public.css">
+    <link rel="stylesheet" href="../../assets/css/note.css">
+</head>
+<body>
+<header></header>
+<main>
+    <p class="col">
+        一、单例模式
+    </p>
+    <p>确保一个类只有一个实例</p>
+    <p>特点：</p>
+    <p class="one_indent">
+        1.三私一公：私有静态属性（存放实例）、私有构造方法（防止创建实例）、私有克隆方法（防止克隆对象）、公有静态方法（对外提供实例）
+    </p>
+    <p class="one_indent">
+        2.一个类只有一个实例
+    </p>
+    <p class="one_indent">
+        3.必须自行创建这个实例
+    </p>
+    <p class="one_indent">
+        4.自行像整个系统提供这个实例
+    </p>
+    <p class="one_indent">
+        应用场景：避免大量new操作消耗资源，减少数据库连接
+    </p>
+    <p class="col">
+        二、简单工厂模式
+    </p>
+    <p>特点：</p>
+    <p class="one_indent">
+        将调用对象和创建对象分离，调用者直接向工厂请求，减少代码耦合，提高系统的可维护性和可扩展性
+    </p>
+    <p class="one_indent">
+        应用场景：提供一种类，具有为你创建对象的某些方法，这样就可以使用工厂创建对象，而不是直接使用new，这样如果想更改创建对象类型直接更改工厂即可。
+    </p>
+    <p class="col">
+        三、观察者模式
+    </p>
+    <p>特点：</p>
+    <p class="one_indent">
+        当一个对象放生变化时，依赖他的对象全部会收到通知，并自动更新，观察者模式实现了低耦合，非侵入式的通知与更新机制
+    </p>
+    <p class="one_indent">
+        应用场景：一个事件发生后，会执行一连串更新操作。传统的编程方式，就是在事件的代码之后直接加入处理逻辑，
+        当更新的逻辑增多后，代码会变得难以维护。这种方式是耦合的，侵入式的。增加新的逻辑需要修改事件的主题体码。
+    </p>
+
+    <p class="col">
+        四、策略模式
+    </p>
+    <p>定义一系列算法，将每个算法封装起来，并让他们相互交替，策略模式让算法独立于使用它的客户而改变。</p>
+    <p>特点：</p>
+    <p class="one_indent">
+        策略模式提供了管理相关的算法族的办法，策略模式提供了可以替换继承关系的办法，使用策略模式可以避免使用多重条件转移语句
+    </p>
+    <p class="one_indent">
+        应用场景：多个类之区别在行为表现不同，在运行时动态选择具体要执行的行为，比如上学，有多种策略：走路、公交、地铁
+    </p>
+
+    <a href="javascript:history.go(-1);" class="back"></a>
+</main>
+</body>
+</html>
