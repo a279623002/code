@@ -45,5 +45,6 @@ func fn1(nums []int) [][]int {
 }
 
 func main() {
-	fmt.Println(fn1([]int{1, 2, 2}))
+	fmt.Println(fn([]int{1, 2, 3, 4}))
+	//fmt.Println(fn1([]int{1, 2, 2}))
 }
