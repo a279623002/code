@@ -10,6 +10,39 @@
 <body>
 <header></header>
 <main>
+    <p>
+        索引
+    </p>
+    <p class="col">
+        类型
+    </p>
+    <p class="one_indent">1. 普通索引</p>
+    <p class="one_indent">2. 唯一索引</p>
+    <p class="one_indent">3. 联合索引</p>
+    <p class="one_indent">4. 全文索引</p>
+    <p class="one_indent">5. 主键索引</p>
+    <p class="one_indent">6. 空间索引(用于经纬度，myisam才支持)</p>
+    <p class="col">
+        索引失效
+    </p>
+    <p class="one_indent">
+        1. 不遵循最左侧原则，如联合索引、like %在左
+    </p>
+    <p class="one_indent">
+        2. or条件带有不是索引的字段
+    </p>
+    <p class="one_indent">
+        3. 索引是字符串没用引号括起来
+    </p>
+    <p class="one_indent">
+        4. 查寻的数量是大表的大部分，如sex=1(70%)，2(30%)，这是查1 可能不会走索引，需要分析或加入其他列组成联合索引
+    </p>
+    <p class="one_indent">
+        5. 对索引进行运算，如 where id - 1 =9
+    </p>
+    <p class="one_indent">
+        6. not in, no exist
+    </p>
     <p class="col">
         事务ACID属性
     </p>
