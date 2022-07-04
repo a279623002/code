@@ -51,11 +51,19 @@
     <p class="col">
         缓存击穿
     </p>
-    <p class="one_indent">大量key在同一时间过期，同时有大量请求这些key，在缓存找不到时会请求数据库，造成数据库压力过大</p>
+    <p class="one_indent">在一个Key失效的瞬间，持续的大并发就穿破缓存，直接访问数据库</p>
+    <p class="one_indent">解决方案:</p>
+    <p class="one_indent">1.设置key永不过期</p>
+    <p class="one_indent">2.添加互斥锁，但收到一个请求时，其他请求需要等待，一个个轮流查询，避免数据库压力过大</p>
+
+    <p class="col">
+        缓存雪崩
+    </p>
+    <p class="one_indent">大量key在同一时间过期</p>
     <p class="one_indent">解决方案:</p>
     <p class="one_indent">1.设置key永不过期</p>
     <p class="one_indent">2.过期时间设为随机</p>
-    <p class="one_indent">3.添加互斥锁，但收到一个请求时，其他请求需要等待，一个个轮流查询，避免数据库压力过大</p>
+
     <p class="col"><a href="https://blog.csdn.net/weixin_44143114/article/details/119878271">主从复制</a></p><br />
 
     <p class="col">
