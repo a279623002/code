@@ -1,54 +1,43 @@
 <?php
-// 观察者模式
 
-/**
- * 主题接口
- */
-interface subject{
-    public function register(observer $observer);
-    public function notify();
-}
-
-/**
- * 观察者接口
- */
-interface observer{
+interface animal{
     public function watch();
 }
 
-/**
- * 主题
- */
-class action implements subject{
-    public $_observers = [];
+interface subject{
+    public function register(animal $animal);
+    public function notify();
+}
 
-    function register(observer $observer){
-        $this->_observers[] = $observer;
+// 主题
+class Action implements subject{
+    private $_animal = [];
+
+    public function register($animal) {
+        $this->_animal[] = $animal;
     }
 
-    function notify() {
-        foreach ($this->_observers as $observer) {
-            $observer->watch();
+    public function notify() {
+        foreach ($this->_animal as $a) {
+            $a->watch();
         }
     }
 }
 
-/**
- * 观察者
- */
-class cat implements observer{
-    function watch() {
-        echo 'cat watched tv'.PHP_EOL;
+class Dog implements animal{
+    public function watch() {
+        echo 'Dog Watch'.PHP_EOL;
     }
 }
 
-class dog implements observer{
-    function watch() {
-        echo 'dog watched tv'.PHP_EOL;
+class Cat implements animal{
+    public function watch() {
+        echo 'Cat Watch'.PHP_EOL;
     }
 }
 
-$action = new action();
-$action->register(new cat());
-$action->register(new dog());
-$action->notify();
+// 观察者模式可根据主题规定的方法调用所有注册的类里面的方法
+$act = new Action();
+$act->register(new Dog);
+$act->register(new Cat);
+$act->notify();

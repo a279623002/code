@@ -1,18 +1,41 @@
 <?php
 
-$str = '****xyz23333***';
-$preg = '/(.*xyz\d)/';
-
-// echo preg_match($preg, $str);
-
-preg_match_all($preg, $str, $res);
-print_r($res);
-
-function a() {
-    include 'index1.html';
-    echo 2233;
+abstract class animal{
+    abstract public function watch();
 }
-@a();
 
-//require 'index.html';
-echo 233;
+abstract class subject{
+    abstract public function register(animal $animal);
+    abstract public function notify();
+}
+
+class Action extends subject{
+    private $_animal = [];
+
+    public function register($animal) {
+        $this->_animal[] = $animal;
+    }
+
+    public function notify() {
+        foreach ($this->_animal as $a) {
+            $a->watch();
+        }
+    }
+}
+
+class Dog extends animal{
+    public function watch() {
+        echo 'Dog Watch'.PHP_EOL;
+    }
+}
+
+class Cat extends animal{
+    public function watch() {
+        echo 'Cat Watch'.PHP_EOL;
+    }
+}
+
+$act = new Action();
+$act->register(new Dog);
+$act->register(new Cat);
+$act->notify();
