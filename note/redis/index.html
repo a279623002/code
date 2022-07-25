@@ -17,10 +17,25 @@
         类型
     </p>
     <p class="one_indent">1.字符串(set\get)</p>
+    <p class="one_indent">
+        使用场景： 计数(库存, 统计)
+    </p>
     <p class="one_indent">2.哈希(hset\hget)</p>
+    <p class="one_indent">
+        使用场景： 存储对象
+    </p>
     <p class="one_indent">3.列表(lpush\lpop)</p>
-    <p class="one_indent">4.集合(sadd\spop)</p>
-    <p class="one_indent">5.有序集合(zadd\zscore)</p>
+    <p class="one_indent">
+        使用场景： 消息队列，分页，完成任务合集
+    </p>
+    <p class="one_indent">4.集合(sadd\spop) 集合成员是唯一</p>
+    <p class="one_indent">
+        使用场景： 标签，共同属性集合
+    </p>
+    <p class="one_indent">5.有序集合(zadd\zscore) 集合成员是唯一</p>
+    <p class="one_indent">
+        使用场景： 定时马甲，延时处理订单
+    </p>
     <p>
         缓存更新策略
     </p>
