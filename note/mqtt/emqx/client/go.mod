@@ -1,4 +1,4 @@
-module emqx
+module client
 
 go 1.16
 
