@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>go设计模式</title>
+    <script src="../../assets/js/font.js"></script>
+    <link rel="stylesheet" href="../../assets/css/public.css">
+    <link rel="stylesheet" href="../../assets/css/note.css">
+</head>
+<body>
+<header></header>
+<main>
+    <div id="code">
+
+    </div>
+
+    <a href="javascript:history.go(-1);" class="back"></a>
+</main>
+
+<script src="../../assets/js/jquery-3.6.0.min.js"></script>
+<script type="text/javascript">
+    function GetQueryString(name)
+    {
+        var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)")
+        var r = window.location.search.substr(1).match(reg)
+        if(r!=null)return  unescape(r[2]); return null
+    }
+
+    var tag = GetQueryString("tag")
+    files = files ? files : ["factory"]
+    var files = GetQueryString("files").split(",")
+    files = files ? files : ["simpleFatory.go"]
+    for (var i=0; i<files.length; i++) {
+        var fileName = files[i]
+        var filePath = "./"+tag+"/"+fileName
+
+        $('#code').append("<p class='title'>"+fileName+"</p>")
+        $.ajax({
+            url: filePath,async:false, success: function (data) {
+                $('#code').append("<pre>"+data+"</pre>")
+            }
+        })
+    }
+
+</script>
+</body>
+</html>
