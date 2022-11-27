@@ -16,9 +16,12 @@
     <p class="col">
         一、工厂模式
     </p>
-    <p class="one_indent" data-tag="factory/simpleFactory" data-files="simpleFactory.go,simpleFactory_test.go">1.简单工厂模式</p>
-    <p class="one_indent" data-tag="factory/factory" data-files="operatorFactory.go,operatorBase.go,operatorFactoryPlus.go,operatorFactoryPlus_test.go" >2.工厂模式</p>
-    <p class="one_indent" data-tag="factory/abstractFactory" data-files="factory.go,factoryMysql.go,factoryMysql_test.go">3.抽象工厂模式</p>
+    <p class="one_indent" data-tag="factory/simpleFactory" data-files="simpleFactory.go,simpleFactory_test.go">
+        1.简单工厂模式</p>
+    <p class="one_indent" data-tag="factory/factory"
+       data-files="operatorFactory.go,operatorBase.go,operatorFactoryPlus.go,operatorFactoryPlus_test.go">2.工厂模式</p>
+    <p class="one_indent" data-tag="factory/abstractFactory"
+       data-files="factory.go,factoryMysql.go,factoryMysql_test.go">3.抽象工厂模式</p>
     <p class="col">
         二、单例模式
     </p>
@@ -26,7 +29,8 @@
     <p class="col">
         三、原型模式
     </p>
-    <p class="one_indent" data-tag="prototype" data-files="prototype.go,prototype_client.go,prototype_test.go">1.原型模式</p>
+    <p class="one_indent" data-tag="prototype" data-files="prototype.go,prototype_client.go,prototype_test.go">
+        1.原型模式</p>
     <p>
         结构型模式
     </p>
@@ -34,6 +38,10 @@
         一、建造者模式
     </p>
     <p class="one_indent" data-tag="builder" data-files="builder.go,builderStr.go,builderStr_test.go">1.建造者模式</p>
+    <p class="col">
+        一、适配器模式
+    </p>
+    <p class="one_indent" data-tag="adapter" data-files="adapter.go,cache.go,adapter_redis.go,adapter_redis_test.go">1.适配器模式</p>
 
 
     <a href="javascript:history.go(-1);" class="back"></a>
@@ -41,8 +49,8 @@
 <script src="../../assets/js/jquery-3.6.0.min.js"></script>
 <script type="text/javascript">
     $(function () {
-        $('.one_indent').on('click', function() {
-            var url = "code.html?tag="+$(this).data("tag")+"&files="+$(this).data("files")
+        $('.one_indent').on('click', function () {
+            var url = "code.html?tag=" + $(this).data("tag") + "&files=" + $(this).data("files")
             window.location.href = url
         })
     })
