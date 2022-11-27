@@ -11,6 +11,6 @@ func TestAdapterRedis_Get(t *testing.T) {
 	cache.Set("shiro")
 
 	if res := cache.Get(); res != "shiro" {
-		t.Errorf("plus expected be shiro, but %s got", res)
+		t.Errorf("res expected be shiro, but %s got", res)
 	}
 }

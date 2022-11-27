@@ -11,6 +11,6 @@ func TestNewPrototypeManage(t *testing.T) {
 
 	ss := m.ClientArr["shiro"].Clone()
 	if s == ss {
-		t.Errorf("expected be s != ss, but s == ss got")
+		t.Errorf("res be s != ss, but s == ss got")
 	}
 }

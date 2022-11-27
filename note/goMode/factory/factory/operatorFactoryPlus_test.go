@@ -10,6 +10,6 @@ func TestOperatorPlus_Result(t *testing.T) {
 	op.SetRight(2)
 
 	if res := op.Result(); res != 3 {
-		t.Errorf("plus expected be 3, but %d got", res)
+		t.Errorf("res expected be 3, but %d got", res)
 	}
 }

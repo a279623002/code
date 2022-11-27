@@ -7,6 +7,6 @@ func TestGetHandler(t *testing.T) {
 	s2 := GetHandler()
 
 	if s1 != s2 {
-		t.Errorf("expected be s1 == s2, but s1 != s2 got")
+		t.Errorf("res expected be s1 == s2, but s1 != s2 got")
 	}
 }
