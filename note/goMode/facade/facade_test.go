@@ -4,11 +4,15 @@ import (
 	"testing"
 )
 
-func TestAPICall_Test(t *testing.T) {
-	api := &APICall{}
-	api.a = NewAModuleApi()
-	api.b = NewBModuleApi()
-	if res := api.Test(); res != "shiro and zzq" {
-		t.Errorf("res expected be shiro and zzq, but %s got", res)
+func TestNewShapeMaker(t *testing.T) {
+	s := NewShapeMaker()
+	if res := s.circle.Draw(); res != "Circle" {
+		t.Errorf("res expected be Circle, but %s got", res)
+	}
+	if res := s.rectangle.Draw(); res != "Rectangle" {
+		t.Errorf("res expected be Rectangle, but %s got", res)
+	}
+	if res := s.square.Draw(); res != "Square" {
+		t.Errorf("res expected be Square, but %s got", res)
 	}
 }

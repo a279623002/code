@@ -1,46 +1,39 @@
 package facade
 
-import "fmt"
-
-type API interface {
-	Test() string
+//模型实例创建
+type Shape interface {
+	Draw() string
 }
 
-type AModuleAPI interface {
-	TestA() string
+type Circle struct {
 }
 
-type aModuleImpl struct {
+type Rectangle struct {
 }
 
-func (a *aModuleImpl) TestA() string {
-	return "shiro"
+type Square struct {
 }
 
-func NewAModuleApi() AModuleAPI {
-	return &aModuleImpl{}
+func NewCircle() *Circle {
+	return &Circle{}
 }
 
-type BModuleAPI interface {
-	TestB() string
+func (c *Circle) Draw() string {
+	return "Circle"
 }
 
-type bModuleImpl struct {
+func NewRectangle() *Rectangle {
+	return &Rectangle{}
 }
 
-func (b *bModuleImpl) TestB() string {
-	return "zzq"
+func (r *Rectangle) Draw() string {
+	return "Rectangle"
 }
 
-func NewBModuleApi() BModuleAPI {
-	return &bModuleImpl{}
+func NewSquare() *Square {
+	return &Square{}
 }
 
-type APICall struct {
-	a AModuleAPI
-	b BModuleAPI
-}
-
-func (a *APICall) Test() string {
-	return fmt.Sprintf("%s and %s", a.a.TestA(), a.b.TestB())
+func (s *Square) Draw() string {
+	return "Square"
 }
