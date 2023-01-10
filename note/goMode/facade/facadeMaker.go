@@ -15,14 +15,14 @@ func NewShapeMaker() *ShapeMaker {
 	}
 }
 
-func (s *ShapeMaker) DrawCircle() {
-	s.circle.Draw()
+func (s *ShapeMaker) DrawCircle() string {
+	return s.circle.Draw()
 }
 
-func (s *ShapeMaker) DrawSquare() {
-	s.square.Draw()
+func (s *ShapeMaker) DrawSquare() string {
+	return s.square.Draw()
 }
 
-func (s *ShapeMaker) DrawRectangle() {
-	s.rectangle.Draw()
+func (s *ShapeMaker) DrawRectangle() string {
+	return s.rectangle.Draw()
 }
