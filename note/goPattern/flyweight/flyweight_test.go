@@ -1,4 +1,4 @@
-package flyweightPattern
+package flyweight
 
 import (
 	"testing"

@@ -1,4 +1,4 @@
-package flyweightPattern
+package flyweight
 
 // 共享的享元类型
 type Flyweight struct {
