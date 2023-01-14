@@ -2,36 +2,32 @@ package main
 
 import (
 	"fmt"
+	"sync"
 )
 
-func fn(nums []int) int {
-	left, right, res := 0, len(nums)-1, 0
-	for left < right {
-		l, r := nums[left], nums[right]
-		res = max(res, min(l, r) * (right-left+1))
-		if l > r {
-			right--
-		} else {
-			left++
-		}
-	}
-	return res
+type AbsentStruct struct {
+	Name string
 }
 
-func min(a, b int) int {
-	if a > b {
-		return b
-	}
-	return a
-}
+var Absent *AbsentStruct
+var once = sync.Once{}
 
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
+func AbsentInstance() *AbsentStruct {
+	once.Do(func() {
+		Absent = new(AbsentStruct)
+	})
+	return Absent
 }
 
 func main() {
-	fmt.Println(fn([]int{2, 3, 3, 1}))
+	wg := sync.WaitGroup{}
+	for i := 0; i < 1000; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			a1 := AbsentInstance()
+			fmt.Printf("%p \n %s \n", a1, a1.Name)
+		}()
+	}
+	wg.Wait()
 }
