@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>casbin</title>
+    <script src="../../assets/js/font.js"></script>
+    <link rel="stylesheet" href="../../assets/css/public.css">
+    <link rel="stylesheet" href="../../assets/css/note.css">
+</head>
+<body>
+<header></header>
+<main>
+    <p>
+        Casbin是一个强大的、高效的开源访问控制框架
+    </p>
+
+    <p class="col">
+        模型文件
+    </p>
+    <img src="../../assets/img/casbin1.png" alt="" class="img">
+    <p class="one_indent">
+        1. request_definition
+    </p>
+    <p class="one_indent">
+        请求入参（实体，资源，方法）
+    </p>
+    <p class="one_indent">
+        举个栗子： 譬如 A1这个用户 要访问/users ,GET 请求，模型文件r = sub, obj, act是这样的，那么你的策略文件就写成：A1,/users,GET
+    </p>
+    <p class="one_indent">
+        2. policy_definition
+    </p>
+    <p class="one_indent">
+        策略（实体，资源，方法）
+    </p>
+    <p class="one_indent">
+        3. role_definition
+    </p>
+    <p class="one_indent">
+        角色域，g = _, _
+    </p>
+    <p class="one_indent">
+        这里的意思是g收到两个参数 g = 用户，角色
+    </p>
+    <p class="one_indent">
+        4. policy_effect
+    </p>
+    <p class="one_indent">
+        对policy生效范围的定义
+    </p>
+    <p class="one_indent">
+        看看经过下面那些匹配规则后的返回值是否有一条等于里面那个allow
+    </p>
+    <p class="one_indent">
+        matchers
+    </p>
+    <p class="one_indent">
+        进来的实体，资源，方法，能不能在权限表（p）里面找到一个一模一样的
+    </p>
+    <p class="col">
+        策略模型
+    </p>
+    <img src="../../assets/img/casbin1.png" alt="" class="img">
+    <p class="col">
+        添加权限
+    </p>
+    <p class="one_indent">
+        enforcer.AddPolicy(uId, muneId, "All")
+    </p>
+    <p class="col">
+        验证权限
+    </p>
+    <p class="one_indent">
+        hasAccess, err = enforcer.Enforce(uId, muneId, "All")
+    </p>
+
+    <a href="javascript:history.go(-1);" class="back"></a>
+</main>
+</body>
+</html>
