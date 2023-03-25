@@ -10,8 +10,29 @@
 <body>
 <header></header>
 <main>
-    <p>
-        索引
+    <p class="col">
+        innodb与myisan区别
+    </p>
+    <p class="one_indent">
+        1. myisan不支持事务
+    </p>
+    <p class="one_indent">
+        2. myisan非聚集索引
+    </p>
+    <p class="one_indent">
+        3. myisan使用一个变量保存表的行数，count(*)比innodb快，查询速度也比innodb快
+    </p>
+    <p class="one_indent">
+        4. myisan不支持外键
+    </p>
+    <p class="col">
+        聚簇索引和非聚簇索引
+    </p>
+    <p class="one_indent">
+        聚簇索引就是按照每张表的主键构造一颗B+树，叶子系欸但存放整行数据,innodb引擎下，如果没有主键，会使用表里唯一索引作为主键，没有唯一索引，则隐式定义一个主键作为聚簇索引
+    </p>
+    <p class="one_indent">
+        除了主键索引其他索引一般都是非聚簇索引（辅助索引），是为了找到主键索引的二级索引，再通过主键索引找数据
     </p>
     <p class="col">
         类型
