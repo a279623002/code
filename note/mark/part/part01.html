@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>基础知识</title>
+    <script src="../../assets/js/font.js"></script>
+    <link rel="stylesheet" href="../../assets/css/public.css">
+    <link rel="stylesheet" href="../../assets/css/note.css">
+</head>
+<body>
+<header></header>
+<main>
+    <p class="col">
+        数据类型
+    </p>
+    <p class="one_indent">
+        1. Go语言中有哪些基本数据类型？
+    </p>
+    <p class="one_indent">
+        基本数据类型包括bool、数值类型（int、uint、float、complex）、字符串类型和派生类型（数组、切片、映射、结构体、函数、接口、指针、通道）。
+    </p>
+    <p class="one_indent">
+        2.如何判断一个类型是否可以转换为另一个类型？
+    </p>
+    <p class="one_indent">
+        可以使用类型断言来判断一个类型是否可以转换为另一个类型，例如：var i interface{} = "hello"，if s, ok := i.(string); ok { fmt.Println(s) }。
+    </p>
+    <p class="col">
+        变量赋值
+    </p>
+    <p class="one_indent">
+        1. 变量赋值是值拷贝还是引用拷贝？
+    </p>
+    <p class="one_indent">
+        值拷贝，即将变量的值复制一份给另一个变量，两个变量之间互不影响
+    </p>
+    <p class="one_indent">
+        2. 切片赋值是值拷贝还是引用拷贝？
+    </p>
+    <p class="one_indent">
+        引用拷贝，即将切片的底层数组指针复制一份给另一个切片，两个切片共享底层数组
+    </p>
+    <p class="one_indent">
+        3. 结构体赋值是值拷贝还是引用拷贝？
+    </p>
+    <p class="one_indent">
+        值拷贝，即将结构体的所有字段的值复制一份给另一个结构体，两个结构体之间互不影响
+    </p>
+    <p class="col">
+        变量作用域
+    </p>
+    <p class="one_indent">
+        1. 变量赋值是值拷贝还是引用拷贝？
+    </p>
+    <p class="one_indent">
+        值拷贝，即将变量的值复制一份给另一个变量，两个变量之间互不影响
+    </p>
+
+
+    <a href="javascript:history.go(-1);" class="back"></a>
+</main>
+</body>
+</html>

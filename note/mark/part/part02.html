@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>并发编程</title>
+    <script src="../../assets/js/font.js"></script>
+    <link rel="stylesheet" href="../../assets/css/public.css">
+    <link rel="stylesheet" href="../../assets/css/note.css">
+</head>
+<body>
+<header></header>
+<main>
+    <p class="col">
+        并发编程
+    </p>
+    <p class="one_indent">
+        Go语言的并发编程机制采用了Goroutine和Channel的方式。Goroutine是一种轻量级的线程，由Go语言的运行时（runtime）管理，可以在一个程序中同时运行成千上万个Goroutine，从而实现高并发。Channel是Goroutine之间的通信机制，可以实现安全的数据交换，避免了多个Goroutine访问同一个共享内存时可能出现的竞争和冲突。通过Goroutine和Channel的结合使用，Go语言实现了高效、安全、简洁的并发编程。
+    </p>
+    <p class="one_indent">
+        1. Goroutine的调度方式是什么？
+    </p>
+    <p class="one_indent">
+        Goroutine调度采用的是M:N调度模型，即将M个Goroutine映射到N个操作系统线程上执行，同时通过调度器来实现Goroutine的切换。
+    </p>
+    <p class="one_indent">
+        2.Channel的底层实现原理是什么？如何避免死锁？
+    </p>
+    <p class="one_indent">
+        Channel底层实现原理是通过锁和条件变量来实现的，避免死锁可以采用避免嵌套锁、避免单向Channel等方法。
+    </p>
+    <p class="one_indent">
+        3.Select语句的使用场景有哪些？如何实现超时控制？
+    </p>
+    <p class="one_indent">
+        Select语句适用于处理多个Channel的同步操作，可以通过设置超时时间来实现超时控制。
+    </p>
+    <p class="one_indent">
+        4.Mutex和RWMutex的区别是什么？如何使用它们来避免数据竞争？
+    </p>
+    <p class="one_indent">
+        Mutex和RWMutex的区别在于，Mutex只能被单个Goroutine持有，而RWMutex可以被多个Goroutine同时持有读锁，也可以被单个Goroutine持有写锁。在使用Mutex和RWMutex时，可以通过加锁和解锁操作来避免数据竞争。
+    </p>
+    <p class="one_indent">
+        5.WaitGroup的作用是什么？如何使用它来等待多个Goroutine的执行结果？
+    </p>
+    <p class="one_indent">
+        WaitGroup可以用来等待多个Goroutine的执行结果，可以通过Add、Done和Wait等方法实现。
+    </p>
+    <p class="one_indent">
+        6.Go语言中的并发模型与其他语言（如Java、Python等）的异同有哪些？
+    </p>
+    <p class="one_indent">
+        Go语言中的并发模型相较于其他语言更加轻量级、简单，同时支持原生的Go程和Channel机制，使得并发编程更加方便易用。
+    </p>
+    <p class="one_indent">
+        7.Goroutine的性能和资源消耗如何？如何优化Goroutine的使用？
+    </p>
+    <p class="one_indent">
+        Goroutine的性能和资源消耗比操作系统线程更轻量级，可以大量创建Goroutine来实现高并发，同时可以通过使用池化等方法来优化Goroutine的使用。
+    </p>
+    <p class="one_indent">
+        8.Go语言中的并发编程是否会导致死锁和竞态条件问题？如何避免这些问题？
+    </p>
+    <p class="one_indent">
+        并发编程可能会出现死锁和竞态条件问题，可以采用避免共享状态、使用锁、使用Channel等方法来避免这些问题。
+    </p>
+    <p class="one_indent">
+        9.Go语言中的并发编程是否支持分布式系统？如何实现分布式并发编程？
+    </p>
+    <p class="one_indent">
+        Go语言中的并发编程支持分布式系统，可以通过使用分布式锁、分布式Channel等方法来实现分布式并发编程。
+    </p>
+    <p class="one_indent">
+        10.Go语言中的并发编程是否可以与函数式编程结合使用？如何实现函数式并发编程？
+    </p>
+    <p class="one_indent">
+        Go语言中的并发编程可以与函数式编程结合使用，可以通过使用高阶函数、闭包等方法来实现函数式并发编程。
+    </p>
+
+
+
+    <a href="javascript:history.go(-1);" class="back"></a>
+</main>
+</body>
+</html>
