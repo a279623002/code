@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>切片</title>
+    <script src="../../../assets/js/font.js"></script>
+    <link rel="stylesheet" href="../../../assets/css/public.css">
+    <link rel="stylesheet" href="../../../assets/css/note.css">
+</head>
+<body>
+<header></header>
+<main>
+
+    <p class="one_indent">
+        切片虽然是引用类型 但用值传递, 如果扩容时切片地址改变，就修改不到原来的切片
+    </p>
+
+    <p class="col">
+        底层实现
+    </p>
+    <p class="one_indent">
+        切片本身并不是动态数组或者数组指针。它内部实现的数据结构通过指针引用底层数组
+    </p>
+    <p class="one_indent">
+        切片对象非常小，是因为它是只有 3 个字段的数据结构
+    </p>
+    <p class="one_indent">
+        1. 指向底层数组的指针
+    </p>
+    <p class="one_indent">
+        2. 切片的长度
+    </p>
+    <p class="one_indent">
+        3. 切片的容量
+    </p>
+    <p class="col">
+        扩容机制
+    </p>
+    <p class="one_indent">
+        1. 首先判断，如果新申请容量大于 2 倍的旧容量，最终容量就是新申请的容量
+    </p>
+    <p class="one_indent">
+        2. 否则判断，如果旧切片的长度小于 1024，则最终容量就是旧容量的两倍
+    </p>
+    <p class="one_indent">
+        3. 否则判断，如果旧切片长度大于等于 1024，则最终容量从旧容量开始循环增加原来的 1/4, 直到最终容量大于等于新申请的容量
+    </p>
+    <p class="one_indent">
+        4. 如果最终容量计算值溢出，则最终容量就是新申请容量
+    </p>
+    <p class="col">
+        扩容前后的 Slice 是否相同
+    </p>
+    <p class="one_indent">
+        情况一：相同
+    </p>
+    <p class="one_indent">
+        原数组还有容量可以扩容（实际容量没有填充完），这种情况下，扩容以后的数组还是指向原来的数组，对一个切片的操作可能影响多个指针指向相同地址的 Slice
+    </p>
+    <p class="one_indent">
+        情况二：不相同
+    </p>
+    <p class="one_indent">
+        原来数组的容量已经达到了最大值，再想扩容， Go 默认会先开一片内存区域，把原来的值拷贝过来，然后再执行 append() 操作。这种情况丝毫不影响原数组
+    </p>
+
+
+
+    <a href="javascript:history.go(-1);" class="back"></a>
+</main>
+</body>
+</html>

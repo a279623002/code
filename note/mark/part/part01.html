@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>基础知识</title>
-    <script src="../../assets/js/font.js"></script>
-    <link rel="stylesheet" href="../../assets/css/public.css">
-    <link rel="stylesheet" href="../../assets/css/note.css">
+    <script src="../../../assets/js/font.js"></script>
+    <link rel="stylesheet" href="../../../assets/css/public.css">
+    <link rel="stylesheet" href="../../../assets/css/note.css">
 </head>
 <body>
 <header></header>
@@ -55,7 +55,18 @@
     <p class="one_indent">
         值拷贝，即将变量的值复制一份给另一个变量，两个变量之间互不影响
     </p>
-
+    <p class="col">
+        make和new的区别？
+    </p>
+    <p class="one_indent">
+        1. new 用于分配值类型的内存，make 用于分配引用类型的内存
+    </p>
+    <p class="one_indent">
+        2. new(T) 函数返回 T 类型的指针，指向新分配的零值内存
+    </p>
+    <p class="one_indent">
+        3. make(T, args) 函数返回 T 类型的值，通常用于分配引用类型（如 slice、map 和 channel）的内存
+    </p>
 
     <a href="javascript:history.go(-1);" class="back"></a>
 </main>

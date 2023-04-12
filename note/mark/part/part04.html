@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>map</title>
+    <script src="../../../assets/js/font.js"></script>
+    <link rel="stylesheet" href="../../../assets/css/public.css">
+    <link rel="stylesheet" href="../../../assets/css/note.css">
+</head>
+<body>
+<header></header>
+<main>
+    <p class="col">
+        底层实现
+    </p>
+    <p class="one_indent">
+        map 的底层实现是一个散列表
+    </p>
+    <p class="one_indent">
+        实现 map 的过程实际上就是实现 散表的过程
+    </p>
+    <p class="one_indent">
+        切片对象非常小，是因为它是只有 3 个字段的数据结构
+    </p>
+    <p class="one_indent">
+        在这个散列表中，主要出现的结构体有两个，一个叫 hmap(a header for a go map)，一个叫 bmap(a bucket for a Go map，通常叫其 bucket)。
+    </p>
+
+    <p class="col">
+        扩容机制
+    </p>
+    <p class="one_indent">
+        双倍扩容
+    </p>
+    <p class="one_indent">
+        扩容采取了一种称为“渐进式”的方式，原有的 key 并不会一次性搬迁完毕，每次最多只会搬迁 2 个 bucket。
+    </p>
+    <p class="one_indent">
+        等量扩容
+    </p>
+    <p class="one_indent">
+        重新排列，极端情况下，重新排列也解决不了，map 存储就会蜕变成链表，性能大大降低，此时哈希因子 hash0 的设置，可以降低此类极端场景的发生
+    </p>
+
+    <p class="col">
+        Map 查找
+    </p>
+    <p class="one_indent">
+        Go 语言中 map 采用的是哈希查找表，由一个 key 通过哈希函数得到哈希值，64位系统中就生成一个 64bit 的哈希值，由这个哈希值将 key 对应存到不同的桶
+        （bucket）中，当有多个哈希映射到相同的的桶中时，使用链表解决哈希冲突。
+    </p>
+
+
+
+    <a href="javascript:history.go(-1);" class="back"></a>
+</main>
+</body>
+</html>
