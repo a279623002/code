@@ -70,6 +70,63 @@
     </p>
 
 
+    <p class="col">
+        RWMutex 实现
+    </p>
+    <p class="one_indent">
+        通过记录 readerCount 读锁的数量来进行控制，当有一个写锁的时候，会将读
+        锁数量设置为负数 1<<30。目的是让新进入的读锁等待之前的写锁释放通知读
+        锁。同样的当有写锁进行抢占时，也会等待之前的读锁都释放完毕，才会开始
+        进行后续的操作。 而等写锁释放完之后，会将值重新加上 1<<30, 并通知刚才
+        新进入的读锁（rw.readerSem），两者互相限制。
+    </p>
+    <p class="col">
+        RWMutex 注意事项
+    </p>
+    <p class="one_indent">
+        1. RWMutex 是单写多读锁，该锁可以加多个读锁或者一个写锁
+    </p>
+    <p class="one_indent">
+        2. 读锁占用的情况下会阻止写，不会阻止读，多个 Goroutine 可以同时获取
+        读锁
+    </p>
+    <p class="one_indent">
+        3. 写锁会阻止其他 Goroutine（无论读和写）进来，整个锁由该 Goroutine
+        独占
+    </p>
+    <p class="one_indent">
+        4. 适用于读多写少的场景
+    </p>
+    <p class="one_indent">
+        5. RWMutex 类型变量的零值是一个未锁定状态的互斥锁
+    </p>
+    <p class="one_indent">
+        6. RWMutex 在首次被使用之后就不能再被拷贝
+    </p>
+    <p class="one_indent">
+        7. RWMutex 的读锁或写锁在未锁定状态，解锁操作都会引发 panic
+    </p>
+    <p class="one_indent">
+        8. RWMutex 的一个写锁去锁定临界区的共享资源，如果临界区的共享资源已
+        被（读锁或写锁）锁定，这个写锁操作的 goroutine 将被阻塞直到解锁
+    </p>
+    <p class="one_indent">
+        9. RWMutex 的读锁不要用于递归调用，比较容易产生死锁
+    </p>
+    <p class="one_indent">
+        10. RWMutex 的锁定状态与特定的 goroutine 没有关联。一个 goroutine 可
+        以 RLock（Lock），另一个 goroutine 可以 RUnlock（Unlock）
+    </p>
+    <p class="one_indent">
+        11. 写锁被解锁后，所有因操作锁定读锁而被阻塞的 goroutine 会被唤醒，并
+        都可以成功锁定读锁
+    </p>
+    <p class="one_indent">
+        12. 读锁被解锁后，在没有被其他读锁锁定的前提下，所有因操作锁定写锁而
+        被阻塞的 Goroutine，其中等待时间最长的一个 Goroutine 会被唤醒
+    </p>
+
+
     <a href="javascript:history.go(-1);" class="back"></a>
 </main>
 </body>

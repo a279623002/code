@@ -51,6 +51,63 @@
     <p class="one_indent">超时剔除，给缓存数据手动设置一个过期时间</p>
     <p class="col">策略三</p>
     <p class="one_indent">如果数据源的数据有更新，则主动更新缓存</p>
+
+    <p>
+        回收策略（淘汰策略）
+    </p>
+    <p class="col">
+        1. volatile-lru
+    </p>
+    <p class="one_indent">
+        从已设置过期时间的数据集（server.db[i].expires）中挑选
+        最近最少使用的数据淘汰
+    </p>
+    <p class="col">
+        2. volatile-ttl
+    </p>
+    <p class="one_indent">
+        从已设置过期时间的数据集（server.db[i].expires）中挑选
+        将要过期的数据淘汰
+    </p>
+    <p class="col">
+        3. volatile-random
+    </p>
+    <p class="one_indent">
+        从已设置过期时间的数据集（server.db[i].expires）中任
+        意选择数据淘汰
+    </p>
+    <p class="col">
+        4. allkeys-lru
+    </p>
+    <p class="one_indent">
+        从数据集（server.db[i].dict）中挑选最近最少使用的数据淘
+        汰
+    </p>
+    <p class="col">
+        5. allkeys-random
+    </p>
+    <p class="one_indent">
+        从数据集（server.db[i].dict）中任意选择数据淘汰
+    </p>
+    <p class="col">
+        6. no-enviction
+    </p>
+    <p class="one_indent">
+        禁止驱逐数据
+    </p>
+
+    <p class="col">
+        Pipeline
+    </p>
+    <img src="../../assets/img/redis1.png" alt="" class="img">
+    <img src="../../assets/img/redis2.png" alt="" class="img">
+
+    <p class="one_indent">
+        可以将多次 IO 往返的时间缩减为一次，前提是 pipeline 执行的指令之 间没
+        有因果相关性。使用 Redis-benchmark 进行压测的时候可以发现影响 Redis
+        的 QPS 峰值的一个重要因素是 pipeline 批次指令的数目。
+    </p>
+
     <p>
         缓存穿透和缓存击穿的区别
     </p>
@@ -74,13 +131,14 @@
     <p class="one_indent">1.设置key永不过期</p>
     <p class="one_indent">2.添加互斥锁，但收到一个请求时，其他请求需要等待，一个个轮流查询，避免数据库压力过大</p>
 
-    <p class="col">
-        缓存雪崩
-    </p>
     <p class="one_indent">大量key在同一时间过期</p>
     <p class="one_indent">解决方案:</p>
     <p class="one_indent">1.设置key永不过期</p>
     <p class="one_indent">2.过期时间设为随机</p>
+    <p class="col">
+        缓存雪崩
+    </p>
+
 
     <p class="col"><a href="https://blog.csdn.net/weixin_44143114/article/details/119878271">主从复制</a></p><br />
 
@@ -98,6 +156,24 @@
     </p>
     <p class="one_indent">
         3. 如果一个Sentinel节点获得的选举票数达到Leader最低票数(quorum和Sentinel节点数/2+1的最大值)，则该Sentinel节点选举为Leader；否则重新进行选举
+    </p>
+
+    <p class="col">
+        mark
+    </p>
+    <p class="one_indent">
+        假如 Redis 里面有 1 亿个 key，其中有 10w 个 key 是以某
+        个固定的已知的前缀开头的，如果将它们全部找出来？
+    </p>
+    <p class="one_indent">
+        使用 keys 指令可以扫出指定模式的 key 列表。
+        对方接着追问：如果这个 Redis 正在给线上的业务提供服务，那使用 keys 指
+        令会有什么问题？
+        这个时候你要回答 Redis 关键的一个特性：<i style="color: red">Redis 的单线程的</i>。keys 指令会
+        导致线程阻塞一段时间，线上服务会停顿，直到指令执行完毕，服务才能恢
+        复。这个时候可以使用 scan 指令，scan 指令可以无阻塞的提取出指定模式的
+        key 列表，但是会有一定的重复概率，在客户端做一次去重就可以了，但是整
+        体所花费的时间会比直接用 keys 指令长。
     </p>
 
     <a href="javascript:history.go(-1);" class="back"></a>
