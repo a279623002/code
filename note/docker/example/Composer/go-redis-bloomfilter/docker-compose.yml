@@ -1,0 +1,34 @@
+version: '3'
+networks:
+  gr-network:
+    driver: bridge
+services:
+  redis:
+    image: redis
+    networks:
+      - gr-network
+    container_name: 'gr-redis'
+    ports:
+      - '6379:6379'
+    volumes:
+      - './redis/conf:/usr/local/etc/redis'
+      - './redis/data:/data'
+    command: redis-server
+  go:
+    build: ./gr-bloomfilter/
+    networks:
+      - gr-network
+    depends_on:
+      - 'redis'
+    links:
+      - redis
+    container_name: gr-bloomfilter
+    restart: always
+    ports:
+      - '6573:6573'
+    volumes:
+      - ./gr-bloomfilter:/files/go/gr-bloomfilter #挂载项目目录
+      - /etc/localtime:/etc/localtime:ro #本地时间 ro read only
+      - /etc/timezone:/etc/timezone:ro #本地时区
+    command: /bin/sh -c 'cd /files/go/gr-bloomfilter && go mod tidy && go build main.go && ./main' #初始运行命令
+
