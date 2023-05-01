@@ -1,0 +1,44 @@
+version: '3.5'
+services:
+  consul1:
+    image: consul:latest
+    container_name: consul1
+    restart: always
+    command: agent -server -client=0.0.0.0 -bootstrap-expect=3 -node=consul1  -config-dir=/consul/config
+    volumes:
+      - ./consul/consul1/data:/consul/data
+      - ./consul/consul1/config:/consul/config
+  consul2:
+    image: consul:latest
+    container_name: consul2
+    restart: always
+    command: agent -server -client=0.0.0.0 -retry-join=consul1 -node=consul2 -config-dir=/consul/config
+    volumes:
+      - ./consul/consul2/data:/consul/data
+      - ./consul/consul2/config:/consul/config
+  consul3:
+    image: consul:latest
+    container_name: consul3
+    restart: always
+    command: agent -server -client=0.0.0.0 -retry-join=consul1 -node=consul3  -config-dir=/consul/config
+    volumes:
+      - ./consul/consul3/data:/consul/data
+      - ./consul/consul3/config:/consul/config
+  consul4:
+    image: consul:latest
+    container_name: consul4
+    restart: always
+    ports:
+      - 8500:8500
+    command: agent -client=0.0.0.0 -retry-join=consul1 -ui -node=client1  -config-dir=/consul/config
+    volumes:
+      - ./consul/consul4/data:/consul/data
+      - ./consul/consul4/config:/consul/config
+  registrator:
+    image: gliderlabs/registrator:latest
+    container_name: registrator
+    restart: always
+    network_mode: host
+    volumes:
+      - "/var/run/docker.sock:/tmp/docker.sock"
+    command: consul://172.24.71.254:8500
