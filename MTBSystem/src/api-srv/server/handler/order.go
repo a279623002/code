@@ -22,6 +22,13 @@ var (
 	endpointPayOrder          = "Order.PayOrder"
 )
 
+// @Summary 订单详情
+// @Tags 影片中心
+// @Description 订单详情
+// @Accept json
+// @Produce json
+// @Param userId query int true "用户id"
+// @Router /order/getOrderMessage [post]
 func GetOrderMessage(c *gin.Context) {
 	userId, _ := strconv.Atoi(c.Query("userId"))
 	orderNum := c.Query("orderNum")
@@ -46,6 +53,14 @@ func GetOrderMessage(c *gin.Context) {
 	}
 }
 
+// @Summary 订单评分
+// @Tags 影片中心
+// @Description 订单评分
+// @Accept json
+// @Produce json
+// @Param score query int true "分数"
+// @Param userId query int true "用户id"
+// @Router /order/orderComment [post]
 func OrderComment(c *gin.Context) {
 	userId, _ := strconv.Atoi(c.Query("userId"))
 	score, _ := strconv.Atoi(c.Query("score"))
@@ -74,6 +89,13 @@ func OrderComment(c *gin.Context) {
 	}
 }
 
+// @Summary 查看看过的电影
+// @Tags 影片中心
+// @Description 查看看过的电影
+// @Accept json
+// @Produce json
+// @Param userId query int true "用户id"
+// @Router /order/lookAlreadyOrders [post]
 func LookAlreadyOrders(c *gin.Context) {
 	userId, _ := strconv.Atoi(c.Query("userId"))
 	grpcReq := &order.LookAlreadyOrdersReq{
@@ -96,6 +118,13 @@ func LookAlreadyOrders(c *gin.Context) {
 	}
 }
 
+// @Summary 查看所有(订单)电影票
+// @Tags 影片中心
+// @Description 查看所有(订单)电影票
+// @Accept json
+// @Produce json
+// @Param userId query int true "用户id"
+// @Router /order/lookOrders [post]
 func LookOrders(c *gin.Context) {
 	userId, _ := strconv.Atoi(c.Query("userId"))
 	grpcReq := &order.LookOrdersReq{
@@ -137,6 +166,13 @@ func UndoOrder(c *gin.Context) {
 	}
 }
 
+// @Summary 付款并更新用户手机
+// @Tags 影片中心
+// @Description 付款并更新用户手机
+// @Accept json
+// @Produce json
+// @Param userId query int true "用户id"
+// @Router /order/payOrder [post]
 func PayOrder(c *gin.Context) {
 	userId, _ := strconv.Atoi(c.Query("userId"))
 	phone, _ := strconv.Atoi(c.Query("phone"))
@@ -163,6 +199,19 @@ func PayOrder(c *gin.Context) {
 	}
 }
 
+// @Summary 选取影厅座位并生成订单
+// @Tags 影片中心
+// @Description 选取影厅座位并生成订单
+// @Accept json
+// @Produce json
+// @Param mhId query int true "影厅id"
+// @Param filmId query int true "影片id"
+// @Param userId query int true "用户id"
+// @Param x query int true "座位x"
+// @Param y query int true "座位y"
+// @Param startTime query string true "开始时间"
+// @Param endTime query string true "结束时间"
+// @Router /order/ticket [post]
 func Ticket(c *gin.Context) {
 	filmId, _ := strconv.Atoi(c.Query("filmId"))
 	userId, _ := strconv.Atoi(c.Query("userId"))
@@ -197,6 +246,14 @@ func Ticket(c *gin.Context) {
 	}
 }
 
+// @Summary 记录想看的电影
+// @Tags 影片中心
+// @Description 记录想看的电影
+// @Accept json
+// @Produce json
+// @Param filmId query int true "影片id"
+// @Param userId query int true "用户id"
+// @Router /order/wantTicket [post]
 func WantTicket(c *gin.Context) {
 	filmId, _ := strconv.Atoi(c.Query("filmId"))
 	userId, _ := strconv.Atoi(c.Query("userId"))

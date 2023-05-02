@@ -35,7 +35,7 @@ $ sudo bash ./ctrl.sh start
 $ sudo bash ./ctrl.sh login
 # cd project(docker)
 # install and run srv
-$ sudo bash ./build.sh all
+$ sudo bash ./build_local.sh all
 ```
 ##### create srv
 1. make proto code
@@ -49,10 +49,5 @@ $ sudo bash ./build.sh all
 9. cd project(docker)
 10. ./build.sh srv
 
-##### start consul
-```
-# 该命令启动只能允许本机访问
-$ consul agent -dev
-# 加上-client 0.0.0.0就可以其他机器进行访问了
-$ consul agent -dev -client 0.0.0.0
-```
+#### swagger
+| http://127.0.0.1:18082/swagger/index.html

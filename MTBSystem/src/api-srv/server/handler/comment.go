@@ -19,6 +19,14 @@ var (
 	endpointDeleteComment = "Comment.DeleteComment"
 )
 
+// @Summary 删除评论
+// @Tags 评论中心
+// @Description 删除评论
+// @Accept json
+// @Produce json
+// @Param commentID query int true "评论id"
+// @Success 1 {object} model.Response "success"
+// @Router /comment/deleteComment [post]
 func DeleteComment(c *gin.Context) {
 	commentID, _ := strconv.Atoi(c.Query("commentID"))
 	grpcReq := &comment.DeleteCommentReq{
@@ -41,6 +49,14 @@ func DeleteComment(c *gin.Context) {
 	}
 }
 
+// @Summary 我的评论
+// @Tags 评论中心
+// @Description 我的评论
+// @Accept json
+// @Produce json
+// @Param userId query int true "用户id"
+// @Success 1 {object} model.Response "success"
+// @Router /comment/myComments [post]
 func MyComments(c *gin.Context) {
 	userId, _ := strconv.Atoi(c.Query("userId"))
 	grpcReq := &comment.MyCommentsReq{
@@ -63,6 +79,14 @@ func MyComments(c *gin.Context) {
 	}
 }
 
+// @Summary 评论点赞
+// @Tags 评论中心
+// @Description 评论点赞
+// @Accept json
+// @Produce json
+// @Param commentID query int true "评论id"
+// @Success 1 {object} model.Response "success"
+// @Router /comment/upNumComment [post]
 func UpNumComment(c *gin.Context) {
 	commentID, _ := strconv.Atoi(c.Query("commentID"))
 	grpcReq := &comment.UpNumCommentReq{
@@ -85,6 +109,18 @@ func UpNumComment(c *gin.Context) {
 	}
 }
 
+// @Summary 评论
+// @Tags 评论中心
+// @Description 评论
+// @Accept json
+// @Produce json
+// @Param movieId query int true "影片id"
+// @Param userId query int true "用户id"
+// @Param title query string true "标题"
+// @Param headImg query string true "内容"
+// @Param nickname query string true "昵称"
+// @Success 1 {object} model.Response "success"
+// @Router /comment/makeComment [post]
 func MakeComment(c *gin.Context) {
 	title := c.Query("title")
 	content := c.Query("content")
@@ -94,7 +130,7 @@ func MakeComment(c *gin.Context) {
 	userId, _ := strconv.Atoi(c.Query("userId"))
 	grpcReq := &comment.MakeCommentReq{
 		MovieId:  int64(movieId),
-		UserId:  int64(userId),
+		UserId:   int64(userId),
 		Title:    title,
 		HeadImg:  headImg,
 		Nickname: nickname,
@@ -117,6 +153,14 @@ func MakeComment(c *gin.Context) {
 	}
 }
 
+// @Summary 获取评论
+// @Tags 评论中心
+// @Description 获取评论
+// @Accept json
+// @Produce json
+// @Param movieId query int true "影片id"
+// @Success 1 {object} model.Response "success"
+// @Router /comment/hotComment [post]
 func HotComment(c *gin.Context) {
 	movieId, _ := strconv.Atoi(c.Query("movieId"))
 	grpcReq := &comment.HotCommentReq{

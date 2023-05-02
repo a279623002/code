@@ -18,6 +18,16 @@ var (
 	endpointRegistAccount     = "User.RegistAccount"
 )
 
+// @Summary 用户注册
+// @Tags 用户中心
+// @Description 用户注册
+// @Accept json
+// @Produce json
+// @Param email query string true "邮箱"
+// @Param username query string true "账号"
+// @Param password query string true "密码"
+// @Success 1 {object} model.Response "success"
+// @Router /user/registAccount [post]
 func RegistAccount(c *gin.Context) {
 	email := c.Query("email")
 	userName := c.Query("username")
@@ -45,6 +55,15 @@ func RegistAccount(c *gin.Context) {
 	}
 }
 
+// @Summary 用户登录
+// @Tags 用户中心
+// @Description 用户登录
+// @Accept json
+// @Produce json
+// @Param email query string true "邮箱"
+// @Param password query string true "密码"
+// @Success 1 {object} model.Response "success"
+// @Router /user/loginAccount [post]
 func LoginAccount(c *gin.Context) {
 	email := c.Query("email")
 	password := c.Query("password")
@@ -70,6 +89,15 @@ func LoginAccount(c *gin.Context) {
 	}
 }
 
+// @Summary 电影评分
+// @Tags 用户中心
+// @Description 评分（需要下单后才能评分）
+// @Accept json
+// @Produce json
+// @Param userId query int true "用户id"
+// @Param movieId query int true "电影id"
+// @Success 1 {object} model.Response "success"
+// @Router /user/wantScore [post]
 func WantScore(c *gin.Context) {
 	userId, _ := strconv.Atoi(c.Query("userId"))
 	movieId, _ := strconv.Atoi(c.Query("movieId"))
@@ -95,10 +123,21 @@ func WantScore(c *gin.Context) {
 	}
 }
 
+// @Summary 用户更新
+// @Tags 用户中心
+// @Description 用户更新
+// @Accept json
+// @Produce json
+// @Param userId query int true "用户id"
+// @Param email query string true "邮箱"
+// @Param username query string true "账号"
+// @Param phone query string true "手机"
+// @Success 1 {object} model.Response "success"
+// @Router /user/updateUserProfile [post]
 func UpdateUserProfile(c *gin.Context) {
-	userName := c.Query("userName")
-	userEmail := c.Query("userEmail")
-	userPhone := c.Query("userPhone")
+	userName := c.Query("username")
+	userEmail := c.Query("email")
+	userPhone := c.Query("phone")
 	userId, _ := strconv.Atoi(c.Query("userId"))
 
 	grpcReq := &user.UpdateUserProfileReq{

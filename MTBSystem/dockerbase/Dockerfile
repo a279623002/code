@@ -30,16 +30,17 @@ RUN apt-get -y install supervisor && \
     mkdir -p /data/logs/gologs/ && \
     mysql_install_db && \
     update-rc.d -f mysql defaults && \
-    wget https://studygolang.com/dl/golang/go1.14.1.linux-amd64.tar.gz && \
-    tar zxf go1.14.1.linux-amd64.tar.gz && \
+    wget https://studygolang.com/dl/golang/go1.20.3.linux-amd64.tar.gz && \
+    tar zxf go1.20.3.linux-amd64.tar.gz && \
     mkdir -p /data/services/ && \
     mv go/ /data/services/go && \
-    rm -rf go1.14.1.linux-amd64.tar.gz consul_0.9.0_linux_amd64.zip && \
+    rm -rf go1.20.3.linux-amd64.tar.gz consul_0.9.0_linux_amd64.zip && \
     echo "export GO111MODULE=on" >> ~/.bashrc && \
     echo "export GOPROXY=https://goproxy.cn,direct" >> ~/.bashrc && \
     echo "export GOROOT=/data/services/go" >> ~/.bashrc && \
     echo "export PATH=$PATH:/data/services/go/bin" >> ~/.bashrc && \
-    sudo ln -s /data/services/go/bin/* /usr/bin/
+    sudo ln -s /data/services/go/bin/* /usr/bin/ && \
+    go env -w GOPROXY=https://goproxy.cn,direct
 
 EXPOSE 3306 8500 6379 8082 8083 8084 8085 5324 9999
 

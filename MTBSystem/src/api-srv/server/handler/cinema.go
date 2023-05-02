@@ -17,6 +17,14 @@ var (
 	endpointLocationCinema        = "Cinema.LocationCinema"
 )
 
+// @Summary 获取影院
+// @Tags 影厅中心
+// @Description 根据location_id 获取影院
+// @Accept json
+// @Produce json
+// @Param locationId query int true "定位id"
+// @Success 1 {object} model.Response "success"
+// @Router /cinema/locationCinema [post]
 func LocationCinema(c *gin.Context) {
 	locationId, _ := strconv.Atoi(c.Query("locationId"))
 	grpcReq := &cinema.LocationCinemaReq{
@@ -39,6 +47,14 @@ func LocationCinema(c *gin.Context) {
 	}
 }
 
+// @Summary 正在销售的影片信息和影院信息
+// @Tags 影厅中心
+// @Description 正在销售的影片信息和影院信息
+// @Accept json
+// @Produce json
+// @Param cinemaId query int true "影院id"
+// @Success 1 {object} model.Response "success"
+// @Router /cinema/getCinemaMessageByCid [post]
 func GetCinemaMessageByCid(c *gin.Context) {
 	cinemaId, _ := strconv.Atoi(c.Query("cinemaId"))
 	grpcReq := &cinema.GetCinemaMessageByCidReq{
@@ -61,6 +77,14 @@ func GetCinemaMessageByCid(c *gin.Context) {
 	}
 }
 
+// @Summary 获取影厅座位表
+// @Tags 影厅中心
+// @Description 获取影厅座位表
+// @Accept json
+// @Produce json
+// @Param mhId query int true "影厅id"
+// @Success 1 {object} model.Response "success"
+// @Router /cinema/getMovieHallByMHId [post]
 func GetMovieHallByMHId(c *gin.Context) {
 	mhId, _ := strconv.Atoi(c.Query("mhId"))
 	grpcReq := &cinema.GetMovieHallByMHIdReq{
