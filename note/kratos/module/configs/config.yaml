@@ -1,0 +1,22 @@
+server:
+  http:
+    addr: 0.0.0.0:8000
+    timeout: 1s
+  grpc:
+    addr: 0.0.0.0:9000
+    timeout: 1s
+data:
+  database:
+    driver: mysql
+    source: mysql:ymqq_test:ym123!@#ym@tcp(rm-7xv15672cu715r2a3ro.mysql.rds.aliyuncs.com:3306)/ymqq_crm_test?loc=Local&parseTime=true
+  redis:
+    addr: 127.0.0.1:6379
+    dial_timeout: 1s
+    read_timeout: 0.2s
+    write_timeout: 0.2s
+    password:
+    db: 1
+    network:
+consul:
+  address: 127.0.0.1:8500
+  scheme: http

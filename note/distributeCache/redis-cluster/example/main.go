@@ -7,7 +7,7 @@ import (
 
 func main() {
 	options := &redis.ClusterOptions{
-		Addrs: []string{"192.168.1.89:7001","192.168.1.89:7002","192.168.1.89:7003"},
+		Addrs: []string{"192.168.1.89:7001", "192.168.1.89:7002", "192.168.1.89:7003"},
 	}
 	client := redis.NewClusterClient(options)
 	err := client.Ping()

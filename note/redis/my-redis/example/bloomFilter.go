@@ -22,8 +22,8 @@ type BloomFilter struct {
 	HashFuncs []string
 }
 
-//Redis BitMap 的底层数据结构实际上是 String 类型，Redis 对于 String 类型有最大值限制不得超过 512M，即 2^32 次方 byte
-//int64 2^63-1 ERR bit offset is not an integer or out of range
+// Redis BitMap 的底层数据结构实际上是 String 类型，Redis 对于 String 类型有最大值限制不得超过 512M，即 2^32 次方 byte
+// int64 2^63-1 ERR bit offset is not an integer or out of range
 func NewBloomFilter(bucket string, hashFuncs []string) *BloomFilter {
 	return &BloomFilter{
 		Bucket:    bucket,

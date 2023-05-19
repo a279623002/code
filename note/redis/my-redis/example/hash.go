@@ -1,13 +1,13 @@
 package example
 
 import (
-	"my-redis/configs"
 	"fmt"
+	"my-redis/configs"
 	"time"
 )
 
 func HMSetAndGet() {
-	key := "Go-Redis-Hash";
+	key := "Go-Redis-Hash"
 	res, _ := configs.RedisDB.HGetAll(key).Result()
 	if len(res) == 0 {
 		fmt.Println("set Go-Redis-Hash")
@@ -15,7 +15,7 @@ func HMSetAndGet() {
 		data["name"] = "shiro"
 		data["hobby"] = "hanser"
 		configs.RedisDB.HMSet(key, data)
-		configs.RedisDB.Expire(key, 60 * time.Second)
+		configs.RedisDB.Expire(key, 60*time.Second)
 		res, _ = configs.RedisDB.HGetAll(key).Result()
 	}
 	fmt.Println(res)

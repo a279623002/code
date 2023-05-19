@@ -5,7 +5,6 @@ import (
 	"testing"
 )
 
-
 type testBloomFilter struct {
 	b        *BloomFilter
 	name     string
@@ -19,7 +18,7 @@ func createMulTestcase(t *testing.T, tbf *testBloomFilter) {
 }
 
 func TestExists(t *testing.T) {
-	session := &configs.SessionConfig{Host:"127.0.0.1:6379",Select:10}
+	session := &configs.SessionConfig{Host: "127.0.0.1:6379", Select: 10}
 	configs.InitDb(session)
 
 	b := NewBloomFilter("shiro", []string{"PJWHash", "DEKHash", "DJBHash"})

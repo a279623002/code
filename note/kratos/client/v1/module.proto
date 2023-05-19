@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package api.module.v1;
+
+option go_package = "module/api/module/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.module.v1";
+
+service Module {
+	rpc CreateModule (CreateModuleRequest) returns (CreateModuleReply);
+	rpc UpdateModule (UpdateModuleRequest) returns (UpdateModuleReply);
+	rpc DeleteModule (DeleteModuleRequest) returns (DeleteModuleReply);
+	rpc GetModule (GetModuleRequest) returns (GetModuleReply);
+	rpc ListModule (PageInfoRequest) returns (ListModuleReply);
+}
+
+message PageInfoRequest {
+	int32 pn = 1;
+	int32 size = 2;
+}
+
+message CreateModuleRequest {
+	string name = 1;
+	int32 cId = 2;
+}
+message CreateModuleReply {
+	int32 id = 1;
+	int32 cId = 2;
+	string name = 3;
+}
+
+message UpdateModuleRequest {
+	int32 id = 1;
+	int32 cId = 2;
+	string name = 3;
+}
+message UpdateModuleReply {}
+
+message DeleteModuleRequest {
+	int32 id = 1;
+}
+message DeleteModuleReply {}
+
+message GetModuleRequest {
+	int32 id = 1;
+}
+message GetModuleReply {}
+
+message ListModuleRequest {}
+message ListModuleReply {
+	int32 total = 1;
+	repeated CreateModuleReply data = 2;
+}

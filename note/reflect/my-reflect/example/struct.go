@@ -7,12 +7,12 @@ import (
 
 type Student struct {
 	Name string
-	Age int
+	Age  int
 	Type int `json:"type" form:"type"`
 }
 
 func (s *Student) SetAge(age, t int) int {
-	s.Age =age
+	s.Age = age
 	s.Type = t
 	fmt.Println("set done")
 	return s.Age
@@ -34,7 +34,7 @@ func ExStruct() {
 	fmt.Println(elem.Name(), elem.Kind(), elem.String()) // Student struct example.Student
 
 	// 获取成员反射信息
-	newStu := &Student{Name:"shiro",Age:233,Type:1}
+	newStu := &Student{Name: "shiro", Age: 233, Type: 1}
 	typeOfNewStuPtr := reflect.TypeOf(newStu)
 	newStuElem := typeOfNewStuPtr.Elem()
 	for i := 0; i < newStuElem.NumField(); i++ {
@@ -49,8 +49,6 @@ func ExStruct() {
 		// false -- 是否为一个嵌入式字段
 		fmt.Println(stuType, stuType.Tag.Get("json"))
 	}
-
-
 
 	// 获取值信息
 	rValue := reflect.ValueOf(newStu)
@@ -75,7 +73,6 @@ func ExStruct() {
 	//而是根据方法的ASCII码值来从小到大排序，所以Dec排在第一个，也就是Method(0)
 	res := rValueNew.Method(0).Call(params)
 	fmt.Println(res[0].Int())
-
 
 	rValue = rValueNew.Elem()
 	for i := 0; i < rValue.NumField(); i++ {
