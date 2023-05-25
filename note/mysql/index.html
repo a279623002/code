@@ -65,6 +65,21 @@
         6. not in, no exist
     </p>
     <p class="col">
+        索引优化
+    </p>
+    <p class="one_indent">
+        1. 使用前缀索引--减少索引字段大小
+    </p>
+    <p class="one_indent">
+        2. 使用覆盖索引--避免回表
+    </p>
+    <p class="one_indent">
+        3. 主键索引自增--插入效率高，不需要移动数据
+    </p>
+    <p class="one_indent">
+        4. 避免索引失效
+    </p>
+    <p class="col">
         事务ACID属性
     </p>
     <p class="one_indent">
@@ -302,6 +317,21 @@
     </p>
     <p class="one_indent">
         在in里面的列表值mysql是会自动从小到大排序，加锁也是一条条从小到大加的锁
+    </p>
+    <p class="col">
+        死锁解决机制
+    </p>
+    <p class="one_indent">
+        超时机制: 即两个事务相互等待时，一旦等待时间超过一个阈值，那么超时事务回滚释放资源，另一个事务就能正常执行了。
+    </p>
+    <p class="one_indent">
+        在InnoDB存储引擎中，，参数innodb lock_wait timeout 用来设置事务超时的时间
+    </p>
+    <p class="one_indent">
+        检测机制 - wait-for graph
+    </p>
+    <p class="one_indent">
+        将持有最少行级排他锁的事务进行回滚
     </p>
     <p class="col">
         锁总结
