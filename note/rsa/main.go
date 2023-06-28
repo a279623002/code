@@ -11,7 +11,10 @@ import (
 	"fmt"
 	"os"
 )
-
+// 生成RSA私钥
+// openssl genrsa -out private_key.pem 2048
+// 生成RSA公钥
+// openssl rsa -in private_key.pem -pubout -out public_key.pem
 var (
 	privateKeyPath = "./pem/private_ssl.pem"
 	publicKeyPath  = "./pem/public_ssl.pem"
