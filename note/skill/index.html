@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>秒杀流程</title>
+    <script src="../../assets/js/font.js"></script>
+    <link rel="stylesheet" href="../../assets/css/public.css">
+    <link rel="stylesheet" href="../../assets/css/note.css">
+</head>
+<body>
+<header></header>
+<main>
+    <p class="col">
+        1. initAct
+    </p>
+    <p class="one_indent">1. hmset(act_id, actInfo)</p>
+    <p class="one_indent">2. set(act_id, stock)</p>
+    <p class="col">
+        2. skill
+    </p>
+    <p class="one_indent">1. limit_user</p>
+    <p class="one_indent">2. check_user_order -> hget(user_id, order)</p>
+    <p class="one_indent">3. check_stock</p>
+    <p class="one_indent">3. check_stock</p>
+    <p class="one_indent">
+        <pre style="background: skyblue; border-radius: .5rem;">
+
+    stock = redis.Get(act_id)
+    if stock > 0 {
+        // 扣减库存
+        // redis->lua->decr stock
+    }else {
+        // 获取所有订单orders
+        // orders已支付状态
+    if len(orders) < stock {
+        // 被占领
+    }else {
+        // 已抢完
+    }}
+        </pre>
+    </p> 
+    <p class="one_indent">4. create orde</p>
+    <p class="one_indent">
+        <pre style="background: skyblue; border-radius: .5rem;">
+
+    // 1.异步生成订单
+    order[order_id] = 雪花id
+    go createOrder(order)
+    // 2. 刷到redis
+    redis.ZSet(act_id, order_id)
+    redis.HSet(order_id, order)
+        </pre>
+    </p>
+    <p class="col">
+        3. 获取所有订单
+    </p>
+    <p class="one_indent">
+        <pre style="background: skyblue; border-radius: .5rem;">
+
+    order_ids = redis.ZRange(act_id)
+    for order_id = range order_ids {
+        order = redis.HGet(order_id)
+        orders = append(orders, order)
+    }
+        </pre>
+    </p>
+    <a href="javascript:history.go(-1);" class="back"></a>
+</main>
+</body>
+</html>
