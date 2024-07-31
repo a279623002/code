@@ -37,14 +37,51 @@
         <div class="content">
             <div id="box1" class="box selected">
                 <p class="col">数据类型</p>
-                <p class="one_indent">值类型：int, float, string, bool, array, stuct</p>
-                <p class="one_indent">指针类型：slice, map, chan, 空接口, 指针</p>
+                <p class="one_indent">1. 值类型：int, float, string, bool, array, stuct</p>
+                <p class="one_indent">2. 引用类型：slice, map, chan, 空接口, 指针</p>
 
                 <p class="col">数据类型区别</p>
-                <p class="one_indent">值类型：变量存值，内存在栈分配</p>
-                <p class="one_indent">指针类型：变量存地址，地址指向值，内存在堆分配</p>
+                <p class="one_indent">1. 值类型：变量存值，内存在栈分配</p>
+                <p class="one_indent">2. 指针类型：变量存地址，地址指向值，内存在堆分配</p>
 
+                <p class="col">变量传递是值拷贝还是引用</p>
+                <p class="one_indent">取决与变量类型</p>
+                <p class="one_indent">1. 值传递为值拷贝，其中<i style="color:red">切片</i>包含对底层数组的引用，在不扩容的情况会影响原始切片，
+                    <i style="color:red">map</i>传递的是指向map内部数据结构的指针的拷贝，会影响原始map</p>
+                <p class="one_indent">2。 指针传递为引用指针操作原始数据，避免不必要的拷贝，提高性能</p>
 
+                <p class="col">new和make的区别</p>
+                <p class="one_indent">1. new</p>
+                <p class="one_indent">分配值类型的内存，返回指向零值的指针</p>
+                <p class="one_indent">2. make</p>
+                <p class="one_indent">分配引用类型的内存，初始化对应类型后返回类型</p>
+
+                <p class="col">切片，chan，map需不需要用make以及区别</p>
+                <p class="one_indent">1. 切片可以不需要make</p>
+                <p class="one_indent">使用make可以指定长度与容量进行分配，其中所有元素为零值，只指定长度容量将默认为长度</p>
+                <p class="one_indent">不使用make切片的长度与容量将由元素或数组范围自动确定</p>
+                <p class="one_indent">2. chan需要make</p>
+                <p class="one_indent">3. map可以不需要make</p>
+                <p class="one_indent">使用make后映射被正确初始化，可以立即存储键值对，没有显式make则go会自动完成初始化</p>
+                <p class="one_indent">不使用make该map为零值，需要显式调用make初始化才能使用</p>
+
+                <p class="col">切片底层与扩容</p>
+                <p class="one_indent">1. 切片底层为指向底层数组的指针，长度，容量</p>
+                <p class="one_indent">2. 扩容机制：</p>
+                <p class="one_indent">2.1 当切片容量不足时，根据版本不同go会自动扩容当前容量2倍或1.25倍</p>
+                <p class="one_indent">2.2 根据计算出的容量，在堆上分配一个新的数组</p>
+                <p class="one_indent">2.3 将原切片中的元素复制到新分配的数组中</p>
+                <p class="one_indent">2.4 更新切片的指针指向新的数据，更新长度与容量</p>
+
+                <p class="col">map底层与扩容</p>
+                <p class="one_indent">1. map底层依赖于哈希表，底层结构体为<i style="color:red">hmap</i>，维护<i style="color:red">bucket桶数组</i>，
+                    bucket中元素结构为<i style="color:red">bmap</i>， bmap为bucketCnt-uint8键值对，bucket满了会放到下一个溢出桶中，
+                    通过<i style="color:red">overflow连接</i>，<i style="color:red">oldbuckets指向原来的桶</i></p>
+
+                <p class="col">channel底层</p>
+                
+
+                <p class="col">channel缓冲与无缓冲区别</p>
             </div>
             <div id="box2" class="box">
                 <p class="col">2</p>
@@ -87,12 +124,14 @@
                 if ($(this).hasClass('close')) {
                     $(this).removeClass('close').html('+')
                     $('.content').animate({
-                        left: '0'
+                        left: '0',
+                        width: '100%'
                     }, 'slow'); // 'slow'定义动画执行的速度
                 } else {
                     $(this).addClass('close').html('—')
                     $('.content').animate({
-                        left: '30%'
+                        left: '30%',
+                        width: '70%'
                     }, 'fast'); // 'slow'定义动画执行的速度
                 }
             })
