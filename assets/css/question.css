@@ -3,10 +3,10 @@ main {
 }
 
 .btn {
-    position: absolute;
-    top: -1rem;
-    left: 0;
-    width: 2rem;
+    position: fixed;
+    top: .2rem;
+    left: .2rem;
+    width: 25%;
     height: .8rem;
     font-size: 1.4rem;
     line-height: .6rem;
@@ -16,9 +16,11 @@ main {
 }
 
 .tab {
-    float: left;
-    width: 22%;
-    padding-right: .5rem;
+    position: fixed;
+    width: 25%;
+    padding-right: 1%;
+    height: 7rem;
+    overflow: auto;
 }
 
 .tab a {
@@ -37,8 +39,10 @@ main {
 
 .content {
     position: relative;
-    width: 100%;
     top: .3rem;
+    z-index: -1;
+    left: 30%;
+    width: 70%;
 }
 
 .content .selected {

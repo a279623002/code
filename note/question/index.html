@@ -39,7 +39,7 @@
                 <p class="col">数据类型</p>
                 <p class="one_indent">值类型：int, float, string, bool, array, stuct</p>
                 <p class="one_indent">指针类型：slice, map, chan, 空接口, 指针</p>
-                
+
                 <p class="col">数据类型区别</p>
                 <p class="one_indent">值类型：变量存值，内存在栈分配</p>
                 <p class="one_indent">指针类型：变量存地址，地址指向值，内存在堆分配</p>
@@ -71,22 +71,31 @@
         </div>
     </main>
     <script>
-        $(window).on('load', function () {
+        $(function () {
             $('.tab a').on('click', function () {
                 $(this).addClass('active').siblings().removeClass('active');
                 var index = $(this).index();
                 $('.content .box').eq(index).addClass('selected').siblings().removeClass('selected');
+                $('html, body').animate({
+                    scrollTop: 0 // 0表示滚动条垂直位置的起始点
+                }, 'slow'); // 'slow'定义动画执行的速度
             })
             $('.btn').on('click', function () {
                 $('.tab').toggle(function () { }, function () { });
                 if ($(this).hasClass('close')) {
                     $(this).removeClass('close').html('+')
+                    $('.content').animate({
+                        left: '0'
+                    }, 'slow'); // 'slow'定义动画执行的速度
                 } else {
                     $(this).addClass('close').html('—')
+                    $('.content').animate({
+                        left: '30%'
+                    }, 'fast'); // 'slow'定义动画执行的速度
                 }
             })
-
         })
+
     </script>
 </body>
 
