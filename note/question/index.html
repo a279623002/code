@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>note</title>
+    <script src="../../assets/js/font.js"></script>
+    <script src="../../assets/js/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="../../assets/css/public.css">
+    <link rel="stylesheet" href="../../assets/css/note.css">
+    <link rel="stylesheet" href="../../assets/css/question.css">
+</head>
+
+<body>
+    <header></header>
+    <main>
+        <a href="javascript:void(0);" class="btn close">—</a>
+        <div class="tab">
+            <a href="#box1" class="active">go</a>
+            <a href="#box2">mysql</a>
+            <a href="#box3">redis</a>
+            <a href="#box4">nginx</a>
+            <a href="#box5">mongodb</a>
+            <a href="#box6">rabbitMQ</a>
+            <a href="#box7">设计模式</a>
+            <a href="#box8">算法</a>
+            <a href="#box9">项目经历</a>
+            <a href="#box10">k8s</a>
+            <a href="#box11">树</a>
+            <a href="#box12">linux</a>
+            <a href="#box13">shell</a>
+            <a href="#box14">docker</a>
+            <a href="#box15">casbin</a>
+            <a href="#box16">协议</a>
+            <a href="#box17">jwt</a>
+        </div>
+        <div class="content">
+            <div id="box1" class="box selected">
+                <p class="col">数据类型</p>
+                <p class="one_indent">值类型：int, float, string, bool, array, stuct</p>
+                <p class="one_indent">指针类型：slice, map, chan, 空接口, 指针</p>
+                
+                <p class="col">数据类型区别</p>
+                <p class="one_indent">值类型：变量存值，内存在栈分配</p>
+                <p class="one_indent">指针类型：变量存地址，地址指向值，内存在堆分配</p>
+            </div>
+            <div id="box2" class="box">
+                <p class="col">2</p>
+                <p class="one_indent">123123123123</p>
+            </div>
+            <div id="box3" class="box">
+                <p class="col">3</p>
+                <p class="one_indent">123123123123</p>
+            </div>
+            <div id="box4" class="box">
+                <p class="col">4</p>
+                <p class="one_indent">123123123123</p>
+            </div>
+            <div id="box5" class="box">
+                <p class="col">5</p>
+                <p class="one_indent">123123123123</p>
+            </div>
+            <div id="box6" class="box">
+                <p class="col">6</p>
+                <p class="one_indent">123123123123</p>
+            </div>
+            <div id="box7" class="box">
+                <p class="col">7</p>
+                <p class="one_indent">123123123123</p>
+            </div>
+        </div>
+    </main>
+    <script>
+        $(window).on('load', function () {
+            $('.tab a').on('click', function () {
+                $(this).addClass('active').siblings().removeClass('active');
+                var index = $(this).index();
+                $('.content .box').eq(index).addClass('selected').siblings().removeClass('selected');
+            })
+            $('.btn').on('click', function () {
+                $('.tab').toggle(function () { }, function () { });
+                if ($(this).hasClass('close')) {
+                    $(this).removeClass('close').html('+')
+                } else {
+                    $(this).addClass('close').html('—')
+                }
+            })
+
+        })
+    </script>
+</body>
+
+</html>

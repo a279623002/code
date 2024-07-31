@@ -1,0 +1,50 @@
+main {
+    position: relative;
+}
+
+.btn {
+    position: absolute;
+    top: -1rem;
+    left: 0;
+    width: 2rem;
+    height: .8rem;
+    font-size: 1.4rem;
+    line-height: .6rem;
+    border-radius: 1rem;
+    border: .1rem solid gray;
+    text-align: center;
+}
+
+.tab {
+    float: left;
+    width: 22%;
+    padding-right: .5rem;
+}
+
+.tab a {
+    display: block;
+    text-align: right;
+    margin: .1rem 0 .1rem 0;
+    padding: .2rem 0 .1rem 0;
+    line-height: .8rem;
+    color: gray;
+    font-weight: bolder;
+}
+
+.active {
+    color: black !important;
+}
+
+.content {
+    position: relative;
+    width: 100%;
+    top: .3rem;
+}
+
+.content .selected {
+    display: block !important;
+}
+
+.content .box {
+    display: none;
+}
