@@ -33,6 +33,7 @@
             <a href="#box15">casbin</a>
             <a href="#box16">协议</a>
             <a href="#box17">jwt</a>
+            <a href="#box18">锁</a>
         </div>
         <div class="content">
             <div id="box1" class="box selected">
@@ -47,7 +48,8 @@
                 <p class="col">变量传递是值拷贝还是引用</p>
                 <p class="one_indent">取决与变量类型</p>
                 <p class="one_indent">1. 值传递为值拷贝，其中<i style="color:red">切片</i>包含对底层数组的引用，在不扩容的情况会影响原始切片，
-                    <i style="color:red">map</i>传递的是指向map内部数据结构的指针的拷贝，会影响原始map</p>
+                    <i style="color:red">map</i>传递的是指向map内部数据结构的指针的拷贝，会影响原始map
+                </p>
                 <p class="one_indent">2。 指针传递为引用指针操作原始数据，避免不必要的拷贝，提高性能</p>
 
                 <p class="col">new和make的区别</p>
@@ -74,14 +76,30 @@
                 <p class="one_indent">2.4 更新切片的指针指向新的数据，更新长度与容量</p>
 
                 <p class="col">map底层与扩容</p>
-                <p class="one_indent">1. map底层依赖于哈希表，底层结构体为<i style="color:red">hmap</i>，维护<i style="color:red">bucket桶数组</i>，
+                <p class="one_indent">1. map底层依赖于哈希表，底层结构体为<i style="color:red">hmap</i>，维护<i
+                        style="color:red">bucket桶数组</i>，
                     bucket中元素结构为<i style="color:red">bmap</i>， bmap为bucketCnt-uint8键值对，bucket满了会放到下一个溢出桶中，
-                    通过<i style="color:red">overflow连接</i>，<i style="color:red">oldbuckets指向原来的桶</i></p>
+                    通过<i style="color:red">overflow</i>连接，<i style="color:red">oldbuckets</i>指向原来的桶</p>
 
                 <p class="col">channel底层</p>
-                
+                <p class="one_indent">底层数据结构为hchan结构体</p>
+                <p class="one_indent">1. qcount：当前channel中元素个数</p>
+                <p class="one_indent">2. dataqsiz：环形缓冲区的容量</p>
+                <p class="one_indent">3. buf：环形缓冲区的指针（有指定缓冲）</p>
+                <p class="one_indent">4. recvx：下一个接收操作的位置</p>
+                <p class="one_indent">5. sendx：下一个发送操作的位置</p>
+                <p class="one_indent">6. recvq：接收等待队列，包含等待从channel接收数据的goroutine</p>
+                <p class="one_indent">7. sendq：发送等待队列，包含等待向channel发送数据的goroutine</p>
+                <p class="one_indent">8. lock：互斥锁，用于保护channel数据结构的访问，防止多个goroutine同时修改channel的内部状态</p>
 
                 <p class="col">channel缓冲与无缓冲区别</p>
+                <p class="one_indent">1. 当创建一个无缓冲channel时，它不会分配用于存储元素的缓冲区。发送和接收操作将直接交换数据，并且必须同时准备好，否则操作将阻塞</p>
+                <p class="one_indent">2. 有缓冲channel会分配一个环形缓冲区来存储元素。发送操作会首先尝试将数据写入缓冲区；如果缓冲区已满，则发送操作将阻塞。
+                    同样，接收操作会首先尝试从缓冲区读取数据；如果缓冲区为空，则接收操作将阻塞</p>
+
+                <p class="col">channel调度</p>
+                <p class="one_indent">Go的运行时系统包含一个调度器，它负责协调goroutine的执行和channel的发送/接收操作。
+                    调度器会根据channel的状态和等待队列中的goroutine来做出决策，以确保并发操作的高效和公平性</p>
             </div>
             <div id="box2" class="box">
                 <p class="col">2</p>
