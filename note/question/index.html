@@ -97,9 +97,57 @@
                 <p class="one_indent">2. 有缓冲channel会分配一个环形缓冲区来存储元素。发送操作会首先尝试将数据写入缓冲区；如果缓冲区已满，则发送操作将阻塞。
                     同样，接收操作会首先尝试从缓冲区读取数据；如果缓冲区为空，则接收操作将阻塞</p>
 
+                <p class="col">channel关闭后可以读写吗</p>
+                <p class="one_indent">1. 对于无缓冲channe，关闭后可以读出零值，写则会panic</p>
+                <p class="one_indent">2. 对于缓冲channe，关闭后可以读完缓冲的值，然后读零值，写则会panic</p>
+
                 <p class="col">channel调度</p>
                 <p class="one_indent">Go的运行时系统包含一个调度器，它负责协调goroutine的执行和channel的发送/接收操作。
                     调度器会根据channel的状态和等待队列中的goroutine来做出决策，以确保并发操作的高效和公平性</p>
+
+                <p class="col">协程控制</p>
+                <p class="one_indent">1. 通过channel实现协程间通信 ,select控制读写，可以通过time.After或context实现超时</p>
+                <p class="one_indent">2. WaitGroup控制并发数量，通过Done()减少计数，Wait()等待所有协程完成</p>
+
+                <p class="col">上下文context原理</p>
+                <p class="one_indent">1. channel与sync.Mutext实现</p>
+                <p class="one_indent">3. cancelCtx，把自己加到父级ctx的children里，cancel方法递归调用children的cancel方法，释放资源</p>
+
+                <p class="col">WaitGroup</p>
+                <p class="one_indent">Add，Done，Wait方法通过原子操作和锁实现计数</p>
+
+                <p class="col">sync有什么锁以及区别</p>
+                <p class="one_indent">1. 互斥锁sync.Mutex, 只有一个goroutine可以访问</p>
+                <p class="one_indent">2. 读写锁sync.RWMutex, 读锁可以多个，写锁只能一个</p>
+                <p class="one_indent">3. 条件变量sync.Cond, 用于等待条件满足</p>
+                <p class="one_indent">4. 信号量sync.Semaphore, 用于控制并发数量</p>
+                <p class="one_indent">5. 计数器sync.WaitGroup, 用于等待协程完成</p>
+                <p class="one_indent">5. 计数器sync.Once, 用于保证初始化只执行一次</p>
+
+                <p class="col">GMP调度</p>
+                <p class="one_indent">1. G: goroutine，协程，轻量级线程，go关键字创建</p>
+                <p class="one_indent">2. M: machine，机器，操作系统线程，go程序在执行时会创建很多M，M负责执行goroutine</p>
+                <p class="one_indent">3. P: processor，处理器，M的执行单元，M可以绑定多个P，P可以并行执行goroutine</p>
+                <p class="one_indent">4. 调度：当一个G准备执行时，会被放入P的运行队列，P会从队列中取出一个G，执行，当G执行完毕，会释放P，
+                    调度器会再次尝试获取一个可执行的G，如果没有可执行的G，则阻塞在M上，等待G的唤醒</p>
+                <p class="one_indent">5. 并行：当一个G被阻塞时，另一个G可以被调度到相同的P上执行，提高执行效率</p>
+                <p class="one_indent">6. 并发：当一个G被阻塞时，另一个G可以被调度到不同的P上执行，提高执行效率</p>
+                <p class="one_indent">7. 主动权：当一个G被阻塞时，M会主动让出P，让其他的G执行，提高执行效率</p>
+                <p class="one_indent">8. 协作式调度：当一个G被阻塞时，会主动寻找其他的G，协作执行，提高执行效率</p>
+                <p class="one_indent">9. 非抢占式调度：当一个G被阻塞时，不会主动让出P，而是等待调度器唤醒，提高执行效率</p>
+                <p class="one_indent">10. 协程切换：当一个G执行完毕，会切换到另一个G，提高执行效率</p>
+                <img src="../../assets/img/GMP.png" alt="" class="img">
+
+
+                <p class="col">三色标记法</p>
+                <p class="one_indent">1. 白色：未分配的内存，可以分配</p>
+                <p class="one_indent">2. 灰色：已分配的内存，不能分配</p>
+                <p class="one_indent">3. 黑色：已分配的内存，不能分配</p>
+                <p class="one_indent">4. 初始状态：所有内存都为白色</p>
+                <p class="one_indent">5. 标记过程：从根对象开始，将其直接可达对象标记为灰色，将其间接可达对象标记为灰色，直到没有灰色对象为止</p>
+                <p class="one_indent">6. 回收过程：将所有未分配的白色内存释放，并将灰色内存标记为黑色</p>
+                <p class="one_indent">7. 优点：不需要额外的空间，不需要额外的标记，不需要额外的遍历，只需要记录每个对象的颜色即可</p>
+                <p class="one_indent">8. 缺点：不能处理循环引用，不能处理对象间的复杂关系</p>
             </div>
             <div id="box2" class="box">
                 <p class="col">2</p>
@@ -126,6 +174,7 @@
                 <p class="one_indent">123123123123</p>
             </div>
         </div>
+        <a href="javascript:history.go(-1);" class="back"></a>
     </main>
     <script>
         $(function () {
