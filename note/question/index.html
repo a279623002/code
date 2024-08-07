@@ -733,7 +733,7 @@ func BinarySearch(arr []int, target int) int {
             </div>
             <div id="box9" class="box">
                 <p class="col">秒杀系统</p>
-                <p class="one_indent">简介：使用nginx, redis, mysql与gin框架开发车品秒杀活动, 
+                <p class="one_indent">简介：使用nginx, redis, mysql与gin框架开发车品秒杀活动,
                     活跃用户为1千多人，1分钟内秒完库存，成功支付订单数达到90%。</p>
 
                 <p class="col">爬虫</p>
@@ -783,11 +783,11 @@ func BinarySearch(arr []int, target int) int {
                 <p class="one_indent">4. 红色节点的子节点都是黑色的：红色节点不能连续出现，即红色节点的父节点和子节点都是黑色的。</p>
                 <p class="one_indent">5. 从任一节点到其每个叶子节点的所有路径都包含相同数目的黑色节点：这个特性保证了红黑树的平衡性，即任意两个叶子节点的路径长度相等. </p>
                 <img data-original="../../assets/img/question_red_black_tree01.png" alt="" class="img lazyload" />
-                
+
                 <p class="col">B树（B-Tree）</p>
                 <p class="one_indent">相比于二叉搜索树，B树的每个节点可以存储更多的键和值。数据直接存储在节点上</p>
                 <img data-original="../../assets/img/question_b-tree01.png" alt="" class="img lazyload" />
-                
+
                 <p class="col">B+树（B+ Tree）</p>
                 <p class="one_indent">相比于B树，B+树内部节点上只存储键，具体数据存到叶子节点上</p>
                 <img data-original="../../assets/img/question_b+tree01.png" alt="" class="img lazyload" />
@@ -862,45 +862,240 @@ p,bob,data2,write
 g,admin,alice  
 g,admin,bob
                 </pre>
-                <p class="one_indent">在这个示例中，p 表示一条策略规则，g 表示角色继承关系。例如，p,alice,data1,read 表示用户alice对数据1有读权限；g,admin,alice 表示用户alice继承admin角色的权限</p>
+                <p class="one_indent">在这个示例中，p 表示一条策略规则，g 表示角色继承关系。例如，p,alice,data1,read 表示用户alice对数据1有读权限；g,admin,alice
+                    表示用户alice继承admin角色的权限</p>
 
             </div>
             <div id="box16" class="box">
                 <p class="col">TCP/IP协议</p>
-                <p class="one_indent"></p>
+                <p class="one_indent">1. 应用层： 应用层、表示层、会话层合并为应用层一个层次</p>
+                <p class="one_indent">面向用户，提供各种网络服务，如HTTP（网页）、FTP（文件传输）、SMTP（邮件发送）、POP3/IMAP（邮件接收）、DNS（域名解析）等</p>
+                <p class="one_indent">2. 传输层： 提供端到端的通信服务，确保数据的可靠传输。主要协议有TCP（面向连接，可靠传输）和UDP（无连接，简单传输）</p>
+                <p class="one_indent">3. 网络层： 使用IP协议实现数据包的寻址和路由，确保数据包从源到目的地的传输</p>
+                <p class="one_indent">4. 网络层： 负责物理网络之间的数据帧传输，如以太网、Wi-Fi等</p>
 
                 <p class="col">UDP协议</p>
-                <p class="one_indent"></p>
+                <p class="one_indent">定义：UDP协议为应用程序提供了一种以最少的协议机制向其他程序发送消息的过程。它是基于IP协议的一种简单的、不可靠的数据传输协议</p>
+                <p class="one_indent">工作层级：UDP工作在OSI（开放系统互连）模型的传输层，为网络应用提供了一种无连接的、不可靠的、基于数据报的传输服务</p>
+                <p class="one_indent">特点：</p>
+                <p class="one_indent">1. 无连接： UDP在发送数据前不进行连接，发送结束时也没有连接可以释放，减少了开销和发送数据之前的时延。</p>
+                <p class="one_indent">2. 不保证可靠交付：
+                    UDP不保证数据包的可靠性、顺序性和完整性，也不提供拥塞控制和流量控制等功能。它只负责将数据包发送到网络上，而不关心数据包是否到达目的地或是否按序到达</p>
+                <p class="one_indent">3. 面向报文：
+                    UDP对应用层交下来的报文，既不合并，也不拆分，而是保留这些报文的边界。接收方的UDP对IP层交上来的UDP用户数据报，在去除首部后就原封不动地交付上层的应用进程</p>
+                <p class="one_indent">4. 首部开销小： UDP只有8个字节的首部，相对于TCP的20字节首部来说，开销较小</p>
+                <p class="one_indent">5. 支持多种交互通信：UDP支持一对一、一对多、多对一和多对多的交互通信</p>
+                <p class="one_indent">应用场景</p>
+                <p class="one_indent">1. DNS查询：DNS基于UDP协议，能够快速解析域名到IP地址</p>
+                <p class="one_indent">2. 在线游戏：特别是实时多人在线游戏，UDP能够快速处理海量数据包，确保游戏的流畅进行</p>
+                <p class="one_indent">3. 视频和音频流传输：如视频会议、实时直播等，这些应用中数据的实时性至关重要，而轻微的数据丢失相对于传输延迟来说是可以接受的</p>
+                <p class="one_indent">4. 网络广播：如校园广播、公司内部通知广播等，UDP的广播功能可以迅速、高效地传达信息给所有接收者</p>
+                <p class="one_indent">5. 实时通信应用：如即时消息传递、VoIP（网络电话）等，这些应用要求数据传输速度快、延迟低</p>
 
                 <p class="col">HTTP协议</p>
-                <p class="one_indent"></p>
+                <p class="one_indent">定义：HTTP协议规定了浏览器与服务器之间数据传输的规则，是互联网上应用最为广泛的一种网络协议</p>
+                <p class="one_indent">
+                    应用层协议：HTTP协议属于应用层协议，基于TCP/IP通信协议来传送数据。HTTP1.0、HTTP1.1、HTTP2.0均基于TCP实现，而HTTP3.0则基于UDP实现</p>
+                <p class="one_indent">无状态协议：HTTP协议对请求和响应之间的通信状态不进行保存，即服务器在处理完客户端的请求并返回响应后，不会保留任何关于此次请求的信息</p>
+                <p class="one_indent">特点：</p>
+                <p class="one_indent">1. 基于TCP协议：HTTP协议建立在TCP协议之上，利用TCP协议的面向连接、可靠传输等特点，确保数据的正确传输</p>
+                <p class="one_indent">2. 请求-响应模型：HTTP协议采用请求-响应模型，一次请求对应一次响应，简化了通信过程</p>
+                <p class="one_indent">3.
+                    无状态性：HTTP协议的无状态性使得服务器不需要保存每个用户的状态信息，提高了处理效率。但这也带来了问题，如用户需要保持登录状态等，需要通过其他机制（如Cookie、Session）来解决</p>
+                <p class="one_indent">4. 可扩展性：HTTP协议允许通过请求头和响应头中的字段进行扩展，以支持更多的功能和选项</p>
+                <p class="one_indent">原理</p>
+                <p class="one_indent">1. 客户端的浏览器首先要通过网络与服务器建立连接，该连接是通过TCP 来完成的，一般 TCP 连接的端口号是80。 建立连接后，
+                    客户机发送一个请求给服务器，请求方式的格式为：统一资源标识符（URL）、协议版本号，后边是 MIME 信息包括请求修饰符、客户机信息和许可内容</p>
+                <p class="one_indent">2. 服务器接到请求后，给予相应的响应信息，其格式为一个状态行，包括信息的协议版本号、一个成功或错误的代码，后边是 MIME
+                    信息包括服务器信息、实体信息和可能的内容</p>
 
                 <p class="col">HTTPS协议</p>
-                <p class="one_indent"></p>
+                <p class="one_indent">HTTP + SSL / TLS，也就是在 HTTP 上又加了一层处理加密信息的模块。服务端和客户端的信息传输都会通过 TLS
+                    进行加密，所以传输的数据都是加密后的数据</p>
+                <p class="one_indent">SSL介于应用层和传输层(TCP)之间。应用层的数据流出时经过SSL层变为加密的数据再传到TCP层。反之，数据从TCP层流入时经过SSL层的解密动作后再传给应用层
+                </p>
+                <p class="one_indent">原理：</p>
+                <p class="one_indent">1. 客户端将它所支持的算法列表和一个用作产生密钥的随机数发送给服务器</p>
+                <p class="one_indent">2. 服务器从客户端的算法列表中选择一个算法，并生成一个随机数作为密钥</p>
+                <p class="one_indent">3. 客户端和服务器各自生成一个随机数，并使用公钥加密随机数，发送给对方</p>
+                <p class="one_indent">4. 双方各自使用自己的私钥解密对方的随机数，并使用相同的随机数生成对称密钥</p>
+                <p class="one_indent">5. 双方使用对称密钥进行通信，对传输的数据进行加密和解密</p>
+                <p class="one_indent">6. 通信结束后，双方都使用相同的密钥进行通信，然后双方各自发送一个“握手”消息给对方，结束TLS会话</p>
+
+                <p class="col">ssl/tls</p>
+                <p class="one_indent">由记录协议、握手协议组成</p>
+                <p class="one_indent">记录协议: 它建立在可靠的传输协议（如TCP）之上，为高层协议提供数据封装、压缩、加密等基本功能的支持</p>
+                <p class="one_indent">握手协议: 它建立在记录协议之上，用于在实际的数据传输开始前，通讯双方进行身份认证、协商加密算法、交换加密密钥等</p>
+
+                <p class="col">websocket</p>
+                <p class="one_indent">定义：实现了浏览器与服务器之间的全双工通信。与传统的HTTP请求-响应模型不同，WebSocket允许服务器主动向客户端推送数据，而不需要客户端频繁地发起请求
+                </p>
+                <p class="one_indent">特点：</p>
+                <p class="one_indent">1. 全双工通信：WebSocket实现了客户端和服务器之间的全双工通信，即双方可以同时发送和接收数据</p>
+                <p class="one_indent">2. 实时性：WebSocket连接保持打开状态，允许实时数据传输，提高了实时性</p>
+                <p class="one_indent">3. 节省资源：WebSocket在一次连接中可以传输多个数据帧，减少了HTTP连接的建立和关闭次数，从而节省了服务器资源和带宽</p>
+                <p class="one_indent">4. 二进制支持：WebSocket支持二进制数据帧的传输，这使得它可以传输更多类型的数据，如音频、视频等</p>
+                <p class="one_indent">原理：</p>
+                <p class="one_indent">1. 握手阶段</p>
+                <p class="one_indent">客户端通过发送一个特殊的HTTP请求头（Upgrade: websocket）向服务器请求建立WebSocket连接</p>
+                <p class="one_indent">服务器检查请求头中的特定字段，确认支持WebSocket协议后，发送一个特殊的HTTP响应头进行握手确认（Upgrade: websocket,
+                    Connection: Upgrade）</p>
+                <p class="one_indent">握手成功后，客户端和服务器之间的连接就升级为WebSocket连接</p>
+                <p class="one_indent">2. 数据传输</p>
+                <p class="one_indent">一旦WebSocket连接建立成功，客户端和服务器就可以通过这个连接进行双向的实时数据传输</p>
+                <p class="one_indent">数据以帧的形式进行传输，WebSocket协议定义了不同类型的帧，如文本帧和二进制帧，用于传输不同类型的数据</p>
+                <p class="one_indent">3. 断开连接</p>
+                <p class="one_indent">当连接不再需要时，客户端或服务器可以发起关闭连接的请求</p>
+                <p class="one_indent">双方会交换特殊的关闭帧，以协商关闭连接，并确保双方都接收到了关闭请求</p>
+                <p class="one_indent">使用场景：实时聊天、实时数据更新、实时监控</p>
+
+                <p class="col">socket</p>
+                <p class="one_indent">组成</p>
+                <p class="one_indent">1. IP 地址（IP Address）：用于标识网络中的设备</p>
+                <p class="one_indent">2. 端口号（Port Number）：用于标识设备上的特定应用程序或服务。每个IP地址上的端口号必须是唯一的，以便区分不同的应用程序</p>
+                <p class="one_indent">Socket 的类型: 最常见的是基于TCP（传输控制协议）和UDP（用户数据报协议）的Socket</p>
+                <p class="one_indent">工作流程(以TCP Socket为例)</p>
+                <p class="one_indent">1. 创建Socket：在客户端和服务器端分别创建一个Socket对象</p>
+                <p class="one_indent">2. 绑定（Bind）：服务器端将Socket绑定到一个特定的IP地址和端口号上，以便监听来自该端口的连接请求</p>
+                <p class="one_indent">3. 监听（Listen）：服务器端Socket开始监听指定端口上的连接请求</p>
+                <p class="one_indent">4. 连接（Connect）：客户端Socket通过指定服务器端的IP地址和端口号来发起连接请求</p>
+                <p class="one_indent">5. 接受连接（Accept）：服务器端Socket接受来自客户端的连接请求，并创建一个新的Socket与该客户端进行通信</p>
+                <p class="one_indent">6. 数据传输：客户端和服务器端通过各自的Socket进行数据的发送和接收</p>
+                <p class="one_indent">7. 关闭连接：通信结束后，客户端和服务器端关闭各自的Socket连接</p>
 
                 <p class="col">3次握手</p>
-                <p class="one_indent"></p>
+                <p class="one_indent">1.客户端向服务器发送(SYN同步序列编号--SEQ序号为x)报文，进入SYN_SEND状态</p>
+                <p class="one_indent">2.服务器收到报文，回应(SYN--SEQ序号为Y)报文和(ACK=x+1)确认字符，进入SYN_RECV状态</p>
+                <p class="one_indent">3.客户端收到报文，回应ACK=y+1 报文，进入Established(已建立\确认)状态，完成握手</p>
 
                 <p class="col">4次挥手</p>
-                <p class="one_indent"></p>
+                <p class="one_indent">1. 客户端的进程向其TCP发送FIN连接释放报文段，表示数据发送完毕</p>
+                <p class="one_indent">2. 服务器收到报文，发送ACK</p>
+                <p class="one_indent">3. 服务器进程结束，发送FIN</p>
+                <p class="one_indent">4. 客户端收到报文，发送ACK</p>
 
                 <p class="col">验证书流程</p>
-                <p class="one_indent"></p>
+                <p class="one_indent">1. 通过机构的根公钥去解密证书签名，得到指纹和指纹算法</p>
+                <p class="one_indent">2. 解密到的指纹是个hash值，代表证书的原始内容</p>
+                <p class="one_indent">3. 用该指纹算法计算要验证的证书内容得到另一个hash值</p>
+                <p class="one_indent">4. 如果这两个hash值相同，则代表证书没有被篡改过，否则就是被篡改了</p>
+                <p class="one_indent">5. 只要证书是可信的，公钥就是可信的</p>
 
             </div>
             <div id="box17" class="box">
-                <p class="col">鉴权原理</p>
-                <p class="one_indent"></p>
+                <p class="col">组成部分</p>
+                <p class="one_indent">1. 头部（Header）: 包含了令牌的类型（通常为JWT）和签名算法（如HS256、RS256等）,以JSON格式表示，并进行Base64编码</p>
+                <p class="one_indent">2. 载荷（Payload）: 包含了用户的一些信息,以JSON格式表示，并进行Base64编码</p>
+                <p class="one_indent">3. 签名（Signature）: 由头部和载荷通过指定算法生成的签名，用于验证数据的完整性和真实性, 通常使用HMAC或RSA等加密算法进行加密</p>
+                <p class="col">鉴权流程</p>
+                <p class="one_indent">用户登录</p>
+                <p class="one_indent">1. 用户使用用户名和密码发送登录请求到服务器</p>
+                <p class="one_indent">2. 服务器验证用户名和密码是否正确</p>
+                <p class="one_indent">3. 如果验证通过，服务器根据用户信息生成JWT令牌，并将其返回给客户端</p>
+                <p class="one_indent">客户端保存JWT令牌</p>
+                <p class="one_indent">1. 客户端收到JWT令牌后，通常将其保存在本地，如localStorage或cookie中</p>
+                <p class="one_indent">客户端发送请求</p>
+                <p class="one_indent">1. 在后续的请求中，客户端将JWT令牌放在请求的头部（通常是Authorization头部），格式为Bearer <token>，然后发送给服务器</p>
+                <p class="one_indent">服务器验证JWT令牌</p>
+                <p class="one_indent">1. 服务器在接收到请求后，从请求头部中获取JWT令牌</p>
+                <p class="one_indent">2. 服务器使用与生成令牌时相同的密钥和算法对JWT令牌进行解析和验证</p>
+                <p class="one_indent">3. 如果验证通过，服务器根据JWT令牌中的信息（如用户ID、角色等）进行用户身份和权限的验证</p>
+                <p class="one_indent">4. 根据验证结果，服务器返回请求的数据或执行相应的操作</p>
 
             </div>
             <div id="box18" class="box">
                 <p class="col">protobuf</p>
-                <p class="one_indent"></p>
+                <p class="one_indent">原理：</p>
+                <p class="one_indent">1. 序列化：将数据结构或对象转换成二进制字节流的过程。Protobuf通过定义.proto文件来描述数据结构，然后使用Protocol
+                    Buffers编译器（protoc）将.proto文件编译成特定编程语言的代码</p>
+                <p class="one_indent">在序列化过程中，Protobuf会对每个字段进行编码，确保得到高效紧凑的数据压缩。对于不同的字段类型，Protobuf采用不同的编码方式和数据存储方式。
+                    例如，对于int32、int64等整数类型，Protobuf使用Varints编码方式，这种编码方式可以根据数字的大小动态调整占用的字节数，从而实现高效的数据压缩</p>
+                <p class="one_indent">2. 反序列化：反序列化是将在序列化过程中所生成的二进制字节流转换成数据结构或者对象的过程。
+                    Protobuf提供了相应的解析方法，如parseFrom(input)，用于从输入流中读取二进制字节流，并将其解析成对应的数据结构或对象 </p>
+                <p class="one_indent">go使用protobuf流程：</p>
+                <p class="one_indent">1. 安装所需插件：protoc-gen-go, protoc-gen-go-grpc(可选其他框架)</p>
+                <p class="one_indent">2. 定义.proto文件</p>
+                <pre>
+syntax = "proto3";  
+  
+package example;  
+  
+// 定义一个简单的消息  
+message MyMessage {  
+  string content = 1;  
+}  
+  
+// 如果你在使用gRPC，你还可以定义服务  
+// service MyService {  
+//   rpc MyMethod(MyMessage) returns (MyMessage);  
+// }
+                </pre>
+                <p class="one_indent">2. 生成Go代码</p>
+                <pre>
+protoc --go_out=. --go_opt=paths=source_relative \  
+--go-grpc_out=. --go-grpc_opt=paths=source_relative \  
+example.proto
+                </pre>
+                <p class="one_indent">3. 使用生成的代码</p>
+                <pre>
+package main  
+  
+import (  
+    "fmt"  
+    "log"  
+  
+    "your_module_path/example" // 替换为你的模块路径和包名  
+    "google.golang.org/protobuf/proto"  
+)  
+  
+func main() {  
+    msg := &example.MyMessage{  
+        Content: "Hello, Protobuf!",  
+    }  
+  
+    // 序列化  
+    data, err := proto.Marshal(msg)  
+    if err != nil {  
+        log.Fatalf("Failed to marshal message: %v", err)  
+    }  
+  
+    // 你可以将data写入文件、发送到网络等  
+    fmt.Printf("Serialized data: %x\n", data)  
+  
+    // 反序列化（可选）  
+    newMsg := &example.MyMessage{}  
+    if err := proto.Unmarshal(data, newMsg); err != nil {  
+        log.Fatalf("Failed to unmarshal message: %v", err)  
+    }  
+  
+    fmt.Println("Unmarshaled message:", newMsg.GetContent())  
+}
+                </pre>
 
-                <p class="col">注册与发现</p>
-                <p class="one_indent">1. etcd</p>
-                <p class="one_indent">2. consul</p>
-                <p class="one_indent">3. zookeeper</p>
+                <p class="col">etcd</p>
+                <p class="one_indent">etcd 是一个分布式键值存储系统</p>
+                <p class="one_indent">在 Kubernetes 中，etcd 被用作存储集群的所有状态信息的后端数据库。Kubernetes 的各种组件（如 API 服务器、调度器、控制器等）都会与
+                    etcd 交互，以读取和写入集群的状态信息。
+                    这使得 Kubernetes 能够管理大量容器和服务的生命周期，并保持整个集群的一致性</p>
+                <p class="one_indent">主要特性和用途:</p>
+                <p class="one_indent">1. 服务发现：etcd 可以用来注册和发现服务。服务可以在启动时将自己的信息（如 IP 地址、端口号等）写入 etcd，而需要访问这些服务的客户端可以查询
+                    etcd 来获取所需的信息</p>
+                <p class="one_indent">2. 配置共享和同步：在分布式系统中，多个组件可能需要共享配置信息。使用 etcd，可以集中存储配置信息，并且当配置发生更改时，etcd
+                    可以通知所有订阅了更改的组件</p>
+                <p class="one_indent">3. 分布式锁和领导者选举：由于 etcd 的强一致性保证，它可以用来实现分布式锁和领导者选举机制。这对于需要协调多个组件的分布式系统非常有用</p>
+                <p class="one_indent">3. 高可用性：etcd 通过集群方式部署，支持多副本数据同步，保证了服务的高可用性。即使集群中的某些节点出现故障，其他节点也可以继续提供服务</p>
+                <p class="one_indent">3. Watch 机制：etcd 提供了 Watch 机制，允许客户端订阅特定键或前缀的更改，并在更改发生时实时获取通知。这非常适合于需要实时更新数据的应用场景
+                </p>
+                <p class="one_indent">3. 安全性和认证：etcd 支持 SSL/TLS 加密通信，以及基于角色的访问控制（RBAC），为分布式系统提供了必要的安全保障</p>
+                <p class="one_indent">3. 简单的 RESTful API：etcd 提供了一个简单的 RESTful API，使得与其他系统或应用的集成变得非常容易</p>
+
+                <p class="col">consul</p>
+                <p class="one_indent">提供了服务发现、健康检查、分布式一致性和键值存储等功能</p>
+                <p class="one_indent">主要功能: 服务发现、健康检查、键值存储、分布式一致性</p>
+
+                <p class="col">zookeeper</p>
+                <p class="one_indent">开源分布式协调和配置服务。它主要用于大型分布式系统中，解决诸如配置管理、服务发现、同步服务等分布式系统常见问题</p>
+                <p class="one_indent">主要功能: 配置管理、同步服务、服务发现、分布式锁、集群管理、消息队列</p>
 
             </div>
         </div>
