@@ -46,12 +46,10 @@
                 <p class="one_indent">1. 值类型：变量存值，内存在栈分配</p>
                 <p class="one_indent">2. 指针类型：变量存地址，地址指向值，内存在堆分配</p>
 
-                <p class="col">变量传递是值拷贝还是引用</p>
-                <p class="one_indent">取决与变量类型</p>
-                <p class="one_indent">1. 值传递为值拷贝，其中<i style="color:red">切片</i>包含对底层数组的引用，在不扩容的情况会影响原始切片，
+                <p class="col">函数传参都是值拷贝</p>
+                <p class="one_indent"><i style="color:red">切片</i>包含对底层数组的引用，在不扩容的情况会影响原始切片，
                     <i style="color:red">map</i>传递的是指向map内部数据结构的指针的拷贝，会影响原始map
                 </p>
-                <p class="one_indent">2。 指针传递为引用指针操作原始数据，避免不必要的拷贝，提高性能</p>
 
                 <p class="col">new和make的区别</p>
                 <p class="one_indent">1. new</p>
