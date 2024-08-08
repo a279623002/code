@@ -1,0 +1,2 @@
+alive: client1 172.18.0.5:8301
+alive: consul1 172.18.0.2:8301
