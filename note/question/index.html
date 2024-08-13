@@ -124,9 +124,9 @@
                 <p class="one_indent">5. 计数器sync.Once, 用于保证初始化只执行一次</p>
 
                 <p class="col">GMP调度</p>
-                <p class="one_indent">1. G: goroutine，协程，轻量级线程，go关键字创建</p>
-                <p class="one_indent">2. M: machine，机器，操作系统线程，go程序在执行时会创建很多M，M负责执行goroutine</p>
-                <p class="one_indent">3. P: processor，处理器，M的执行单元，M可以绑定多个P，P可以并行执行goroutine</p>
+                <p class="one_indent">1. G: goroutine，表示一个 Goroutine，对于Go调度器来说，每个G都是一个待执行的任务,协程，轻量级线程，go关键字创建</p>
+                <p class="one_indent">2. M: machine，表示的是操作系统的线程，由操作系统进行调度和管理</p>
+                <p class="one_indent">3. P: processor，表示Go调度器中的处理器，它是系统线程和Goroutine 的中间层</p>
                 <p class="one_indent">4. 调度：当一个G准备执行时，会被放入P的运行队列，P会从队列中取出一个G，执行，当G执行完毕，会释放P，
                     调度器会再次尝试获取一个可执行的G，如果没有可执行的G，则阻塞在M上，等待G的唤醒</p>
                 <p class="one_indent">5. 并行：当一个G被阻塞时，另一个G可以被调度到相同的P上执行，提高执行效率</p>
