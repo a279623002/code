@@ -223,6 +223,11 @@
                 <p class="col">幻读，脏读， 不可重复读什么情况发生</p>
                 <p class="one_indent">1. 幻读（Phantom Read）：发生在当一个事务读取某些数据后，‌另一个事务插入或删除了一些数据，‌导致前一个事务再次读取相同的数据时，
                     ‌看到的数据集与第一次读取时不同。‌幻读侧重于某个范围内的数据行数量变化，‌即数据集的不一致导致的问题。‌</p>
+                <p class="one_indent">
+                    具体来说，‌幻读的出现是由于事务隔离级别造成的。‌在读已提交隔离级别下，‌事务在读取数据时会锁定相应的行，‌但锁定的时间很短。
+                    ‌这可能导致在事务读取数据和事务完成之间，‌其他事务有机会插入新的数据。‌由于这些新插入的数据在第一个事务的读取操作之后才出现，
+                    ‌因此对于第一个事务而言，‌这些新数据就像是“幻象”一样，‌造成了幻读
+                </p>
                 <p class="one_indent">2. 脏读（Dirty Read）：一个事务读到另一个事务未提交的变更，侧重于更新</p>
                 <p class="one_indent">3. 不可重复读（Repeatable Read）：一个事务在同一个事务中多次读取同一数据时，其结果是一致的，即使其他事务在该事务中插入了新的数据</p>
 
@@ -277,14 +282,25 @@
                 <p class="one_indent">2. 同步模式：异步模式，半同步模式（只能保证主库的bin-log至少传输到了一个从节点上），全同步模式</p>
                 <p class="one_indent">3. 数据一致性：主库配置每次事务对应的binlog刷到磁盘中，从库配置自动修复机制</p>
 
+                <p class="col">执行顺序</p>
+                <p class="one_indent">1. from子句：从哪个表中读取数据</p>
+                <p class="one_indent">2. join操作：连接多个表</p>
+                <p class="one_indent">3. on子句：连接条件</p>
+                <p class="one_indent">4. where子句：对数据进行过滤</p>
+                <p class="one_indent">5. group by子句：对数据进行分组</p>
+                <p class="one_indent">6. having子句：对分组数据进行过滤</p>
+                <p class="one_indent">7. select子句：选择要显示的列</p>
+                <p class="one_indent">8. order by子句：对结果集进行排序</p>
+                <p class="one_indent">9. limit子句：限制结果集的数量</p>
+                <p class="one_indent">10. union操作：合并多个结果集</p>
             </div>
             <div id="box3" class="box">
                 <p class="col">缓存类型与使用场景</p>
                 <p class="one_indent">1. 字符串（String）：缓存用户信息、配置信息等</p>
                 <p class="one_indent">2. 哈希（Hash）：缓存对象，如用户信息、商品信息等</p>
                 <p class="one_indent">3. 列表（List）：缓存排行榜、文章列表等</p>
-                <p class="one_indent">4. 集合（Set）：缓存共同好友、共同关注等</p>
-                <p class="one_indent">5. 有序集合（Sorted Set）：缓存排行榜、商品推荐等</p>
+                <p class="one_indent">4. 集合（Set）：缓存共同好友、共同关注等,集合成员是唯一</p>
+                <p class="one_indent">5. 有序集合（Sorted Set）：缓存排行榜、商品推荐等,不允许重复的成员</p>
                 <p class="one_indent">6. 二进制位图（Bitmaps）：缓存用户签到状态、商品访问记录，布隆过滤器等</p>
 
                 <p class="col">缓存更新策略</p>
@@ -300,7 +316,7 @@
 
                 <p class="col">缓存击穿，缓存穿透，缓存雪崩解决方法</p>
                 <p class="one_indent">1. 缓存击穿（Cache
-                    Hitting）：一个热点key在某个时间点过期时，恰好有大量并发请求访问这个key，导致这些请求直接打到数据库，给数据库带来巨大压力，可以使用互斥锁，缓存空值来解决</p>
+                    Hitting）：一个热点key在某个时间点过期时，恰好有大量并发请求访问这个key，导致这些请求直接打到数据库，给数据库带来巨大压力，可以使用互斥锁</p>
                 <p class="one_indent">2. 缓存穿透（Cache
                     Penetration）：查询一个不存在的数据，由于缓存和数据库都没有这个数据，导致每次请求都会直接打到数据库，给数据库带来压力，可以使用布隆过滤器，缓存空值来解决</p>
                 <p class="one_indent">3. 缓存雪崩（Cache
@@ -308,7 +324,7 @@
                 </p>
 
                 <p class="col">布隆过滤器</p>
-                <p class="one_indent">用于判断一个元素是否在一个集合中，核心为二进制向量（位数组）和一系列随机映射函数（哈系函数）</p>
+                <p class="one_indent">用于判断一个元素是否在一个集合中，核心为二进制向量（位数组）和一系列随机映射函数（哈希函数）</p>
                 <p class="one_indent">工作原理</p>
                 <p class="one_indent">1. 初始化: 创建一个足够长的二进制向量，并将所有位初始化为0， 选择多个哈系函数用于映射元素到位数组</p>
                 <p class="one_indent">2. 添加元素：用多个哈系函数对元素进行哈系计算，把得到的多个哈希值对应位设置为1</p>
@@ -477,16 +493,18 @@ db.orders.aggregate([
                 <p class="one_indent">
                     生产者只需要知道该往哪个Exchange发送消息，路由工作由Exchange负责。
                     由于Exchange不会保存数据，发布订阅\路由\主题模式必须先保证有queue被绑定到该Exchange，否则消息会被丢掉
-                    simple\工作队列模式 生产者不用绑定Exchange，只需要指定消息需要推送到哪个退列，会有个默认Exchange转发消息
+                    simple\工作队列模式 生产者不用绑定Exchange，只需要指定消息需要推送到哪个队列，会有个默认Exchange转发消息
                 </p>
 
                 <p class="col">TTL队列</p>
                 <p class="one_indent">
-                    1.队列的过期时间: 队列中每个消息的过期时间都是6s，并不是指这个队列只可以存活6s。例如，消息第1秒存入queue，消息B第3秒存入queue，那么Ａ会在第7秒过期，Ｂ在第9秒过期
+                    1.通过队列属性设置：‌队列中所有消息都有相同的过期时间
                 </p>
                 <p class="one_indent">
-                    2.队列中的每个消息都可以设置不同的过期时间:由于队列的先入先出的特性，消息只有在真正被消费时才会判断是否过期。
-                    例如，如果队尾消息Ａ的过期时间为20s，倒数第二个消息Ｂ的过期时间为2s，那么Ｂ的真正的过期时间为20s，因为Ｂ要等待Ａ
+                    2.对消息进行单独设置：‌每条消息的TTL可以不同
+                </p>
+                <p class="one_indent">
+                    3.如果同时使用了这两种方式，‌消息的过期时间将以较小的数值为准
                 </p>
 
                 <p class="col">死信队列 (DXL)</p>
