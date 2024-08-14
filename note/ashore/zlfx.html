@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>note</title>
+    <script src="../../assets/js/font.js"></script>
+    <script src="../../assets/js/jquery-3.6.0.min.js"></script>
+    <script src="../../assets/js/lazyload.js"></script>
+    <link rel="stylesheet" href="../../assets/css/public.css">
+    <link rel="stylesheet" href="../../assets/css/note.css">
+    <link rel="stylesheet" href="../../assets/css/question.css">
+</head>
+
+<body>
+    <header></header>
+    <main>
+        <a href="javascript:void(0);" class="btn close">—</a>
+        <div class="tab">
+            <a href="#box1" class="active">统计术语</a>
+            <a href="#box2">结构阅读</a>
+            <a href="#box3">重点题型</a>
+            <a href="#box4">速算技巧</a>
+        </div>
+        <div class="content">
+            <div id="box1" class="box selected">
+               <p class="col">基期、现期</p>
+               <p class="one_indent">如2017年比2016年增加300元， <i>2017年</i>为现期，<i>2016年</i>为基期。</p>
+               <p class="col">增长量</p>
+               <p class="one_indent">增长量 = 现期量 - 基期量</p>
+               <p class="col">增长率</p>
+               <p class="one_indent">增长率 = 增长量 / 基期量 * 100%</p>
+               <p class="one_indent">如2017年100w，2018年130w，增长率为 （130 - 100） / 100</p>
+               <p class="one_indent">速算方式： 增长量 / 基期</p>
+               <p class="one_indent">又名： 比较数、增长率、增长幅度、增长速度、增长势</p>
+
+               <p class="col">例题1</p>
+               <p class="one_indent">2017产值144w，比2016增长20%，求2016产值与2017增长量</p>
+               <p class="one_indent">1. 2016产值 = 144 / (1 + 0.2) = 120w</p>
+               <p class="one_indent">2. 2017增长量 = 2017产值 - 2016产值 = 24w</p>
+
+               <p class="col">例题2</p>
+               <p class="one_indent">2017比2016增长3.2倍，2017是2016的多少倍</p>
+               <p class="one_indent">（1 + 3.2 ）：1 = <i>4.2倍</i></p>
+
+      
+            </div>
+            <div id="box2" class="box">
+               35min
+            </div>
+            <div id="box3" class="box">
+                30min
+            </div>
+            <div id="box4" class="box">
+                10min
+            </div>
+            <div id="box5" class="box">
+                15min
+            </div>
+            <div id="box6" class="box">
+               
+            </div>
+          
+        </div>
+        <a href="javascript:history.go(-1);" class="back"></a>
+    </main>
+    <script>
+        $(function () {
+            $("img.lazyload").lazyload();
+            $('.tab a').on('click', function () {
+                $(this).addClass('active').siblings().removeClass('active');
+                var index = $(this).index();
+                $('.content .box').eq(index).addClass('selected').siblings().removeClass('selected');
+                $('html, body').animate({
+                    scrollTop: 0 // 0表示滚动条垂直位置的起始点
+                }, 'slow'); // 'slow'定义动画执行的速度
+            })
+            $('.btn').on('click', function () {
+                $('.tab').toggle(function () { }, function () { });
+                if ($(this).hasClass('close')) {
+                    $(this).removeClass('close').html('+')
+                    $('.content').animate({
+                        left: '0',
+                        width: '100%'
+                    }, 'slow'); // 'slow'定义动画执行的速度
+                } else {
+                    $(this).addClass('close').html('—')
+                    $('.content').animate({
+                        left: '30%',
+                        width: '70%'
+                    }, 'fast'); // 'slow'定义动画执行的速度
+                }
+            })
+        })
+
+    </script>
+</body>
+
+</html>

@@ -240,10 +240,9 @@
 
                 <p class="col">锁的类型</p>
                 <p class="one_indent">一：按模式分类</p>
-                <p class="one_indent">1. 乐观锁：假设不会发生冲突，只在提交操作时检查是否有冲突，适用于<i style="color: red;">读多写少</i>的场景,
+                <p class="one_indent">1. 乐观锁：假设不会发生冲突，只在提交操作时检查是否有冲突，适用于<i>读多写少</i>的场景,
                     乐观锁不是数据库层面的锁，而是通过应用逻辑（如版本号、时间戳等）来实现的</p>
-                <p class="one_indent">2. 悲观锁：假设冲突总是会发生，因此每次访问数据都会加锁，适用于<i
-                        style="color: red;">写多读少</i>的场景,悲观锁主要通过数据库提供的锁机制来实现，如SELECT ... FOR UPDATE</p>
+                <p class="one_indent">2. 悲观锁：假设冲突总是会发生，因此每次访问数据都会加锁，适用于<i>写多读少</i>的场景,悲观锁主要通过数据库提供的锁机制来实现，如SELECT ... FOR UPDATE</p>
                 <p class="one_indent">二：按粒度分类</p>
                 <p class="one_indent">1. 全局锁：对整个数据库实例加锁，限制除了超级用户外的所有查询和修改操作，一般用于备份、恢复等操作</p>
                 <p class="one_indent">2. 表级锁：对整张表加锁，锁定期间其他事务不能对该表进行任何操作，适用于MyISAM</p>

@@ -53,3 +53,7 @@ main {
 .content .box {
     display: none;
 }
+
+.content .box i {
+    color: red;
+}
