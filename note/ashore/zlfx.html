@@ -24,73 +24,104 @@
         </div>
         <div class="content">
             <div id="box1" class="box selected">
-               <p class="col">基期、现期</p>
-               <p class="one_indent">如2017年比2016年增加300元， <i>2017年</i>为现期，<i>2016年</i>为基期。</p>
-               <p class="col">增长量</p>
-               <p class="one_indent">增长量 = 现期量 - 基期量</p>
-               <p class="col">增长率</p>
-               <p class="one_indent">增长率 = 增长量 / 基期量 * 100%</p>
-               <p class="one_indent">如2017年100w，2018年130w，增长率为 （130 - 100） / 100</p>
-               <p class="one_indent">速算方式： 增长量 / 基期</p>
-               <p class="one_indent">又名： 比较数、增长率、增长幅度、增长速度、增长势</p>
+                <p class="col">基期、现期</p>
+                <p class="one_indent">如2017年比2016年增加300元， <i>2017年</i>为现期，<i>2016年</i>为基期。</p>
+                <p class="col">增长量</p>
+                <p class="one_indent">增长量 = 现期量 - 基期量</p>
+                <p class="col">增长率</p>
+                <p class="one_indent">增长率 = 增长量 / 基期量 * 100%</p>
+                <p class="one_indent">如2017年100w，2018年130w，增长率为 （130 - 100） / 100</p>
+                <p class="one_indent">速算方式： 增长量 / 基期</p>
+                <p class="one_indent">又名： 比较数、增长率、增长幅度、增长速度、增长势</p>
 
-               <p class="col">例题1</p>
-               <p class="one_indent">2017产值144w，比2016增长20%，求2016产值与2017增长量</p>
-               <p class="one_indent">1. 2016产值 = 144 / (1 + 0.2) = 120w</p>
-               <p class="one_indent">2. 2017增长量 = 2017产值 - 2016产值 = 24w</p>
+                <p class="col">例题1</p>
+                <p class="one_indent">2017产值144w，比2016增长20%，求2016产值与2017增长量</p>
+                <p class="one_indent">1. 2016产值 = 144 / (1 + 0.2) = 120w</p>
+                <p class="one_indent">2. 2017增长量 = 2017产值 - 2016产值 = 24w</p>
 
-               <p class="col">例题2</p>
-               <p class="one_indent">2017比2016增长3.2倍，2017是2016的多少倍</p>
-               <p class="one_indent">（1 + 3.2 ）：1 = <i>4.2倍</i></p>
+                <p class="col">例题2</p>
+                <p class="one_indent">2017比2016增长3.2倍，2017是2016的多少倍</p>
+                <p class="one_indent">（1 + 3.2 ）：1 = <i>4.2倍</i></p>
 
-               <p class="col">年均增长量</p>
-               <p class="one_indent">年均增长量 = （现期量 - 基期量）/ 年数</p>
+                <p class="col">间隔增长率</p>
+                <p class="one_indent">出现题型： 间隔一年</p>
+                <p class="one_indent">如2018到2019增长率为r1, 2019到2020增长率为r2， 则2018到2019增长率为r</p>
+                <p class="one_indent">公式： r = r1 + r2 + r1 * r2</p>
 
-               <p class="col">年均增长率</p>
-               <p class="one_indent">现期量 = 基期量*(1+年均增长率)^年数</p>
+                <p class="col">混合增长率</p>
+                <p class="one_indent">大小居中，偏量大一方</p>
+                <pre>
+示例一
+地产贷款余额1.04w亿，同比增长21.4%，房产贷款余额3.2w亿，同比增长12.3%。
+求房地产贷款余额同比增速约为？
+A. 14.4% B. 12.3% C. 19.3% D. 24.4%
+解：12.3% < ? < 21.4%
+因为3.2w > 1.04，往12.3%偏移，所以答案为A。
 
-               <p class="col">例题3</p>
-               <p class="one_indent">2015营收100w，营收年均增长率为10%，2018年营收为多少</p>
-               <p class="one_indent">100w * (1+0.1)^3 = 133.1w</p>
+示例二
+全国水品产量2700w吨，同比增长3.2%，其中养殖水产品产量2114w吨，同比增长4.13%
+求非养殖水产品同比增长？
+A. -20% B. 0% C. 5% D. 10%
+解：
+2114w  n   2700w  m   得出非养殖 6000w
+4.1% <---> 3.2% <---> ?
+     0.9%         x
+公式<i>n/m = 2114/600</i>
+得出 m = 3.5n
+即 x = 0.9% * 3.5 ~= 3.2%, 所以答案为B。
+                </pre>
 
-               <p class="col">例题4</p>
-               <p class="one_indent">2015营收100w，2018年营收133.1w, 2015-2018年均增长率为多少</p>
-               <p class="one_indent">100w * (1+r)^3 = 133.1w => 开立方</p>
-               
-               <p class="col">同比</p>
-               <p class="one_indent">与历史周期相比较</p>
-               <p class="one_indent">如 2019.9 ：2018.9</p>
 
-               <p class="col">环比</p>
-               <p class="one_indent">现在统计周期与上一个统计周期相比较</p>
-               <p class="one_indent">如 2019.9-12月 ：2019.4-8月</p>
-    
-               <p class="col">比重</p>
-               <p class="one_indent">如2019年全国gdp为100w亿, 第一产业为20w亿, 占全国比重为20 ：100 = 20%</p>
 
-               <p class="col">顺差</p>
-               <p class="one_indent">出口-进口</p>
+                <p class="col">年均增长量</p>
+                <p class="one_indent">年均增长量 = （现期量 - 基期量）/ 年数</p>
 
-               <p class="col">逆差</p>
-               <p class="one_indent">进口-出口</p>
+                <p class="col">年均增长率</p>
+                <p class="one_indent">现期量 = 基期量*(1+年均增长率)^年数</p>
 
-               <p class="col">GDP=增加值</p>
-               <p class="one_indent">国内生产总值 = 第一产业增加值 + 第二产业增加值 + 第三产业增加值</p>
+                <p class="col">例题3</p>
+                <p class="one_indent">2015营收100w，营收年均增长率为10%，2018年营收为多少</p>
+                <p class="one_indent">100w * (1+0.1)^3 = 133.1w</p>
 
-               <p class="col">恩格尔系数</p>
-               <p class="one_indent">食品支出总额占个人消费支出总额得比重</p>
-               <p class="one_indent">比重越低，反应生活水平越高</p>
+                <p class="col">例题4</p>
+                <p class="one_indent">2015营收100w，2018年营收133.1w, 2015-2018年均增长率为多少</p>
+                <p class="one_indent">100w * (1+r)^3 = 133.1w => 开立方</p>
 
-               <p class="col">基尼系数</p>
-               <p class="one_indent">衡量一个国家或地区居民收入差距得常用指标</p>
-               <p class="one_indent">介于0-1之间，越接近0，代表收入差距越小，越接近1，代表收入差距越大。</p>
+                <p class="col">同比</p>
+                <p class="one_indent">与历史周期相比较</p>
+                <p class="one_indent">如 2019.9 ：2018.9</p>
+
+                <p class="col">环比</p>
+                <p class="one_indent">现在统计周期与上一个统计周期相比较</p>
+                <p class="one_indent">如 2019.9-12月 ：2019.4-8月</p>
+
+                <p class="col">比重</p>
+                <p class="one_indent">如2019年全国gdp为100w亿, 第一产业为20w亿, 占全国比重为20 ：100 = 20%</p>
+
+                <p class="col">顺差</p>
+                <p class="one_indent">出口-进口</p>
+
+                <p class="col">逆差</p>
+                <p class="one_indent">进口-出口</p>
+
+                <p class="col">GDP=增加值</p>
+                <p class="one_indent">国内生产总值 = 第一产业增加值 + 第二产业增加值 + 第三产业增加值</p>
+
+                <p class="col">恩格尔系数</p>
+                <p class="one_indent">食品支出总额占个人消费支出总额得比重</p>
+                <p class="one_indent">比重越低，反应生活水平越高</p>
+
+                <p class="col">基尼系数</p>
+                <p class="one_indent">衡量一个国家或地区居民收入差距得常用指标</p>
+                <p class="one_indent">介于0-1之间，越接近0，代表收入差距越小，越接近1，代表收入差距越大。</p>
 
             </div>
             <div id="box2" class="box">
-               35min
+                35min
             </div>
             <div id="box3" class="box">
-                30min
+                <p class="col"></p>
+                <p class="one_indent"></p>
             </div>
             <div id="box4" class="box">
                 <p class="col">截位直除法</p>
@@ -144,7 +175,7 @@
 1/18 = 5.56%
 1/19 = 5.26%
                 </pre>
-    
+
                 <p class="col">例题3</p>
                 <p class="one_indent">出口额26.5亿，同比增长24.9%，求增长多少亿</p>
                 <pre>
@@ -168,43 +199,14 @@ n 为4
                 <p class="one_indent">1. 首位直除</p>
                 <p class="one_indent">如 13/78 比 27/124， 13/78 ~= 0.1+，27/124 ~= 0.2+， 即13/78大</p>
                 <p class="one_indent">2. 变化速度</p>
-                <p class="one_indent">如 13/78 比 27/151， 分子13 * 2+ = 27，分母78 * 2- = 151， 
+                <p class="one_indent">如 13/78 比 27/151， 分子13 * 2+ = 27，分母78 * 2- = 151，
                     即13/78 * 2+/2- = 27/151，2+/2- = 1+，说明13/28需要1倍多才等于27/151</p>
 
             </div>
         </div>
         <a href="javascript:history.go(-1);" class="back"></a>
     </main>
-    <script>
-        $(function () {
-            $("img.lazyload").lazyload();
-            $('.tab a').on('click', function () {
-                $(this).addClass('active').siblings().removeClass('active');
-                var index = $(this).index();
-                $('.content .box').eq(index).addClass('selected').siblings().removeClass('selected');
-                $('html, body').animate({
-                    scrollTop: 0 // 0表示滚动条垂直位置的起始点
-                }, 'slow'); // 'slow'定义动画执行的速度
-            })
-            $('.btn').on('click', function () {
-                $('.tab').toggle(function () { }, function () { });
-                if ($(this).hasClass('close')) {
-                    $(this).removeClass('close').html('+')
-                    $('.content').animate({
-                        left: '0',
-                        width: '100%'
-                    }, 'slow'); // 'slow'定义动画执行的速度
-                } else {
-                    $(this).addClass('close').html('—')
-                    $('.content').animate({
-                        left: '30%',
-                        width: '70%'
-                    }, 'fast'); // 'slow'定义动画执行的速度
-                }
-            })
-        })
-
-    </script>
+    <script src="../../assets/js/tab.js"></script>
 </body>
 
 </html>
