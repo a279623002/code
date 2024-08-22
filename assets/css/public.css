@@ -8,6 +8,7 @@ body {
     padding: .2rem .2rem 2rem .2rem;
     position: relative;
     background: #FFF;
+    z-index: -1;
 }
 
 a {

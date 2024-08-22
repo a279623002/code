@@ -1,5 +1,6 @@
 main {
     position: relative;
+    z-index: -1;
 }
 
 .btn {
@@ -14,6 +15,7 @@ main {
     border: .1rem solid gray;
     text-align: center;
     font-weight: bolder;
+    z-index: 2;
 }
 
 .tab {
@@ -32,6 +34,7 @@ main {
     line-height: .8rem;
     color: gray;
     font-weight: bolder;
+    z-index: 2;
 }
 
 .active {
@@ -41,7 +44,7 @@ main {
 .content {
     position: relative;
     top: .3rem;
-    z-index: -1;
+    z-index: 1;
     left: 30%;
     width: 70%;
 }
@@ -56,4 +59,8 @@ main {
 
 .content .box i {
     color: red;
+}
+
+.content .box pre {
+    overflow: auto;
 }
