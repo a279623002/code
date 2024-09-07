@@ -1,6 +1,3 @@
 .idea
 
-go-zero-demo/docker/consul/consul1/data/
-go-zero-demo/docker/consul/consul2/data/
-go-zero-demo/docker/consul/consul3/data/
-go-zero-demo/docker/consul/consul4/data/
+**/data/
