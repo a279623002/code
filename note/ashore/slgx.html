@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>note</title>
+    <script src="../../assets/js/font.js"></script>
+    <script src="../../assets/js/jquery-3.6.0.min.js"></script>
+    <script src="../../assets/js/lazyload.js"></script>
+    <link rel="stylesheet" href="../../assets/css/public.css">
+    <link rel="stylesheet" href="../../assets/css/note.css">
+    <link rel="stylesheet" href="../../assets/css/question.css">
+</head>
+
+<body>
+    <header></header>
+    <main>
+        <a href="javascript:void(0);" class="btn close">—</a>
+        <div class="tab">
+            <a href="#box1" class="active">倍数</a> 
+            <a href="#box2">方程法</a> 
+        </div>
+        <div class="content">
+            <div id="box1" class="box selected">
+                <p class="col">倍数</p>
+                <p class="one_indent">一个班级50多人，男生是女生的3倍，男生最多多少人</p>
+                <p class="one_indent">解：男生是3的倍数，且班级数为4的倍数</p>
+
+                <p class="one_indent">例1</p>
+                <p class="one_indent">甲的销售额是乙和丙的1.5倍，甲和乙的销售额是丙的5倍，已知乙的销售额是56w。问甲的销售额是</p>
+                <p class="one_indent">解：甲+56 为5的倍数，或者 甲 = 1.5（乙+丙） =》 甲/（乙+丙） = 3/2， 即甲是3的倍数</p>
+
+                <p class="one_indent">例2</p>
+                <p class="one_indent">20多人，16箱水，每人6瓶还剩1.5箱，1.5箱正好女生每人1瓶。求男生</p>
+                <p class="one_indent">设一箱有n瓶水，男生 = (14.5 * n - 1.5 * n * 6) / 6 = 5.5n/6</p>
+                <p class="one_indent">即 男/n = 11/12</p>
+
+                <p class="one_indent">例3</p>
+                <p class="one_indent">某公司为客户出售货物收取3%的服务费，代购收取2%的服务费，客户委托该公司出售自产的物品并代购设备。</p>
+                <p class="one_indent">已知公司收取服务费200元，客户收支平衡。求自产的物品销售价是多少</p>
+                <p class="one_indent">设售价为x，代购价为y</p>
+                <p class="one_indent">解：x * 97% = y * 102%</p>
+                <p class="one_indent">x/y = 102/97 </p>
+                <p class="one_indent">x为102的倍数</p>
+
+
+                <p class="col">比</p>
+                <p class="one_indent">一个班级50多人，男女比例为5：7，男生最多多少人</p>
+                <p class="one_indent">解：男生是5的倍数，且班级数为12的倍数</p>
+
+                <p class="one_indent">例1</p>
+                <p class="one_indent">甲乙两班各有40多个学生，甲男女比为5：6，乙男女比为5：4。求男生比女生多多少人</p>
+                <p class="one_indent">解：甲男：甲女 = 5：6， 甲班有40多个且为11 的倍数，推出44人；同理乙班为45人</p>
+                <p class="one_indent">即男生20 + 25 女生 24 + 20 </p>
+
+                <p class="one_indent">例2</p>
+                <p class="one_indent">乙的3倍与丙的6倍之和是甲的4倍，甲与乙的2倍之和是丙的7倍。求甲乙丙之比</p>
+                <p class="one_indent">解：设甲乙丙为x、y、z</p>
+                <p class="one_indent">1. 3y + 6z = 4x => 3（y + 2z）= 4 * x，即x为3的倍数</p>
+                <p class="one_indent">2. x + 2y = 7z => x + 2y 是7的倍数</p>
+
+
+                <p class="col">分数</p>
+                <p class="one_indent">一个班级50多人，男生占全班的7/13，男生最多多少人</p>
+                <p class="one_indent">解：男生是7的倍数，且班级数为13的倍数</p>
+
+                <p class="one_indent">例1</p>
+                <p class="one_indent">去年有员工830人，今年男员工比去年减少6%，女员工比去年增加5%，员工总数比去年增加3人。今年男员工多少人</p>
+                <p class="one_indent">解：今男：去男 = 94 ：100 = 约分 = 47 ：50, 即今男为47的倍数</p>
+                
+                <p class="one_indent">例2</p>
+                <p class="one_indent">200ml沐浴露每箱20瓶每瓶定价14，500ml沐浴露每箱12每瓶定价15。都卖完后两种收入相等，求200ml最少有几箱</p>
+                <p class="one_indent">解：设200ml有x箱， 500ml有y箱</p>
+                <p class="one_indent">20 * 14 * x = 12 * 15 * y</p>
+                <p class="one_indent">x/y = 300 / 280 = 约分 = 15 / 14</p>
+
+                <p class="col">分组求总数</p>
+                <p class="one_indent">例1</p>
+                <p class="one_indent">按7男5女分组，剩8名男生；按9男5女分组，剩40名女生。班级总数为</p>
+                <p class="one_indent">解：总数-8 为12的倍数，或者总数-40 为14的倍数</p>
+      
+                <p class="one_indent">例2</p>
+                <p class="one_indent">铁人三项，全程51.5km，小陈3个项目耗时比为3：8：4，平均速度为15km/h，且两次换项共耗时4分钟。完成比赛共耗时多少</p>
+                <p class="one_indent">解：总耗时-4 为15的倍数</p>
+
+                <p class="col">分组后求差</p>
+                <p class="one_indent">例1</p>
+                <p class="one_indent">按7男3女分组，还剩4名男生；按5男2女分组，还剩2名男生。求男生比女生多多少人</p>
+                <p class="one_indent">解：设1分组数为n，男生为 7n + 4, 女生为3n, 差为 4n + 4, 同理2 的差为 3m + 2</p>
+
+                <p class="col">平均分求和</p>
+                <p class="one_indent">例1</p>
+                <p class="one_indent">甲乙两队平均分92, 甲平均分88，乙平均分94。求甲乙两人总人数</p>
+                <p class="one_indent">解1：甲一人4分等于乙二人2分，即甲：乙 = 1 ： 2， 总人数为3的倍数</p>
+                <p class="one_indent">解2：设甲为x,乙为y</p>
+                <p class="one_indent">88 * x + 94 * y = 92 * (x + y)</p>
+                <p class="one_indent">88 * x + 94 * y = 92 * x + 92 * y</p>
+                <p class="one_indent">2 * y = 4 * x</p>
+                <p class="one_indent">y / x = 2 / 1</p>
+
+                <p class="col">利润</p>
+                <p class="one_indent">例1</p>
+                <p class="one_indent">A每套成本是144元，售价200元，一个经销商订购120套，并提出：如果售价每降低2元，就多订购6套。按经销商要求，获得最大利润需售出套数是：</p>
+                <p class="one_indent">解：利润 = (200 - 144)  * 120 = 56 * 120</p>
+                <p class="one_indent">要求 （56 - 2） * （120 + 6n）  </p>
+                <p class="one_indent">套数为（120 + 6n） </p>
+
+    
+        
+   
+            </div>
+
+            <div id="box2" class="box">
+                <p class="col">原则</p>
+                <p class="one_indent">1. 优先设所求量</p>
+                <p class="one_indent">2. 设小不设大</p>
+                <p class="one_indent">3. 设中间变量</p>
+            </div>
+        </div>
+        <a href="javascript:history.go(-1);" class="back"></a>
+    </main>
+    <script src="../../assets/js/tab.js"></script>
+</body>
+
+</html>
