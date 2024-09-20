@@ -19,6 +19,9 @@
         <div class="tab">
             <a href="#box1" class="active">倍数</a> 
             <a href="#box2">方程法</a> 
+            <a href="#box3">工程问题</a> 
+            <a href="#box4">行程问题</a> 
+            <a href="#box5">排列组合</a> 
         </div>
         <div class="content">
             <div id="box1" class="box selected">
@@ -115,6 +118,156 @@
                 <p class="one_indent">1. 优先设所求量</p>
                 <p class="one_indent">2. 设小不设大</p>
                 <p class="one_indent">3. 设中间变量</p>
+
+                <p class="col">赋零</p>
+                <p class="one_indent">如给定3A + B + 3C = 20,</p>
+                <p class="one_indent">4A + 2B + 4C = 30,</p>
+                <p class="one_indent">求A+B+C的值</p>
+                
+            </div>
+
+            <div id="box3" class="box">
+                <p class="col">公式</p>
+                <p class="one_indent">总工程 = 效率 * 时间</p>
+
+                <p class="col">给定时间型</p>
+                <p class="one_indent">如甲完成工程需要20天，乙需要15天，甲先做13天后，甲乙一起做完需要多少天</p>
+                <p class="one_indent">设定总工程为甲乙最小公倍数，即60，则甲效率为3/天，乙4/天</p>
+                <p class="one_indent">60 - 3 * 13 = 21 </p>
+                <p class="one_indent">21 / （3 + 4） = 3天 </p>
+
+                <p class="col">例</p>
+                <p class="one_indent">两根长度相同的粗细木材，粗木燃烧完需要2小时，细木材1小时。</p>
+                <p class="one_indent">烧了一会后同时熄灭，粗木材剩余长度是细木材的2倍，求燃烧时间</p>
+                <pre>
+总长度 = 燃烧效率（长度/时间） * 时间
+2        1                     1
+2        2                     2
+设燃烧x小时
+则2 - x = 2 * (2 - 2x)
+x  = 2/3 小时
+                </pre>
+
+                <p class="col">效率制约型</p>
+                <p class="one_indent">1. 甲：乙 = 2：3</p>
+                <p class="one_indent">2. 提高20%，1：1.2 = 5：6</p>
+                <p class="one_indent">3. 42台收割机，默认效率一样 1： 1</p>
+                <p class="one_indent">4. 某一部分工程量甲需要5天 乙需要3天，即效率比 甲：乙=3：5</p>
+
+                <p class="col">例</p>
+                <p class="one_indent">80台工作机每天工作10小时预期30天完成工作。工作中期间休息10天，剩余8天时，增加70台后求每天多工作几小时</p>
+                <p class="one_indent">解： 设每台工作机工作效率为1</p>
+                <pre>
+总工作量 = 工作机效率 * 时间
+24000      80         30 * 10
+预期30天，实际工作12天后休息10天剩余8天增加70台工作机
+80 * 18 * 10 = 150 * 8 * t
+t =  12
+12 - 10 = 2 小时
+                </pre>
+            </div>
+            <div id="box4" class="box">
+                <p class="col">公式</p>
+                <p class="one_indent">路程 = 速度 * 时间</p>
+                <p class="one_indent">s = v * t</p>
+
+                <p class="col">等距离平均速度</p>
+                <p class="one_indent">相同路程，去v1，回v2，求来回平均速度</p>
+                <p class="one_indent">v = 2v1v2/(v1+v2)</p>
+                <p class="one_indent">使用场景：</p>
+                <p class="one_indent">1. 上下坡</p>
+                <p class="one_indent">2. 往返</p>
+                <p class="one_indent">3. 前半程后半程</p>
+
+                <p class="col">流水行船</p>
+                <p class="one_indent">v顺 = v船+v水</p>
+                <p class="one_indent">v逆 = v船-v水</p>
+
+                <p class="col">相遇追及</p>
+                <p class="one_indent">相遇：路程 = (v1 + v2) * 时间</p>
+                <p class="one_indent">追及：S追 = (v1 - v2) * 时间</p>
+
+                <p class="col">环形跑道</p>
+                <p class="one_indent">相反方向：AB相反方向出发，第一次遇上时，AB一共跑了S米，即一圈，第n次遇上一共跑了Sn米</p>
+                <p class="one_indent">相同方向：AB相同方向出发，A比B快，A追上B时，A比B多跑了S米，即一圈，第n次追上A比B多跑了Sn米</p>
+                
+                <p class="col">两端相遇</p>
+                <p class="one_indent">A与B距离S，甲从A出发，乙从B出发，第一次相遇时一共走了S米，第二次相遇时一共走了3S米，第三次为5S米</p>
+                <p class="one_indent">第N次一共走了(2n-1)S米</p>
+
+                <p class="col">例</p>
+                <p class="one_indent">两个校区相距2760米，甲乙从各自校区来回，甲速度为70米/分，乙为110米/分，求第二次遇见需要多少分钟</p>
+                <p class="one_indent">(70+110)*t = 2760 * (2*2-1)</p>
+                <p class="one_indent">t = 36</p>
+
+                <p class="col">例</p>
+                <p class="one_indent">甲乙从相距100m两边开始匀速行进，甲前进100m要72s，乙前进100m要60s，在12分钟内甲乙来回相遇次数为多少</p>
+                <p class="one_indent">（甲速度+乙速度）*12为一共走了多少m</p>*
+                <p class="one_indent">(100/72+100/60)*12*60 = 2200</p>
+                <p class="one_indent">（2n-1）100 = 2200</p>
+                <p class="one_indent">n=11.5</p>
+
+
+            </div>
+
+            <div id="box5" class="box">
+                <p class="col">分类：加法</p>
+                <p class="one_indent">如：北京站去天安门，可以做地铁，taxi，专车...等，一共有n种</p>
+                <p class="col">分步：乘法</p>
+                <pre>
+北京站------------->天安门---------->奥体
+     ---地铁---             --地铁--
+     ---专车---             --公交（2路）--
+     ---公交（1路）---       --公交（8路）--
+     ---公交（52路）---
+     ---公交（76路）---
+从北京站到奥铁乘车方案一共有 6 * 3 种
+                </pre>
+                <p class="col">例</p>
+                <p class="one_indent">甲到乙直达班车4班，甲到丙5班，丙到乙3班，甲到乙有多少种方案？</p>
+                <p class="one_indent">解：4+5*3 = 19</p>
+
+                <p class="col">排列：A(array)有序</p>
+                <p class="one_indent">如有6个人，6人都排队有多少种方案？</p>
+                <p class="one_indent">A6^6 = 6*5*4*3*2*1 = 720 = 6!</p>
+                <p class="one_indent">第一个人有6种可能，第二个人有5种可能</p>
+                <p class="one_indent">如有6个人，3人都排队有多少种方案？</p>
+                <p class="one_indent">A3^6 = 6*5*4 = 120</p>
+
+                <p class="col">组合：C(combination)无序</p>
+                <p class="one_indent">如从10个人选4个人，有多少种方案？</p>
+                <p class="one_indent">C4^10 = A4^10 / A4^4</p>
+                <p class="one_indent">Cx^y = Ax^y / Ax^x</p>
+                <p class="one_indent">10人选4人排列，A4^10 等价于 不排列为C4^10, 选出4人后再进行排列有A4^4种可能，即C4^10 * A4^4</p>
+                <p class="one_indent">Cm^m = 1</p>
+                <p class="one_indent">C1^m = m</p>
+                <p class="one_indent">Cn^m = C(m-n)^m</p>
+                <p class="one_indent">如C3^7 = C4^7</p>
+
+                <p class="col">捆绑法-相邻问题</p>
+                <p class="one_indent">7个人，其中AB相邻，有几种方案</p>
+                <p class="one_indent">AB看为1人，即A6^6,AB排列有A2^2种可能</p>
+                <p class="one_indent">结果为A6^6 * A2^2</p>
+
+                <p class="col">插空法-不相邻问题</p>
+                <p class="one_indent">7个人，其中AB不相邻，有几种方案</p>
+                <p class="one_indent">除了AB其他5人先排序，即A5^5</p>
+                <p class="one_indent">_c_d_e_f_g_</p>
+                <p class="one_indent">AB可以插入6个_位置，即A2^6</p>
+                <p class="one_indent">结果为A5^5*A2^6</p>
+
+                <p class="col">例</p>
+                <p class="one_indent">12课松树与9课柏树种植道路两侧，每侧9棵且首尾为松树，每侧柏树数量相等不相邻，求种植方法</p>
+                <p class="one_indent">每侧为松_松_松_松_松_松</p>
+                <p class="one_indent">柏树可以插入5个位置，即C3^5 = 10</p>
+                <p class="one_indent">每侧为10种可能，结果为10 * 10 = 100种</p>
+
+                <p class="col">插板法</p>
+                <p class="one_indent">3个人瓜分10元，每人至少1块，有多少种方案？</p>
+                <p class="one_indent">1_2_3_4_5_6_7_8_9_10</p>
+                <p class="one_indent">有9个_可以插入2个/分隔成3部分</p>
+                <p class="one_indent">即C2^9</p>
+                <p class="one_indent">n个人瓜分m个相同的物品，每人至少1个，有C(n-1)^(m-1)种方案？</p>
             </div>
         </div>
         <a href="javascript:history.go(-1);" class="back"></a>
