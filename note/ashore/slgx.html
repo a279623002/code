@@ -22,6 +22,7 @@
             <a href="#box3">工程问题</a> 
             <a href="#box4">行程问题</a> 
             <a href="#box5">排列组合</a> 
+            <a href="#box6">概率</a> 
         </div>
         <div class="content">
             <div id="box1" class="box selected">
@@ -273,6 +274,39 @@ t =  12
                 <p class="one_indent">如3个厨师每个厨师炒了道菜且不能吃自己炒的菜，有多少种方案？</p>
                 <p class="one_indent">Dn = D3 = 2</p>
                 <p class="one_indent">D2=1 D3=2 D4=9 D5=44</p>
+
+                <p class="col">例</p>
+                <p class="one_indent">从5个科室各抽取了一名人员，交流到其他科室，如每个科室只能接受一人有多少种方案？</p>
+                <p class="one_indent">D5=44</p>
+            </div>
+
+            <div id="box6" class="box">
+                <p class="col">公式</p>
+                <p class="one_indent">P=满足条件的情况数/总情况数</p>
+                <p class="one_indent">如一个骰子投出1的概率为1/6</p>
+
+                <p class="col">分步相乘</p>
+                <p class="one_indent">如：8人组4队，每队2人，小王小李分在一队的概率是</p>
+                <p class="one_indent">1. 小王可以从8个位置选一个，概率为8/8</p>
+                <p class="one_indent">2. 现在剩7个位置，小李只能选小王该组的一位，概率为1/7</p>
+                <p class="one_indent">8/8 * 1/7 = 1/7</p>
+                <p class="one_indent">按公式解：</p>
+                <p class="one_indent">8人去A队为C2^8</p>
+                <p class="one_indent">6人去B队为C2^6</p>
+                <p class="one_indent">4人去C队为C2^4</p>
+                <p class="one_indent">2人去D队为C2^2</p>
+                <p class="one_indent">总情况为：C2^8 * C2^6 * C2^4 * C2^2</p>
+                <p class="one_indent">小王小李去同一队的情况：4种</p>
+                <p class="one_indent">那么其余3队的情况为C2^6 * C2^4 C2^2</p>
+                <p class="one_indent">概率为 (4 * C2^6 * C2^4 * C2^2) / (C2^8 * C2^6 * C2^4 * C2^2)</p>
+
+                <p class="col">分类相加</p>
+                <p class="one_indent">如：比赛3局两胜，甲每局80%概率赢乙，整场比赛甲有多大概率赢甲</p>
+                <p class="one_indent">1. 甲第一局第二局赢则不用比第三局获胜，概率为80% * 80%</p>
+                <p class="one_indent">2. 甲第一局第三局赢且第二局输，概率为80% * 20% * 80%</p>
+                <p class="one_indent">3. 甲第二局第三局赢且第一局输，概率为20% * 80% * 80%</p>
+                <p class="one_indent">概率为 80% * 80% + 80% * 20% * 80% + 20% * 80% * 80% = 80% * 80% * 140%</p>
+
             </div>
         </div>
         <a href="javascript:history.go(-1);" class="back"></a>
