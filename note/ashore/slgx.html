@@ -24,6 +24,7 @@
             <a href="#box5">排列组合</a> 
             <a href="#box6">概率</a> 
             <a href="#box7">经济利润</a> 
+            <a href="#box8">最值问题</a> 
         </div>
         <div class="content">
             <div id="box1" class="box selected">
@@ -311,20 +312,6 @@ t =  12
             </div>
 
             <div id="box7" class="box"> 
-                <p class="col">计算技巧</p>
-                <p class="one_indent">a+b = 10</p>
-                <p class="one_indent">a*b 的最大值为a=b=5,即25</p>
-
-                <p class="col">例</p>
-                <p class="one_indent">公司出售一批苗木，如果每株4元，可卖出20w株；若苗木单价每提高0.4元，就会少卖1w株。</p>
-                <p class="one_indent">在最佳定价的情况下，公司最大收入是多少w。</p>
-                <p class="one_indent">解： 设提高n次单价</p>
-                <p class="one_indent">总价 = (4 + 0.4n)*(20 - n)</p>
-                <p class="one_indent">20-n 为 每提高n次则少卖1w株，单位为w，即200000- 10000n</p>
-                <p class="one_indent">总价 = 0.4 (10 + n)(20 - n)</p>
-                <p class="one_indent">运用技巧 (10 + n) + (20 - n) = 30</p>
-                <p class="one_indent">即(10 + n)(20 - n) 的最大值为 = 15 * 15</p>
-                <p class="one_indent">总价 = 0.4 * 15 * 15 = 90w</p>
 
 
                 <p class="col">基本经济利润</p>
@@ -350,6 +337,55 @@ t =  12
                 <p class="one_indent">2.分段计算</p>
 
 
+            </div>
+
+            <div id="box8" class="box">
+                
+                <p class="col">最大值</p>
+                <p class="one_indent">a+b = 10</p>
+                <p class="one_indent">a*b 的最大值为a=b=5,即25</p>
+
+                <p class="col">例</p>
+                <p class="one_indent">公司出售一批苗木，如果每株4元，可卖出20w株；若苗木单价每提高0.4元，就会少卖1w株。</p>
+                <p class="one_indent">在最佳定价的情况下，公司最大收入是多少w。</p>
+                <p class="one_indent">解： 设提高n次单价</p>
+                <p class="one_indent">总价 = (4 + 0.4n)*(20 - n)</p>
+                <p class="one_indent">20-n 为 每提高n次则少卖1w株，单位为w，即200000- 10000n</p>
+                <p class="one_indent">总价 = 0.4 (10 + n)(20 - n)</p>
+                <p class="one_indent">运用技巧 (10 + n) + (20 - n) = 30</p>
+                <p class="one_indent">即(10 + n)(20 - n) 的最大值为 = 15 * 15</p>
+                <p class="one_indent">总价 = 0.4 * 15 * 15 = 90w</p>
+
+                <p class="col">最不利值</p>
+                <p class="one_indent">最不利架构：<i>至少...才能保证...</i></p>
+                <p class="one_indent">最不利的情况+1</p>
+                <p class="one_indent">例： 红球3个，黑球4个，白球5个，至少摸出多少个球才能出一个白球</p>
+                <p class="one_indent">黑球4个白球5个，最后摸出红球，即10个</p>
+
+                <p class="col">例</p>
+                <p class="one_indent">排名前三专利申请，中兴2826项，松下2464项，华为1831项，至少拿出多少项专利才能保证一定有2110项是同一家公司的申请</p>
+                <p class="one_indent">最不利的情况是：</p>
+                <p class="one_indent">中兴拿出2109</p>
+                <p class="one_indent">松下拿出2109</p>
+                <p class="one_indent">华为1831</p>
+                <p class="one_indent">即2109+2109+1831 + 1</p>
+
+                <p class="col">例</p>
+                <p class="one_indent">要求每名党员参加培训且只参加4项中的2项，无论怎么安排，至少都有5名参加的培训完全相同，求党员数量</p>
+                <p class="one_indent">每名党员参加的情况数（培训方案）是C2^4 = 6</p>
+                <p class="one_indent">最不利的情况是：</p>
+                <p class="one_indent">6种培训方案下每一种都有4个党员</p>
+                <p class="one_indent">即 6 * 4 + 1</p>
+
+                <p class="col">数列构造</p>
+                <p class="one_indent"><i>最多（少）...最少（多）...</i></p>
+                <p class="one_indent"><i>排名第...最少（多）...</i></p>
+                <p class="one_indent">如总共100支笔，6个人分，每个人分得不同，分得最少的人最多能分几支</p>
+                <p class="one_indent">1. 排序后定位： 设最小的最多能分x支</p>
+                <p class="one_indent">2. 构造：x,x+1,x+2,x+3,x+4,x+5</p>
+                <p class="one_indent">3. 求和：6x + 15 = 100</p>
+                <p class="one_indent">x = 14.167</p>
+                <p class="one_indent">4. 反向：最多能分即取14，最少能分即取15</p>
             </div>
         </div>
         <a href="javascript:history.go(-1);" class="back"></a>
