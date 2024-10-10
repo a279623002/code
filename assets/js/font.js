@@ -29,8 +29,8 @@ function back() {
     } else {
         urlArr.pop();
     }
+    var newPath = urlArr.join('/');
 
-
-    window.location.href = urlArr;
+    window.location.href = newPath;
 
 }
