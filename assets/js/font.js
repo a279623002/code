@@ -31,6 +31,6 @@ function back() {
     }
 
 
-    window.location.href = newPath;
+    window.location.href = urlArr;
 
 }
