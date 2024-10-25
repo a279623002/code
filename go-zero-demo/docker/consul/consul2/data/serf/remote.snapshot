@@ -3,3 +3,8 @@ alive: consul1.dc1 172.18.0.2:8302
 alive: consul3.dc1 172.18.0.4:8302
 clock: 2
 alive: consul2.dc1 172.18.0.5:8302
+alive: consul2.dc1 172.18.0.4:8302
+alive: consul3.dc1 172.18.0.5:8302
+alive: consul1.dc1 172.18.0.3:8302
+clock: 1
+clock: 3
