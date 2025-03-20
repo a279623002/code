@@ -78,7 +78,7 @@
                 <p class="one_indent">200ml沐浴露每箱20瓶每瓶定价14，500ml沐浴露每箱12每瓶定价15。都卖完后两种收入相等，求200ml最少有几箱</p>
                 <p class="one_indent">解：设200ml有x箱， 500ml有y箱</p>
                 <p class="one_indent">20 * 14 * x = 12 * 15 * y</p>
-                <p class="one_indent">x/y = 300 / 280 = 约分 = 15 / 14</p>
+                <p class="one_indent">x/y = 180 / 280 = 约分 = 9 / 14</p>
 
                 <p class="col">分组求总数</p>
                 <p class="one_indent">例1</p>
@@ -201,7 +201,7 @@ t =  12
                 <p class="col">例</p>
                 <p class="one_indent">两个校区相距2760米，甲乙从各自校区来回，甲速度为70米/分，乙为110米/分，求第二次遇见需要多少分钟</p>
                 <p class="one_indent">(70+110)*t = 2760 * (2*2-1)</p>
-                <p class="one_indent">t = 36</p>
+                <p class="one_indent">t = 46</p>
 
                 <p class="col">例</p>
                 <p class="one_indent">甲乙从相距100m两边开始匀速行进，甲前进100m要72s，乙前进100m要60s，在12分钟内甲乙来回相遇次数为多少</p>
@@ -260,7 +260,7 @@ t =  12
                 <p class="one_indent">结果为A5^5*A2^6</p>
 
                 <p class="col">例</p>
-                <p class="one_indent">12课松树与9课柏树种植道路两侧，每侧9棵且首尾为松树，每侧柏树数量相等不相邻，求种植方法</p>
+                <p class="one_indent">12课松树与6课柏树种植道路两侧，每侧9棵且首尾为松树，每侧柏树数量相等不相邻，求种植方法</p>
                 <p class="one_indent">每侧为松_松_松_松_松_松</p>
                 <p class="one_indent">柏树可以插入5个位置，即C3^5 = 10</p>
                 <p class="one_indent">每侧为10种可能，结果为10 * 10 = 100种</p>
@@ -271,6 +271,14 @@ t =  12
                 <p class="one_indent">有9个_可以插入2个/分隔成3部分</p>
                 <p class="one_indent">即C2^9</p>
                 <p class="one_indent">n个人瓜分m个相同的物品，每人至少1个，有C(n-1)^(m-1)种方案？</p>
+
+                <p class="col">例</p>
+                <p class="one_indent">甲乙丙公司订购12套工具，每家公司至少3套，最多5套，有几种方案？</p>
+                <p class="one_indent">每家公司先分2套，12-3*2 = 6套</p>
+                <p class="one_indent">1_2_3_4_5_6</p>
+                <p class="one_indent">有5个_可以插入2个/分隔成3部分，即C2^5 = 10</p>
+                <p class="one_indent">分隔的部分出现4套(1,1,4)的可能是C1^3 = 3</p>
+                <p class="one_indent">即最少3套，最多5套，共10-3 = 7种方案</p>
 
                 <p class="col">错位排列</p>
                 <p class="one_indent">如3个厨师每个厨师炒了道菜且不能吃自己炒的菜，有多少种方案？</p>
