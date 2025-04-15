@@ -1,0 +1,622 @@
+basePath: /
+definitions:
+  model.Response:
+    properties:
+      code:
+        type: integer
+      msg:
+        type: string
+    type: object
+host: 127.0.0.1:8082
+info:
+  contact: {}
+  description: 影院订票系统.
+  title: 影院订票系统
+  version: "1.0"
+paths:
+  /cinema/getCinemaMessageByCid:
+    post:
+      consumes:
+      - application/json
+      description: 正在销售的影片信息和影院信息
+      parameters:
+      - description: 影院id
+        in: query
+        name: cinemaId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "1":
+          description: success
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: 正在销售的影片信息和影院信息
+      tags:
+      - 影厅中心
+  /cinema/getMovieHallByMHId:
+    post:
+      consumes:
+      - application/json
+      description: 获取影厅座位表
+      parameters:
+      - description: 影厅id
+        in: query
+        name: mhId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "1":
+          description: success
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: 获取影厅座位表
+      tags:
+      - 影厅中心
+  /cinema/locationCinema:
+    post:
+      consumes:
+      - application/json
+      description: 根据location_id 获取影院
+      parameters:
+      - description: 定位id
+        in: query
+        name: locationId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "1":
+          description: success
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: 获取影院
+      tags:
+      - 影厅中心
+  /comment/deleteComment:
+    post:
+      consumes:
+      - application/json
+      description: 删除评论
+      parameters:
+      - description: 评论id
+        in: query
+        name: commentID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "1":
+          description: success
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: 删除评论
+      tags:
+      - 评论中心
+  /comment/hotComment:
+    post:
+      consumes:
+      - application/json
+      description: 获取评论
+      parameters:
+      - description: 影片id
+        in: query
+        name: movieId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "1":
+          description: success
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: 获取评论
+      tags:
+      - 评论中心
+  /comment/makeComment:
+    post:
+      consumes:
+      - application/json
+      description: 评论
+      parameters:
+      - description: 影片id
+        in: query
+        name: movieId
+        required: true
+        type: integer
+      - description: 用户id
+        in: query
+        name: userId
+        required: true
+        type: integer
+      - description: 标题
+        in: query
+        name: title
+        required: true
+        type: string
+      - description: 内容
+        in: query
+        name: headImg
+        required: true
+        type: string
+      - description: 昵称
+        in: query
+        name: nickname
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "1":
+          description: success
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: 评论
+      tags:
+      - 评论中心
+  /comment/myComments:
+    post:
+      consumes:
+      - application/json
+      description: 我的评论
+      parameters:
+      - description: 用户id
+        in: query
+        name: userId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "1":
+          description: success
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: 我的评论
+      tags:
+      - 评论中心
+  /comment/upNumComment:
+    post:
+      consumes:
+      - application/json
+      description: 评论点赞
+      parameters:
+      - description: 评论id
+        in: query
+        name: commentID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "1":
+          description: success
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: 评论点赞
+      tags:
+      - 评论中心
+  /film/getFilmsByCidADay:
+    post:
+      consumes:
+      - application/json
+      description: 获取正在销售的影片信息
+      parameters:
+      - description: 影厅id
+        in: query
+        name: cinemaId
+        required: true
+        type: integer
+      - description: 影片id
+        in: query
+        name: filmId
+        required: true
+        type: integer
+      - description: 时间 0：今天 1：明天 2：后天
+        in: query
+        name: dayNum
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "1":
+          description: success
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: 获取正在销售的影片信息
+      tags:
+      - 影片中心
+  /film/hotPlayMovies:
+    get:
+      consumes:
+      - application/json
+      description: 搜索--暂时写死
+      produces:
+      - application/json
+      responses:
+        "1":
+          description: success
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: 搜索
+      tags:
+      - 影片中心
+  /film/imageAll:
+    post:
+      consumes:
+      - application/json
+      description: 剧照
+      parameters:
+      - description: 影片id
+        in: query
+        name: movieId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "1":
+          description: success
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: 剧照
+      tags:
+      - 影片中心
+  /film/locationMovies:
+    get:
+      consumes:
+      - application/json
+      description: 上映的影片
+      produces:
+      - application/json
+      responses:
+        "1":
+          description: success
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: 上映的影片
+      tags:
+      - 影片中心
+  /film/movieComingNew:
+    post:
+      consumes:
+      - application/json
+      description: 即将上映的影片
+      produces:
+      - application/json
+      responses:
+        "1":
+          description: success
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: 即将上映的影片
+      tags:
+      - 影片中心
+  /film/movieCreditsWithTypes:
+    post:
+      consumes:
+      - application/json
+      description: 获取影片导演演员
+      parameters:
+      - description: 影片id
+        in: query
+        name: movieId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "1":
+          description: success
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: 获取影片导演演员
+      tags:
+      - 影片中心
+  /film/movieDetail:
+    post:
+      consumes:
+      - application/json
+      description: 影片详情
+      parameters:
+      - description: 影片id
+        in: query
+        name: movieId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "1":
+          description: success
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: 影片详情
+      tags:
+      - 影片中心
+  /order/getOrderMessage:
+    post:
+      consumes:
+      - application/json
+      description: 订单详情
+      parameters:
+      - description: 用户id
+        in: query
+        name: userId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses: {}
+      summary: 订单详情
+      tags:
+      - 影片中心
+  /order/lookAlreadyOrders:
+    post:
+      consumes:
+      - application/json
+      description: 查看看过的电影
+      parameters:
+      - description: 用户id
+        in: query
+        name: userId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses: {}
+      summary: 查看看过的电影
+      tags:
+      - 影片中心
+  /order/lookOrders:
+    post:
+      consumes:
+      - application/json
+      description: 查看所有(订单)电影票
+      parameters:
+      - description: 用户id
+        in: query
+        name: userId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses: {}
+      summary: 查看所有(订单)电影票
+      tags:
+      - 影片中心
+  /order/orderComment:
+    post:
+      consumes:
+      - application/json
+      description: 订单评分
+      parameters:
+      - description: 分数
+        in: query
+        name: score
+        required: true
+        type: integer
+      - description: 用户id
+        in: query
+        name: userId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses: {}
+      summary: 订单评分
+      tags:
+      - 影片中心
+  /order/payOrder:
+    post:
+      consumes:
+      - application/json
+      description: 付款并更新用户手机
+      parameters:
+      - description: 用户id
+        in: query
+        name: userId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses: {}
+      summary: 付款并更新用户手机
+      tags:
+      - 影片中心
+  /order/ticket:
+    post:
+      consumes:
+      - application/json
+      description: 选取影厅座位并生成订单
+      parameters:
+      - description: 影厅id
+        in: query
+        name: mhId
+        required: true
+        type: integer
+      - description: 影片id
+        in: query
+        name: filmId
+        required: true
+        type: integer
+      - description: 用户id
+        in: query
+        name: userId
+        required: true
+        type: integer
+      - description: 座位x
+        in: query
+        name: x
+        required: true
+        type: integer
+      - description: 座位y
+        in: query
+        name: "y"
+        required: true
+        type: integer
+      - description: 开始时间
+        in: query
+        name: startTime
+        required: true
+        type: string
+      - description: 结束时间
+        in: query
+        name: endTime
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: 选取影厅座位并生成订单
+      tags:
+      - 影片中心
+  /order/wantTicket:
+    post:
+      consumes:
+      - application/json
+      description: 记录想看的电影
+      parameters:
+      - description: 影片id
+        in: query
+        name: filmId
+        required: true
+        type: integer
+      - description: 用户id
+        in: query
+        name: userId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses: {}
+      summary: 记录想看的电影
+      tags:
+      - 影片中心
+  /user/loginAccount:
+    post:
+      consumes:
+      - application/json
+      description: 用户登录
+      parameters:
+      - description: 邮箱
+        in: query
+        name: email
+        required: true
+        type: string
+      - description: 密码
+        in: query
+        name: password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "1":
+          description: success
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: 用户登录
+      tags:
+      - 用户中心
+  /user/registAccount:
+    post:
+      consumes:
+      - application/json
+      description: 用户注册
+      parameters:
+      - description: 邮箱
+        in: query
+        name: email
+        required: true
+        type: string
+      - description: 账号
+        in: query
+        name: username
+        required: true
+        type: string
+      - description: 密码
+        in: query
+        name: password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "1":
+          description: success
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: 用户注册
+      tags:
+      - 用户中心
+  /user/updateUserProfile:
+    post:
+      consumes:
+      - application/json
+      description: 用户更新
+      parameters:
+      - description: 用户id
+        in: query
+        name: userId
+        required: true
+        type: integer
+      - description: 邮箱
+        in: query
+        name: email
+        required: true
+        type: string
+      - description: 账号
+        in: query
+        name: username
+        required: true
+        type: string
+      - description: 手机
+        in: query
+        name: phone
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "1":
+          description: success
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: 用户更新
+      tags:
+      - 用户中心
+  /user/wantScore:
+    post:
+      consumes:
+      - application/json
+      description: 评分（需要下单后才能评分）
+      parameters:
+      - description: 用户id
+        in: query
+        name: userId
+        required: true
+        type: integer
+      - description: 电影id
+        in: query
+        name: movieId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "1":
+          description: success
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: 电影评分
+      tags:
+      - 用户中心
+swagger: "2.0"
