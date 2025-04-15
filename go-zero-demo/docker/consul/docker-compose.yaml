@@ -1,0 +1,39 @@
+version: '3.5'
+services:
+  consul1:
+    image: hub.atomgit.com/amd64/consul:1.13.9
+    container_name: consul1
+    restart: always
+    command: agent -server -client=0.0.0.0 -bootstrap-expect=3 -node=consul1  -config-dir=/consul/config
+    volumes:
+      - ./consul1/data:/consul/data
+      - ./consul1/config:/consul/config
+
+  consul2:
+    image: hub.atomgit.com/amd64/consul:1.13.9
+    container_name: consul2
+    restart: always
+    command: agent -server -client=0.0.0.0 -retry-join=consul1 -node=consul2 -config-dir=/consul/config
+    volumes:
+      - ./consul2/data:/consul/data
+      - ./consul2/config:/consul/config
+
+  consul3:
+    image: hub.atomgit.com/amd64/consul:1.13.9
+    container_name: consul3
+    restart: always
+    command: agent -server -client=0.0.0.0 -retry-join=consul1 -node=consul3  -config-dir=/consul/config
+    volumes:
+      - ./consul3/data:/consul/data
+      - ./consul3/config:/consul/config
+
+  consul4:
+    image: hub.atomgit.com/amd64/consul:1.13.9
+    container_name: consul4
+    restart: always
+    ports:
+      - 8500:8500
+    command: agent -client=0.0.0.0 -retry-join=consul1 -ui -node=client1  -config-dir=/consul/config
+    volumes:
+      - ./consul4/data:/consul/data
+      - ./consul4/config:/consul/config

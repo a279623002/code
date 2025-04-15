@@ -1,0 +1,28 @@
+syntax = "v2"
+
+info (
+	author: "shiro"
+	date:   "2024-8-8"
+	desc:   "demo"
+)
+
+type (
+	DemoReq {
+		ID int64 `json:"id"`
+	}
+	DemoResp {
+		ID int64 `json:"id"`
+	}
+)
+
+//定义了一个服务叫demo-api
+service demo-api {
+	//获取接口的名字叫获取id
+	@doc "获取id"
+	//对应的hanlder即controller是demo
+	@handler demo
+	//请求方法是post，路径是/demo/id，参数是DemoReq，返回值是DemoResp
+	post /demo/id (DemoReq) returns (DemoResp)
+//可以继续定义多个api
+}
+

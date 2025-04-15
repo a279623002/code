@@ -1,0 +1,19 @@
+syntax = "proto3";
+package demo;
+// protoc-gen-go 版本大于1.4.0, proto文件需要加上go_package,否则无法生成
+option go_package = "./demo";
+
+//定义请求体
+message DemoRequest {
+  int64 id = 1;
+}
+//定义响应体
+message DemoResponse {
+  int64 id = 1;
+
+}
+service Demo {
+  //rpc方法
+  rpc getID(DemoRequest) returns(DemoResponse);
+  //可以继续定义多个方法
+}

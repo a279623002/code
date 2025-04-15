@@ -1,0 +1,66 @@
+main {
+    position: relative;
+    z-index: -1;
+}
+
+.btn {
+    position: fixed;
+    top: .2rem;
+    left: .2rem;
+    width: 25%;
+    height: .8rem;
+    font-size: .5rem;
+    line-height: .8rem;
+    border-radius: 1rem;
+    border: .1rem solid gray;
+    text-align: center;
+    font-weight: bolder;
+    z-index: 2;
+}
+
+.tab {
+    position: fixed;
+    width: 25%;
+    padding-right: 1%;
+    height: 80%;
+    overflow: auto;
+}
+
+.tab a {
+    display: block;
+    text-align: right;
+    margin: .1rem 0 .1rem 0;
+    padding: .2rem 0 .1rem 0;
+    line-height: .8rem;
+    color: gray;
+    font-weight: bolder;
+    z-index: 2;
+}
+
+.active {
+    color: black !important;
+}
+
+.content {
+    position: relative;
+    top: .3rem;
+    z-index: 1;
+    left: 30%;
+    width: 70%;
+}
+
+.content .selected {
+    display: block !important;
+}
+
+.content .box {
+    display: none;
+}
+
+.content .box i {
+    color: red;
+}
+
+.content .box pre {
+    overflow: auto;
+}

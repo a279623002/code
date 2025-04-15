@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>redis</title>
+    <script src="../../assets/js/jquery-3.6.0.min.js"></script>
     <script src="../../assets/js/font.js"></script>
     <link rel="stylesheet" href="../../assets/css/public.css">
     <link rel="stylesheet" href="../../assets/css/note.css">
@@ -131,13 +132,14 @@
     <p class="one_indent">1.设置key永不过期</p>
     <p class="one_indent">2.添加互斥锁，但收到一个请求时，其他请求需要等待，一个个轮流查询，避免数据库压力过大</p>
 
+    <p class="col">
+        缓存雪崩
+    </p>
     <p class="one_indent">大量key在同一时间过期</p>
     <p class="one_indent">解决方案:</p>
     <p class="one_indent">1.设置key永不过期</p>
     <p class="one_indent">2.过期时间设为随机</p>
-    <p class="col">
-        缓存雪崩
-    </p>
+
 
 
     <p class="col"><a href="https://blog.csdn.net/weixin_44143114/article/details/119878271">主从复制</a></p><br />

@@ -1,0 +1,6 @@
+Name: demo-api
+Host: 0.0.0.0
+Port: 8888
+#注意这个名字和config文件中的名字是对应的
+DemoRpc:
+  Target: consul://127.0.0.1:8500/demo.rpc

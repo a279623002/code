@@ -1,0 +1,14 @@
+alive: consul2 172.19.0.2:8301
+alive: consul1 172.19.0.3:8301
+clock: 1
+alive: consul3 172.19.0.4:8301
+event-clock: 1
+alive: client1 172.19.0.5:8301
+clock: 2
+not-alive: client1
+alive: consul2 172.20.0.5:8301
+alive: consul3 172.20.0.3:8301
+clock: 3
+alive: consul1 172.20.0.2:8301
+alive: client1 172.20.0.4:8301
+event-clock: 2

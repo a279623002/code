@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>note</title>
+    <script src="../../assets/js/jquery-3.6.0.min.js"></script>
+    <script src="../../assets/js/font.js"></script>
+    <script src="../../assets/js/lazyload.js"></script>
+    <link rel="stylesheet" href="../../assets/css/public.css">
+    <link rel="stylesheet" href="../../assets/css/note.css">
+    <link rel="stylesheet" href="../../assets/css/question.css">
+</head>
+
+<body>
+    <header></header>
+    <main>
+        <a href="javascript:void(0);" class="btn close">—</a>
+        <div class="tab">
+            <a href="#box1" class="active">统计术语</a>
+            <a href="#box2">结构阅读</a>
+            <a href="#box3">重点题型</a>
+            <a href="#box4">速算技巧</a>
+        </div>
+        <div class="content">
+            <div id="box1" class="box selected">
+                <p class="col">基期、现期</p>
+                <p class="one_indent">如2017年比2016年增加300元， <i>2017年</i>为现期，<i>2016年</i>为基期。</p>
+                <p class="col">增长量</p>
+                <p class="one_indent">增长量 = 现期量 - 基期量</p>
+                <p class="col">增长率</p>
+                <p class="one_indent">增长率 = 增长量 / 基期量 * 100%</p>
+                <p class="one_indent">如2017年100w，2018年130w，增长率为 （130 - 100） / 100</p>
+                <p class="one_indent">速算方式： 增长量 / 基期</p>
+                <p class="one_indent">又名： 比较数、增长率、增长幅度、增长速度、增长势</p>
+
+                <p class="col">例题1</p>
+                <p class="one_indent">2017产值144w，比2016增长20%，求2016产值与2017增长量</p>
+                <p class="one_indent">1. 2016产值 = 144 / (1 + 0.2) = 120w</p>
+                <p class="one_indent">2. 2017增长量 = 2017产值 - 2016产值 = 24w</p>
+
+                <p class="col">例题2</p>
+                <p class="one_indent">2017比2016增长3.2倍，2017是2016的多少倍</p>
+                <p class="one_indent">（1 + 3.2 ）：1 = <i>4.2倍</i></p>
+
+                <p class="col">间隔增长率</p>
+                <p class="one_indent">出现题型： 间隔一年</p>
+                <p class="one_indent">如2018到2019增长率为r1, 2019到2020增长率为r2， 则2018到2020增长率为r</p>
+                <p class="one_indent">公式： r = r1 + r2 + r1 * r2</p>
+
+                <p class="col">混合增长率</p>
+                <p class="one_indent">大小居中，偏量大一方</p>
+                <pre>
+示例一
+地产贷款余额1.04w亿，同比增长21.4%，房产贷款余额3.2w亿，同比增长12.3%。
+求房地产贷款余额同比增速约为？x
+A. 14.4% B. 12.3% C. 19.3% D. 24.4%
+解：12.3% < ? < 21.4%
+因为3.2w > 1.04，往12.3%偏移，所以答案为A。
+
+示例二
+全国水品产量2700w吨，同比增长3.2%，其中养殖水产品产量2114w吨，同比增长4.13%
+求非养殖水产品同比增长？
+A. -20% B. 0% C. 5% D. 10%
+解：
+2114w  n   2700w  m   得出非养殖 600w
+4.1% <---> 3.2% <---> ?
+     0.9%         x
+量跟距离成反比 即 n : m = 600 : 2114 = 1 : 3.5
+等价于公式 <i>n/m = 1/3.5</i>
+得出 m = 3.5n
+即 x = 0.9% * 3.5 ~= 3.2%, 所以答案为B。
+                </pre>
+
+                <p class="col">例</p>
+                <p class="one_indent">2022年，全国居民人均收支盈余比上一年（）；注：收支盈余=收入-支出</p>
+                <p class="one_indent">题干2022年比上一年结合选项为增加/减少了+百分数，且收支盈余和支出是收入的两部分</p>
+                <p class="one_indent">判定为混合增长率题型，r收入为5%, r支出为1.8%</p>
+                <p class="one_indent">r盈余>r收入>r支出，既r>5%</p>
+
+
+
+                <p class="col">年均增长量</p>
+                <p class="one_indent">年均增长量 = （现期量 - 基期量）/ 年数</p>
+
+                <p class="col">例</p>
+                <p class="one_indent">2013-2022年，中外对外直接投资流量年均增长约（）亿美元</p>
+                <p class="one_indent">2013：1078.4</p>
+                <p class="one_indent">2014：...</p>
+                <p class="one_indent">...</p>
+                <p class="one_indent">2022：1631.2</p>
+                <p class="one_indent">1631.2 - 1078.4 = 552.8 / 9 = 60.6</p>
+
+
+                <p class="col">年均增长率</p>
+                <p class="one_indent">现期量 = 基期量*(1+年均增长率)^年数</p>
+                <p class="one_indent">1 + n*r = 现期/基期</p>
+
+                <p class="col">例</p>
+                <p class="one_indent">2019-2021年，全国县域农业农村信息化建设县均社会资本投入得年均增率约为（）</p>
+                <p class="one_indent">2019年：2054.6w（基期）</p>
+                <p class="one_indent">2021年：3588.8w（现期）</p>
+                <p class="one_indent">n = 2021 - 2019 - 2</p>
+                <p class="one_indent">3588.8 / 2054.6 ~= 1.75 - 1 = 0.75 / 2 = 0.37；答案为32%</p>
+
+                <p class="col">例题3</p>
+                <p class="one_indent">2015营收100w，营收年均增长率为10%，2018年营收为多少</p>
+                <p class="one_indent">100w * (1+0.1)^3 = 133.1w</p>
+
+                <p class="col">例题4</p>
+                <p class="one_indent">2015营收100w，2018年营收133.1w, 2015-2018年均增长率为多少</p>
+                <p class="one_indent">100w * (1+r)^3 = 133.1w => 开立方</p>
+
+                <p class="col">增长率比较</p>
+                <p class="one_indent">现期a, 增长率r，a大r大则大，一大一小看a*r, 正大于负</p>
+
+                <p class="col">平均值增长率</p>
+                <p class="one_indent">如2018年北京房地产销售额增速为a，销售面积增速为b，均价增速为？</p>
+                <p class="one_indent"><i>公式：</i> 均价增速 = (a-b)/(1+b)</p>
+
+                <p class="col">基期比重/倍数</p>
+                <p class="one_indent">如2017年，产量A, 增长率r1, 产量B, 增长率r2, 求2016年A占B约多少</p>
+                <p class="one_indent">x = (A/(1+r1))/(B/(1+r2))</p>
+                <p class="one_indent"><i>公式：</i> A/B * (1+r2)/(1+r1)</p>
+
+                <p class="col">两期比重比较大小</p>
+                <p class="one_indent">如2017年，全国增长率r1, 某省增长率r2, 求2016年某省占全国比2017年上升还是下降？</p>
+                <p class="one_indent">r1 > r2 下降</p>
+                <p class="one_indent">r1 < r2 上升</p>
+
+                <p class="col">两期比重差</p>
+                <p class="one_indent">差 = A/B * (r1-r2)/(1+r1)</p>
+
+                <p class="col">例</p>
+                <p class="one_indent">与2021年相比，2022年中国对外直接投资流量在全球中的占比</p>
+                <p class="one_indent">2022年：全球对外直接投资流量1.5w亿美元（B），比上年下降14%（r2）</p>
+                <p class="one_indent">2022年：中国对外直接投资流量1631.2亿美元（A）, 下降8.8%（r1）,占全球份额的10.9%（A/B）</p>
+                <p class="one_indent">由公式得 10.9% * （-8.8% - （-14%））/（1-8.8%） = 10.9% * 5.2% / 91.2% ~= 0.6%; 不到3个百分点</p>
+
+                <p class="col">同比</p>
+                <p class="one_indent">与历史周期相比较</p>
+                <p class="one_indent">如 2019.9 ：2018.9</p>
+
+                <p class="col">环比</p>
+                <p class="one_indent">现在统计周期与上一个统计周期相比较</p>
+                <p class="one_indent">如 2019.9-12月 ：2019.4-8月</p>
+
+                <p class="col">比重</p>
+                <p class="one_indent">如2019年全国gdp为100w亿, 第一产业为20w亿, 占全国比重为20 ：100 = 20%</p>
+
+                <p class="col">顺差</p>
+                <p class="one_indent">出口-进口</p>
+
+                <p class="col">逆差</p>
+                <p class="one_indent">进口-出口</p>
+
+                <p class="col">GDP=增加值</p>
+                <p class="one_indent">国内生产总值 = 第一产业增加值 + 第二产业增加值 + 第三产业增加值</p>
+
+                <p class="col">恩格尔系数</p>
+                <p class="one_indent">食品支出总额占个人消费支出总额得比重</p>
+                <p class="one_indent">比重越低，反应生活水平越高</p>
+
+                <p class="col">基尼系数</p>
+                <p class="one_indent">衡量一个国家或地区居民收入差距得常用指标</p>
+                <p class="one_indent">介于0-1之间，越接近0，代表收入差距越小，越接近1，代表收入差距越大。</p>
+
+            </div>
+            <div id="box2" class="box">
+                35min
+            </div>
+            <div id="box3" class="box">
+                <p class="col"></p>
+                <p class="one_indent"></p>
+            </div>
+            <div id="box4" class="box">
+                <p class="col">截位直除法</p>
+                <p class="one_indent">1. 估算原则： 保留<i>3位</i>有效数字</p>
+                <p class="one_indent">2. 判断原则： 选项首位不同，保留2位；选项首位相同，保留3位</p>
+                <p class="one_indent">3. 一步除式： 只估算分母</p>
+                <p class="one_indent">如： 12345/1639 ~= 12345/1670</p>
+                <p class="one_indent">如： 12345/1685 ~= 12345/1690 ~= 12345/1700</p>
+                <p class="one_indent">4. 多步连除：分子分母同时截位</p>
+
+                <p class="col">例题1</p>
+                <p class="one_indent">图书总藏量79092万册，比上年末增长5.6%，电子图书50674万册，比上年末增长34.2%，求电子图书增长册数是总藏量的多少倍。</p>
+                <pre>
+((50674/(1 + 0.342)) * 0.342)
+/
+((79092/(1+0.056)) * 0.056)
+=>
+50674/79092 * 1.056/1.342 * 0.342/0.056
+=> 5/8 * 1.06/1.34 * 6
+=> 30/8 * 1.06/1.34
+=> 4- * 1.06/1.34
+~= 3
+                </pre>
+
+                <p class="col">例题2</p>
+                <p class="one_indent">2017人均收入3723，增长6.9%，2016人均收入为多少。</p>
+                <pre>
+3723/(1 + 0.069)
+=> 3723 / 1.07
+~= 3.4
+                </pre>
+
+                <p class="col">特殊分数</p>
+                <pre>
+1/2 = 50%
+1/3 = 33.33%
+1/4 = 25%
+1/5 = 20%
+1/6 = 16.67%
+1/7 = 14.29%
+1/8 = 12.5%
+1/9 = 11.11%
+1/10 = 10%
+1/11 = 9.09%
+1/12 = 8.33%
+1/13 = 7.69%
+1/14 = 7.14%
+1/15 = 6.67%
+1/16 = 6.25%
+1/17 = 5.88%
+1/18 = 5.56%
+1/19 = 5.26%
+                </pre>
+
+                <p class="col">例题3</p>
+                <p class="one_indent">出口额26.5亿，同比增长24.9%，求增长多少亿</p>
+                <pre>
+(26.5/(1 + 0.24)) * 0.24
+~= (26.5/(5/4)) * (1/4)
+=> 26.5 / 5 = 5.3
+                </pre>
+
+                <p class="one_indent">增长率与现期求<i>增长量</i></p>
+                <p class="one_indent">设增长率r = 1/n</p>
+                <p class="one_indent">公式=> 增长量=现期量/(n+1)</p>
+                <p class="one_indent">如例3</p>
+                <pre>
+增长率24.9 ~= 1/4
+n 为4
+公式 26.5/(4+1)
+=> 26.5 / 5 = 5.3
+                </pre>
+
+                <p class="col">分数比较</p>
+                <p class="one_indent">1. 首位直除</p>
+                <p class="one_indent">如 13/78 比 27/124， 13/78 ~= 0.1+，27/124 ~= 0.2+， 即13/78大</p>
+                <p class="one_indent">2. 变化速度</p>
+                <p class="one_indent">如 13/78 比 27/151， 分子13 * 2+ = 27，分母78 * 2- = 151，
+                    即13/78 * 2+/2- = 27/151，2+/2- = 1+，说明13/28需要1倍多才等于27/151</p>
+
+
+            </div>
+        </div>
+        <a href="javascript:history.go(-1);" class="back"></a>
+    </main>
+    <script src="../../assets/js/tab.js"></script>
+</body>
+
+</html>
