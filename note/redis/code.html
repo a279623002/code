@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>redis</title>
+    <script src="../../assets/js/jquery-3.6.0.min.js"></script>
+    <script src="../../assets/js/font.js"></script>
+    <link rel="stylesheet" href="../../assets/css/public.css">
+    <link rel="stylesheet" href="../../assets/css/note.css">
+</head>
+<body>
+<header></header>
+<main>
+    <pre>
+package main
+
+import (
+    "context"
+    "errors"
+    "time"
+
+    "github.com/go-redis/redis/v8"
+)
+
+// RedisLock 基于Redis的分布式锁实现
+type RedisLock struct {
+    client     *redis.Client
+    key        string
+    value      string
+    expiration time.Duration
+}
+
+// NewRedisLock 创建一个新的Redis锁
+func NewRedisLock(client *redis.Client, key, value string, expiration time.Duration) *RedisLock {
+    return &RedisLock{
+        client:     client,
+        key:        key,
+        value:      value,
+        expiration: expiration,
+    }
+}
+
+// Acquire 尝试获取锁
+func (rl *RedisLock) Acquire(ctx context.Context) (bool, error) {
+    // 使用SET NX命令，只在键不存在时设置值
+    result, err := rl.client.SetNX(ctx, rl.key, rl.value, rl.expiration).Result()
+    if err != nil {
+        return false, err
+    }
+    return result, nil
+}
+
+// Release 释放锁
+func (rl *RedisLock) Release(ctx context.Context) error {
+    // 使用Lua脚本确保只删除自己的锁
+    script := `
+    if redis.call("GET", KEYS[1]) == ARGV[1] then
+        return redis.call("DEL", KEYS[1])
+    else
+        return 0
+    end
+    `
+    
+    result, err := rl.client.Eval(ctx, script, []string{rl.key}, rl.value).Result()
+    if err != nil {
+        return err
+    }
+    
+    if result.(int64) != 1 {
+        return errors.New("锁不存在或已被其他客户端获取")
+    }
+    
+    return nil
+}
+
+// 使用示例
+func main() {
+    ctx := context.Background()
+    
+    // 创建Redis客户端
+    rdb := redis.NewClient(&redis.Options{
+        Addr: "localhost:6379",
+    })
+    defer rdb.Close()
+    
+    // 创建锁
+    lock := NewRedisLock(rdb, "my-lock", "unique-value-1", 10*time.Second)
+    
+    // 尝试获取锁
+    acquired, err := lock.Acquire(ctx)
+    if err != nil {
+        panic(err)
+    }
+    
+    if acquired {
+        // 获取锁成功，执行受保护的操作
+        // ...
+        
+        // 操作完成后释放锁
+        if err := lock.Release(ctx); err != nil {
+            panic(err)
+        }
+    } else {
+        // 未能获取锁
+    }
+}
+    </pre>
+
+    <a href="javascript:history.go(-1);" class="back"></a>
+</main>
+</body>
+</html>

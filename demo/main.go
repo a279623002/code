@@ -117,14 +117,18 @@ func test1(m map[string]string) map[string]string {
 	return m
 }
 
+func t(n *int) {
+	*n += 1
+	fmt.Println(*n)
+}
+
 func main() {
 	// datas := NewDatas()
 	// for _, v := range datas {
 	// 	Judge(v)
 	// }
-	m := map[string]string{"a": "1"}
-	fmt.Printf("%p\n", m)
-	m1 := test1(m)
-	fmt.Println(m1)
-	fmt.Println(m)
+	n := 0
+	defer t(&n)
+	defer t(&n)
+	defer t(&n)
 }

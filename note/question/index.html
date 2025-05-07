@@ -35,6 +35,7 @@
             <a href="#box16">协议</a>
             <a href="#box17">jwt</a>
             <a href="#box18">微服务</a>
+            <a href="#box19">分布式架构</a>
         </div>
         <div class="content">
             <div id="box1" class="box selected">
@@ -748,15 +749,19 @@ func BinarySearch(arr []int, target int) int {
 
             </div>
             <div id="box9" class="box">
-                <p class="col">秒杀系统</p>
+                <p class="col">权限管理后台系统</p>
+                <p class="one_indent">简介：使用casbin+gin+mysql开发权限管理系统，通过RBAC模型控制用户对资源的访问权限。</p>
+
+                <p class="col">问卷投票系统--微服务</p>
+                <p class="one_indent">简介：使用go-zero开发，分为投票问卷功能模块与用户体系模块，功能对标问卷星，
+                    实现多种问题类型功能，如单选、多选、填空等。</p>
+
+                <p class="col">秒杀系统--高并发</p>
                 <p class="one_indent">简介：使用nginx, redis, mysql与gin框架开发车品秒杀活动,
                     活跃用户为1千多人，1分钟内秒完库存，成功支付订单数达到90%。</p>
 
-                <p class="col">爬虫</p>
+                <p class="col">爬虫--高并发</p>
                 <p class="one_indent">简介：使用rabbitmq+beego爬取车辆数据，通过go-colly爬取目标车辆详情地址发送给消息队列，由worker消费消息并解析数据。</p>
-
-                <p class="col">权限管理系统</p>
-                <p class="one_indent">简介：使用casbin+gin+mysql开发权限管理系统，通过RBAC模型控制用户对资源的访问权限。</p>
 
             </div>
             <div id="box10" class="box">
@@ -1020,99 +1025,59 @@ g,admin,bob
 
             </div>
             <div id="box18" class="box">
-                <p class="col">protobuf</p>
-                <p class="one_indent">原理：</p>
-                <p class="one_indent">1. 序列化：将数据结构或对象转换成二进制字节流的过程。Protobuf通过定义.proto文件来描述数据结构，然后使用Protocol
-                    Buffers编译器（protoc）将.proto文件编译成特定编程语言的代码</p>
-                <p class="one_indent">在序列化过程中，Protobuf会对每个字段进行编码，确保得到高效紧凑的数据压缩。对于不同的字段类型，Protobuf采用不同的编码方式和数据存储方式。
-                    例如，对于int32、int64等整数类型，Protobuf使用Varints编码方式，这种编码方式可以根据数字的大小动态调整占用的字节数，从而实现高效的数据压缩</p>
-                <p class="one_indent">2. 反序列化：反序列化是将在序列化过程中所生成的二进制字节流转换成数据结构或者对象的过程。
-                    Protobuf提供了相应的解析方法，如parseFrom(input)，用于从输入流中读取二进制字节流，并将其解析成对应的数据结构或对象 </p>
-                <p class="one_indent">go使用protobuf流程：</p>
-                <p class="one_indent">1. 安装所需插件：protoc-gen-go, protoc-gen-go-grpc(可选其他框架)</p>
-                <p class="one_indent">2. 定义.proto文件</p>
-                <pre>
-syntax = "proto3";  
-  
-package example;  
-  
-// 定义一个简单的消息  
-message MyMessage {  
-  string content = 1;  
-}  
-  
-// 如果你在使用gRPC，你还可以定义服务  
-// service MyService {  
-//   rpc MyMethod(MyMessage) returns (MyMessage);  
-// }
-                </pre>
-                <p class="one_indent">2. 生成Go代码</p>
-                <pre>
-protoc --go_out=. --go_opt=paths=source_relative \  
---go-grpc_out=. --go-grpc_opt=paths=source_relative \  
-example.proto
-                </pre>
-                <p class="one_indent">3. 使用生成的代码</p>
-                <pre>
-package main  
-  
-import (  
-    "fmt"  
-    "log"  
-  
-    "your_module_path/example" // 替换为你的模块路径和包名  
-    "google.golang.org/protobuf/proto"  
-)  
-  
-func main() {  
-    msg := &example.MyMessage{  
-        Content: "Hello, Protobuf!",  
-    }  
-  
-    // 序列化  
-    data, err := proto.Marshal(msg)  
-    if err != nil {  
-        log.Fatalf("Failed to marshal message: %v", err)  
-    }  
-  
-    // 你可以将data写入文件、发送到网络等  
-    fmt.Printf("Serialized data: %x\n", data)  
-  
-    // 反序列化（可选）  
-    newMsg := &example.MyMessage{}  
-    if err := proto.Unmarshal(data, newMsg); err != nil {  
-        log.Fatalf("Failed to unmarshal message: %v", err)  
-    }  
-  
-    fmt.Println("Unmarshaled message:", newMsg.GetContent())  
-}
-                </pre>
+                <p class="col">rpc</p>
+                <p class="one_indent">远程过程调用（Remote Procedure Call，RPC）是一种通过网络从远程计算机程序上请求服务，而不需要了解底层网络技术的协议。
+                    RPC协议假定某些传输协议如TCP/IP或其他的可靠传输协议如UDP，为通信双方提供一个抽象层，使得像调用本地函数一样调用远程过程。
+                    RPC 协议包括序列化、协议编解码器和网络传输栈</p>
+                <p class="one_indent">RPC与HTTP协议的区别：</p>
+                <p class="one_indent">1. RPC协议是远程过程调用协议，而HTTP协议是用于Web应用的协议，两者的目标不同</p>
+                <p class="one_indent">2. RPC‌优先使用‌二进制协议‌（如Protobuf、Thrift），而HTTP‌协议‌使用‌文本协议‌（如JSON、XML）</p>
 
-                <p class="col">etcd</p>
-                <p class="one_indent">etcd 是一个分布式键值存储系统</p>
-                <p class="one_indent">在 Kubernetes 中，etcd 被用作存储集群的所有状态信息的后端数据库。Kubernetes 的各种组件（如 API 服务器、调度器、控制器等）都会与
-                    etcd 交互，以读取和写入集群的状态信息。
-                    这使得 Kubernetes 能够管理大量容器和服务的生命周期，并保持整个集群的一致性</p>
-                <p class="one_indent">主要特性和用途:</p>
-                <p class="one_indent">1. 服务发现：etcd 可以用来注册和发现服务。服务可以在启动时将自己的信息（如 IP 地址、端口号等）写入 etcd，而需要访问这些服务的客户端可以查询
-                    etcd 来获取所需的信息</p>
-                <p class="one_indent">2. 配置共享和同步：在分布式系统中，多个组件可能需要共享配置信息。使用 etcd，可以集中存储配置信息，并且当配置发生更改时，etcd
-                    可以通知所有订阅了更改的组件</p>
-                <p class="one_indent">3. 分布式锁和领导者选举：由于 etcd 的强一致性保证，它可以用来实现分布式锁和领导者选举机制。这对于需要协调多个组件的分布式系统非常有用</p>
-                <p class="one_indent">3. 高可用性：etcd 通过集群方式部署，支持多副本数据同步，保证了服务的高可用性。即使集群中的某些节点出现故障，其他节点也可以继续提供服务</p>
-                <p class="one_indent">3. Watch 机制：etcd 提供了 Watch 机制，允许客户端订阅特定键或前缀的更改，并在更改发生时实时获取通知。这非常适合于需要实时更新数据的应用场景
-                </p>
-                <p class="one_indent">3. 安全性和认证：etcd 支持 SSL/TLS 加密通信，以及基于角色的访问控制（RBAC），为分布式系统提供了必要的安全保障</p>
-                <p class="one_indent">3. 简单的 RESTful API：etcd 提供了一个简单的 RESTful API，使得与其他系统或应用的集成变得非常容易</p>
+                <p class="col">rpc调用过程</p>
+                <p class="one_indent">1. 客户端调用远程过程，并将参数序列化为字节流</p>
+                <p class="one_indent">2. 客户端通过网络发送字节流到服务器</p>
+                <p class="one_indent">3. 服务器收到字节流，反序列化为参数</p>
+                <p class="one_indent">4. 服务器调用本地的远程过程</p>
+                <p class="one_indent">5. 服务器将结果序列化为字节流</p>
+                <p class="one_indent">6. 服务器通过网络发送字节流到客户端</p>
+                <p class="one_indent">7. 客户端收到字节流，反序列化为结果</p>
+                <p class="one_indent">8. 客户端调用返回结果</p>
 
-                <p class="col">consul</p>
-                <p class="one_indent">提供了服务发现、健康检查、分布式一致性和键值存储等功能</p>
-                <p class="one_indent">主要功能: 服务发现、健康检查、键值存储、分布式一致性</p>
+                <p class="col">grpc</p>
+                <p class="one_indent">使用protocol buffer作为序列化协议（编码解码），http2.0作为通讯协议的RPC协议的rpc框架</p>
+                <p class="one_indent">使用原理：</p>
+                <p class="one_indent">1. 服务定义从.proto开始，定义了服务的接口、方法、入参、出参等信息</p>
+                <p class="one_indent">2. 使用protoc命令编译.proto文件，生成相应的.go文件</p>
+                <p class="one_indent">3. 客户端调用服务时，通过grpc的stub调用，将参数序列化为字节流，通过http2.0发送给服务端</p>
+                <p class="one_indent">4. 服务端收到字节流，反序列化为参数，调用本地的远程过程</p>
+                <p class="one_indent">5. 本地的远程过程执行，并将结果序列化为字节流</p>
+                <p class="one_indent">6. 服务端通过http2.0发送字节流给客户端</p>
+                <p class="one_indent">7. 客户端收到字节流，反序列化为结果</p>
+                <p class="one_indent">8. 客户端调用返回结果</p>
 
-                <p class="col">zookeeper</p>
-                <p class="one_indent">开源分布式协调和配置服务。它主要用于大型分布式系统中，解决诸如配置管理、服务发现、同步服务等分布式系统常见问题</p>
-                <p class="one_indent">主要功能: 配置管理、同步服务、服务发现、分布式锁、集群管理、消息队列</p>
+           
+            </div>
+            <div id="box19" class="box">
+                <p class="col">CAP定理</p>
+                <p class="one_indent">三个特性（不可能同时满足）：</p>
+                <p class="one_indent">1. 一致性（Consistency）：所有节点在同一时间具有相同的数据</p>
+                <p class="one_indent">2. 可用性（Availability）：每一个请求都必须得到非错的响应</p>
+                <p class="one_indent">3. 分区容错性（Partition Tolerance）：系统仍然能够正常工作，在网络分区故障时，仍然能够保持可用</p>
+                <p class="one_indent">CAP理论指出，一个分布式系统不可能同时满足一致性、可用性和分区容错性这三个特性。在实际的分布式系统中，不能同时保证这三个特性，最多只能同时满足两个。
+                    因此，根据CAP理论，只能选择两个，而不能同时选择三个。在实际的分布式系统中，通常采用的是AP或CP模型。</p>
+                    <p class="one_indent">CP：可能牺牲可用性，如etcd、zookeeper</p>
+                <p class="col">分布式锁</p>
+                <p class="one_indent">1. redis:<a href="../redis/code.html">code</a>，竞争锁，当一个节点尝试获取锁时，使用 SETNX 命令设置一个特定的键（例如 “lock_key”），若键不存在，则设置成功，该节点获取锁；若键已存在，则表示锁已被其他节点持有，获取锁失败。
+                    为防止死锁，获取锁的节点通常会设置一个过期时间（通过 SETEX 命令或在 SETNX 成功后使用 EXPIRE 命令），确保即使节点在持有锁期间崩溃，锁也能在一定时间后自动释放。
+                    </p>
+                <p class="one_indent">2. zookeeper:ZooKeeper是一个分布式协调服务，其临时节点特性非常适合实现分布式锁</p>
+                <p class="one_indent">3. etcd:基于临时节点实现分布式锁，当节点崩溃或会话过期时，临时节点会自动被删除，从而释放锁，避免了死锁的发生，公平性和可靠性要求较高</p>
 
+                <p class="col">etcd、consul、zookeeper的区别</p>
+                <p class="one_indent">1. zookeeper:使用zap协议，拥有自己的自定义Jute RPC 协议，该协议对于 Zookeeper 而言是完全唯一的，并限制了其受支持的语言绑定</p>
+                <p class="one_indent">2. etcd:使用raft协议，参考了 ZooKeeper 的设计和实现经验，客户端基于grpc构建，支持多种语言和框架</p>
+                <p class="one_indent">3. consul:使用gossip协议，etcd 和 Consul 解决了不同的问题。如果要寻找分布式一致键值存储，那么与 Consul 相比，etcd是更好的选择。如果正在寻找端到端的集群服务发现，etcd 将没有足够的功能。可以选择 Kubernetes，Consul或 SmartStack</p>
+                
             </div>
         </div>
         <a href="javascript:history.go(-1);" class="back"></a>
