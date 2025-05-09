@@ -766,22 +766,40 @@ func BinarySearch(arr []int, target int) int {
             </div>
             <div id="box10" class="box">
                 <p>k8s架构</p>
+                <img src="../../assets/img/k8s.png" alt="" class="img lazyload">
+
                 <p class="col">Master节点</p>
-                <p class="one_indent">1. kube-apiserver：提供资源操作的唯一入口，并授权、认证各个请求。</p>
-                <p class="one_indent">2. kube-scheduler：负责资源的调度，按照预定的调度策略将Pod调度到相应的节点上。</p>
-                <p class="one_indent">3. kube-controller-manager：负责维护集群的状态，比如故障检测、自动扩展、滚动更新等。</p>
-                <p class="one_indent">4. etcd：保存集群的状态，比如集群中各个节点的资源信息、服务信息等。</p>
+                <p class="one_indent">1. kube-apiserver：作为整个集群的中心，负责处理REST请求，更新对象状态，调度其他组件。</p>
+                <p class="one_indent">2. kube-scheduler：根据资源需求、硬件/软件/策略约束等为新创建的Pod选择合适的Node进行绑定</p>
+                <p class="one_indent">3. kube-controller-manager：运行控制器，监控集群的状态，确保其处于预期状态。</p>
+                <p class="one_indent">4. etcd：作为持久存储，保存整个集群的配置数据。</p>
                 <p class="col">Node节点</p>
-                <p class="one_indent">1. kubelet：负责维护容器的生命周期，同时也负责Volume（CVI）和网络（CNI）的管理。</p>
+                <p class="one_indent">1. kubelet：在每个Node上运行，负责该节点的容器生命周期管理。</p>
                 <p class="one_indent">2. kube-proxy：负责为Service提供cluster内部的服务发现和负载均衡。</p>
-                <p class="one_indent">3. docker：容器运行时，负责Pod和容器的创建、启停、删除等。</p>
-                <p class="col">Pod</p>
-                <p class="one_indent">1. 一个Pod是一组紧密相关的容器集合，共享网络命名空间、IPC命名空间、UTS命名空间。</p>
-                <p class="one_indent">2. Pod中的容器共享资源：网络、IPC、UTS。</p>
-                <p class="one_indent">3. Pod中的容器共享存储卷。</p>
-                <p class="col">Service</p>
-                <p class="one_indent">1. Service是一组提供相同服务的Pod的抽象，提供单个IP地址和DNS名称。</p>
-                <p class="one_indent">2. Service通过Label Selector来选择Pod。</p>
+                <p class="one_indent">3. docker：或其他容器引擎，根据镜像运行容器实例。</p>
+                <p class="one_indent">4. volume:提供持久化存储，支持多种类型，如本地存储、网络存储等</p>
+
+                <p class="col">主要资源对象</p>
+                <p class="one_indent">1. Pod：k8s最小单元，包含一个或多个容器，共享网络命名空间、存储卷，以及其他资源</p>
+                <p class="one_indent">2. Service：提供单个或多个Pod的访问入口，提供负载均衡和服务发现功能</p>
+                <p class="one_indent">3. Deployment：可以自动管理Pod的创建、更新和删除，以实现应用程序的高可用性和滚动升级。</p>
+                <p class="one_indent">3. Deployment：可以自动管理Pod的创建、更新和删除，以实现应用程序的高可用性和滚动升级。</p>
+                <p class="one_indent">4. ConfigMap：用于保存配置数据，如环境变量、命令行参数等，可以在Pod中作为环境变量或文件挂载到容器中</p>
+                <p class="one_indent">5. Namespace: 用于隔离资源，使得不同团队或项目的资源互不干扰</p>
+                <p class="one_indent">6. Ingress：提供外部访问入口，负责将外部请求转发到集群内部的服务</p>
+
+               
+                <p class="col">工作流程</p>
+                <p class="one_indent">1. 用户提交请求：用户通过kubectl或其他客户端工具提交创建Pod等资源的请求。</p>
+                <p class="one_indent">2. kube-apiserver接收到请求，进行认证和授权检查，然后将资源对象的数据存储到etcd中。</p>
+                <p class="one_indent">3. kube-scheduler调度器监听新的Pod创建请求，根据调度算法和策略选择合适的工作节点（Node），并将绑定结果存储回etcd</p>
+                <p class="one_indent">4. 各个工作节点上的Kubelet定期从API Server获取需要运行的Pod清单，调用容器运行时接口（如Docker）创建和启动容器实例</p>
+                <p class="one_indent">5. 各类控制器（如部署控制器、副本集控制器）通过list-watch机制监控API Server中的资源对象状态，确保实际状态与期望状态一致，如有必要，会自动调整以维持期望状态。</p>
+
+                <p class="col">请求访问过程</p>
+                <img src="../../assets/img/k8s_req.png" alt="" class="img lazyload">
+                
+
 
             </div>
             <div id="box11" class="box">
