@@ -749,20 +749,21 @@ func BinarySearch(arr []int, target int) int {
 
             </div>
             <div id="box9" class="box">
-                <p class="col">权限管理后台系统</p>
-                <p class="one_indent">简介：使用casbin+gin+mysql开发权限管理系统，通过RBAC模型控制用户对资源的访问权限。</p>
-
-                <p class="col">问卷投票系统--微服务</p>
-                <p class="one_indent">简介：使用go-zero开发，分为投票问卷功能模块与用户体系模块，功能对标问卷星，
-                    实现多种问题类型功能，如单选、多选、填空等。</p>
-
+                
                 <p class="col">秒杀系统--高并发</p>
                 <p class="one_indent">简介：使用nginx, redis, mysql与gin框架开发车品秒杀活动,
-                    活跃用户为1千多人，1分钟内秒完库存，成功支付订单数达到90%。</p>
-
-                <p class="col">爬虫--高并发</p>
-                <p class="one_indent">简介：使用rabbitmq+beego爬取车辆数据，通过go-colly爬取目标车辆详情地址发送给消息队列，由worker消费消息并解析数据。</p>
-
+                    活跃用户为1千多人，活动时长10分钟，前端后端限制每人3秒一个请求。</p>
+                <p class="one_indent">请求数：10分钟/3秒 * 日活用户1000 * 日活比例0.2 = 200 * 1000 * 0.2 = 40000</p>
+                <p class="one_indent">平均qps: 40000 / 600s = 666</p>
+                <p class="one_indent">峰值qps: 平均qps*并发系数（通常取3-5）=666 * 5 = 3330</p>
+                <p class="one_indent">单台机器qps: 单台机器qps = 单台机器cpu核数 * 并发系数</p>
+            
+                <p class="col">学校系统--高并发</p>
+                <p class="one_indent">简介：多个系统获取组织树、班级、年纪、学科等信息,通过协程加上读写锁获取redis缓存数据实现高并发。
+                        在校学生约18w人，在校教职工约2w人左右，每天访问量约10次。</p>
+                <p class="one_indent">请求数：10 * 日活用户20万 * 日活比例0.2 = 40w</p>
+                <p class="one_indent">平均qps: 40w / 86400s = 5w</p>
+                
             </div>
             <div id="box10" class="box">
                 <p>k8s架构</p>

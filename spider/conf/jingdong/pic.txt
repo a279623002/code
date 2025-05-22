@@ -1,0 +1,29 @@
+<div id="choose-attr-1" class="li p-choose" data-type="口味" data-idx="0">
+                <div class="dt " title="口味">口味                                </div>
+                <div class="dd">
+                                        <div class="item" data-sku="65064633993" data-value="经典牛羊肉犬粮12kg">
+                    <b></b>
+                                        <a href="#none" clstag="shangpin|keycount|product|yanse-经典牛羊肉犬粮12kg">
+                                                                        <img data-img="1" src="//img13.360buyimg.com/n9/s28x28_jfs/t1/296375/13/7627/154987/6826f975Fd6bd159c/66289cb729ba5661.jpg.avif" width="28" height="28" alt="经典牛羊肉犬粮12kg"><i>经典牛羊肉犬粮12kg</i>
+                                                                    </a>
+                                    </div>
+                                    <div class="item" data-sku="65064633994" data-value="经典深海鱼犬粮12kg">
+                    <b></b>
+                                        <a href="#none" clstag="shangpin|keycount|product|yanse-经典深海鱼犬粮12kg">
+                                                                        <img data-img="1" src="//img14.360buyimg.com/n9/s28x28_jfs/t1/292670/6/5616/162186/6826f998F4a87e3b3/b02edcaa5883cc53.jpg.avif" width="28" height="28" alt="经典深海鱼犬粮12kg"><i>经典深海鱼犬粮12kg</i>
+                                                                    </a>
+                                    </div>
+                                    <div class="item  selected" data-sku="65064633995" data-value="经典鸡肉犬粮12kg">
+                    <b></b>
+                                        <a href="#none" clstag="shangpin|keycount|product|yanse-经典鸡肉犬粮12kg">
+                                                                        <img data-img="1" src="//img10.360buyimg.com/n9/s28x28_jfs/t1/311397/25/1418/156703/6826f9a5F8b559134/ea5a754a00bd1152.jpg.avif" width="28" height="28" alt="经典鸡肉犬粮12kg"><i>经典鸡肉犬粮12kg</i>
+                                                                    </a>
+                                    </div>
+                                    <div class="item" data-sku="65064633996" data-value="经典鸭肉梨犬粮12kg">
+                    <b></b>
+                                        <a href="#none" clstag="shangpin|keycount|product|yanse-经典鸭肉梨犬粮12kg">
+                                                                        <img data-img="1" src="//img11.360buyimg.com/n9/s28x28_jfs/t1/312201/25/1412/153618/6826f9b1F8522515f/923cbd8f1b3fbbb3.jpg.avif" width="28" height="28" alt="经典鸭肉梨犬粮12kg"><i>经典鸭肉梨犬粮12kg</i>
+                                                                    </a>
+                                    </div>
+                                            </div>
+        </div>
