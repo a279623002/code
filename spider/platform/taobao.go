@@ -23,25 +23,20 @@ func (tb *Taobao) Start() {
 	tb.wg.Add(1)
 	go func() {
 		defer tb.wg.Done()
-		tb.Run("./conf/taobao/detail.html", "slide")
+		tb.Run("./conf/taobao/slide.txt", "slide")
 	}()
-	// tb.wg.Add(1)
-	// go func() {
-	// 	defer tb.wg.Done()
-	// 	tb.Run("./conf/taobao/slide.txt", "slide")
-	// }()
 
-	// tb.wg.Add(1)
-	// go func() {
-	// 	defer tb.wg.Done()
-	// 	tb.Run("./conf/taobao/pic.txt", "pic")
-	// }()
+	tb.wg.Add(1)
+	go func() {
+		defer tb.wg.Done()
+		tb.Run("./conf/taobao/pic.txt", "pic")
+	}()
 
-	// tb.wg.Add(1)
-	// go func() {
-	// 	defer tb.wg.Done()
-	// 	tb.Run("./conf/taobao/detail.txt", "detail")
-	// }()
+	tb.wg.Add(1)
+	go func() {
+		defer tb.wg.Done()
+		tb.Run("./conf/taobao/detail.txt", "detail")
+	}()
 	tb.wg.Wait()
 }
 
@@ -56,20 +51,14 @@ func (tb *Taobao) Run(filename string, typeName string) {
 	if err != nil {
 		panic(fmt.Sprintf("解析HTML失败: %v", err))
 	}
-	// class="pageContentWrap"
-	doc.Find("#ice-container ul li").Each(func(i int, s *goquery.Selection) {
-		h, _ := s.Html()
-		fmt.Println(h)
 
-	})	
+	var imgURLs []string
+	doc.Find("img").Each(func(i int, s *goquery.Selection) {
+		imgURL, exists := s.Attr("src")
+		if exists && imgURL != "" {
+			imgURLs = append(imgURLs, util.ImgWebpReplace(imgURL))
+		}
+	})
 
-	// var imgURLs []string
-	// doc.Find("img").Each(func(i int, s *goquery.Selection) {
-	// 	imgURL, exists := s.Attr("src")
-	// 	if exists && imgURL != "" {
-	// 		imgURLs = append(imgURLs, util.ImgWebpReplace(imgURL))
-	// 	}
-	// })
-
-	// util.Download(tb.filepath, typeName, imgURLs)
+	util.Download(tb.filepath, typeName, imgURLs)
 }

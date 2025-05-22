@@ -28,15 +28,20 @@ func ReadFile(filename string) (content string, err error) {
 }
 
 func ImgWebpReplace(imgURL string) (res string) {
-	if strings.Contains(imgURL, ".jpg") {
-		res = strings.Split(imgURL, "jpg")[0] + "jpg"
-	} else if strings.Contains(imgURL, ".png") {
-		res = strings.Split(imgURL, "png")[0] + "png"
-	} else if strings.Contains(imgURL, ".jpeg") {
-		res = strings.Split(imgURL, "jpeg")[0] + "jpeg"
-	} else {
-		res = imgURL
+	res = imgURL
+	if !strings.Contains(res, "https:") {
+		res = "https:" + res
+	}	
+	if strings.Contains(res, ".jpg") {
+		res = strings.Split(res, "jpg")[0] + "jpg"
 	}
+	if strings.Contains(res, ".png") {
+		res = strings.Split(res, "png")[0] + "png"
+	}
+	if strings.Contains(res, ".jpeg") {
+		res = strings.Split(res, "jpeg")[0] + "jpeg"
+	} 
+	
 	return
 }
 

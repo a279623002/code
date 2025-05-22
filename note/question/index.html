@@ -36,6 +36,7 @@
             <a href="#box17">jwt</a>
             <a href="#box18">微服务</a>
             <a href="#box19">分布式架构</a>
+            <a href="#box20">php</a>
         </div>
         <div class="content">
             <div id="box1" class="box selected">
@@ -1097,6 +1098,57 @@ g,admin,bob
                 <p class="one_indent">2. etcd:使用raft协议，参考了 ZooKeeper 的设计和实现经验，客户端基于grpc构建，支持多种语言和框架</p>
                 <p class="one_indent">3. consul:使用gossip协议，etcd 和 Consul 解决了不同的问题。如果要寻找分布式一致键值存储，那么与 Consul 相比，etcd是更好的选择。如果正在寻找端到端的集群服务发现，etcd 将没有足够的功能。可以选择 Kubernetes，Consul或 SmartStack</p>
                 
+            </div>
+            <div id="box20" class="box">
+                <p class="col">oop</p>
+                <p class="one_indent">封装</p>
+                <p class="one_indent">继承</p>
+                <p class="one_indent">多态</p>
+                <p class="one_indent">加上抽象,则是面向对象</p>
+                
+
+                <p class="col">php垃圾回收--计数器</p>
+                <p class="one_indent">1.每个对象内含一个引用计数器</p>
+                <p class="one_indent">2.当这个对象被引用时其计数器+1</p>
+                <p class="one_indent">3. 当引用这个对象的对象被删除时,其计数器-1</p>
+                <p class="one_indent">4. 当计数器为0时,对象被回收</p>
+
+                <p class="col">php解释器</p>
+                <p class="one_indent">内置在zend引擎,其负责整个php脚本的周期运转</p>
+
+                <p class="col">php-fpm</p>
+                <p class="one_indent">进程管理器,高效管理和运行多个php解释器实例,根据需要启停php进程</p>
+                <p class="one_indent">原理:php-fpm是管理fastCGI的重要根据,fastCGI包含主进程(监控和管理工作),工作进程执行php</p>
+                <p class="col">FastCGI</p>
+                <img src="../../assets/img/fastcgi.png" alt="" class="img lazyload">
+
+                <p class="col">框架运行流程</p>
+                <p class="one_indent">1. 用户发起请求</p>
+                <p class="one_indent">2. 请求先到达入口文件(初始化框架,进入框架处理流程)</p>
+                <p class="one_indent">3. 定义常量,加载框架引导文件,自动加载函数(根据命名空间和类名查找)</p>
+                <p class="one_indent">4. 加载配置,初始化应用,创建应用实例,加载应用类库,设置应用环境</p>
+                <p class="one_indent">5. 路由规则匹配,绑定参数</p>
+                <p class="one_indent">6. 控制器调度对应的控制器类,调用模型类操作数据库,处理请求后返回响应json或渲染模板</p>
+
+                <p class="col">PHP7的新特性</p>
+                <p class="one_indent">1. 可以使用 string、int、float和 bool </p>
+                <p class="one_indent">2. 增加了对返回类型声明的支持</p>
+
+                <p class="col">防攻击</p>
+                <p class="one_indent">1. 常见攻击</p>
+                <p class="one_indent">1.1 sql注入: 攻击者通过把恶意的SQL指令插入到Web表单提交或Cookie中</p>
+                <p class="one_indent">1.2 xss攻击: 跨站点脚本攻击，由用户输入一些数据到你的网站，
+                    其中包括客户端脚本(通常JavaScript)。如果你没有过滤就输出数据到另一个web页面，这个脚本将被执行</p>
+                <p class="one_indent">1.3 csrf攻击: 跨站点请求伪造，是指一个页面发出的请求，
+                    看起来就像是网站的信任用户，但是是伪造的</p>
+                <p class="one_indent">1.4 dos攻击:大量请求，消耗服务器资源，导致网站瘫痪</p>
+                <p class="one_indent">2. 防护措施</p>
+                <p class="one_indent">2.1 输入过滤: 对用户输入的数据进行检查，过滤掉不合法的字符，并进行转义</p>
+                <p class="one_indent">2.2 输出过滤: 对输出的数据进行检查，过滤掉不合法的字符，并进行转义</p>
+                <p class="one_indent">2.3 验证码: 验证码是一种常用的防御攻击手段，它通过对用户输入进行验证，来判断用户是否是机器而不是人</p>
+                <p class="one_indent">2.4 nginx过滤限制请求</p>
+
+
             </div>
         </div>
         <a href="javascript:history.go(-1);" class="back"></a>
