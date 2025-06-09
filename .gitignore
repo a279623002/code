@@ -1,6 +1,6 @@
 .idea
 
-./spider/download/*
-./spider/conf/*
+spider/download/*
+spider/conf/*
 
 **/data/

@@ -36,7 +36,8 @@
             <a href="#box17">jwt</a>
             <a href="#box18">微服务</a>
             <a href="#box19">分布式架构</a>
-            <a href="#box20">php</a>
+            <a href="#box20">高并发高可用</a>
+            <a href="#box21">大数据</a>
         </div>
         <div class="content">
             <div id="box1" class="box selected">
@@ -104,11 +105,19 @@
 
                 <p class="col">channel调度</p>
                 <p class="one_indent">Go的运行时系统包含一个调度器，它负责协调goroutine的执行和channel的发送/接收操作。
-                    调度器会根据channel的状态和等待队列中的goroutine来做出决策，以确保并发操作的高效和公平性</p>
+                    调度器会根据channel的状态和等待队列中的goroutine来做出决策，以确保并发操作的高效和公平性，当某个Goroutine阻塞时，调度器会将其他Goroutine唤醒，或者主动挂起让出资源如sleep  。</p>
 
                 <p class="col">协程控制</p>
                 <p class="one_indent">1. 通过channel实现协程间通信 ,select控制读写，可以通过time.After或context实现超时</p>
                 <p class="one_indent">2. WaitGroup控制并发数量，通过Done()减少计数，Wait()等待所有协程完成</p>
+
+                <p class="col">并发模型</p>
+                <p class="one_indent">1. CSP（Communicating Sequential Processes）理论</p>
+                <p class="one_indent">2. 强调通过通信来共享内存，而非通过共享内存来实现通信</p>
+
+                <p class="col">资源泄漏</p>
+                <p class="one_indent">1. Goroutine 创建后没有正确结束，或者 Channel 没有正确关闭，就可能导致资源泄漏</p>
+                <p class="one_indent">2. 为了避免资源泄漏，需要确保所有 Goroutine 在完成任务后能够正常退出，可以使用context.Context来管理 Goroutine 的生命周期</p>
 
                 <p class="col">上下文context原理</p>
                 <p class="one_indent">1. channel与sync.Mutext实现</p>
@@ -591,6 +600,46 @@ db.orders.aggregate([
                     来将需要保证先后顺序的同一类数据（同一个订单的数据） 发送到同一个queue当中
                 </p>
                 <img data-original="../../assets/img/rbmq8.png" alt="" class="img lazyload">
+
+
+                <p class="col">kafka</p>
+                <img data-original="../../assets/img/kafka.png" alt="" class="img lazyload">
+                <p class="one_indent">不支持读写分离，主读主写架构，通过分区实现负载均衡</p>
+                <p class="one_indent">生产者发送消息有哪些模式？</p>
+                <p class="one_indent">1. 发后即忘：消息发送后，不管对方是否接收到消息，都认为消息发送成功。</p>
+                <p class="one_indent">2. 同步发送：生产者发送消息后，等待broker返回确认后才认为消息发送成功。</p>
+                <p class="one_indent">3. 异步发送：Kafka支持 producer.send() 传入一个回调函数，消息不管成功或者失败都会调用这个回调函数</p>
+                <p class="one_indent">发送消息的分区策略有哪些</p>
+                <p class="one_indent">1.轮询</p>
+                <p class="one_indent">2.key 指定分区</p>
+                <p class="one_indent">3.自定义策略</p>
+                <p class="one_indent">4.指定 Partiton 发送</p>
+                <p class="one_indent">Kafka 的可靠性是怎么保证的</p>
+                <p class="one_indent">1. 生产者丢失消息：设置acks=all：确保消息被所有副本写入后才算成功。
+增加retries和delivery.timeout.ms：提升消息重试能力。
+使用idempotence机制：开启生产者幂等性（enable.idempotence=true），防止重复消息导致的丢失。</p>
+                <p class="one_indent">1.1 acks = 1，默认为1。生产者发送消息，只要 leader 副本成功写入消息，就代表成功。
+                    这种方案的问题在于，当返回成功后，如果 leader 副本和 follower 副本还没有来得及同步，leader 就崩溃了，那么在选举后新的 leader 就没有这条消息，也就丢失了。</p>
+                <p class="one_indent">1.2 acks = 0。生产者发送消息后直接算写入成功，不需要等待响应。这个方案的问题很明显，只要服务端写消息时出现任何问题，都会导致消息丢失。</p>
+                <p class="one_indent">1.3 acks = -1 或 acks = all。生产者发送消息后，需要等待 ISR 中的所有副本都成功写入消息后才能收到服务端的响应。毫无疑问这种方案的可靠性是最高的，
+                    但是如果 ISR 中只有leader 副本，那么就和 acks = 1 毫无差别了。消费者要等消息成功写入到所有副本才行消费到这个消息。</p>
+                <p class="one_indent">2. Broker端消息丢失：提高副本数量：增加replication.factor，确保至少一个副本始终可用。
+设置min.insync.replicas：限制消息提交时的最小同步副本数，例如设置为2。
+使用可靠的存储设备：选择性能稳定的磁盘并做好备份。</p>
+                <p class="one_indent">3. 消费者端消息丢失：启用手动提交偏移量：消费者在成功处理消息后明确提交（如使用commitSync）。
+定期提交偏移量：设置合理的提交间隔（auto.commit.interval.ms）。
+使用幂等性消费者逻辑：确保消费的业务逻辑能够处理重复消息。/p>
+                <p class="one_indent">Kafka 的消息消费方式有哪些</p>
+                <p class="one_indent">点对点、发布订阅</p>
+
+                <p class="one_indent">名词解释</p>
+                <p class="one_indent">1. AR: 分区中的所有副本统称为AR（Assigned Replicas）</p>
+                <p class="one_indent">2. ISR: 同步副本集合(In-Sync Replicas)。当主副本发生故障时，Kafka会从ISR中选举一个新的主副本来接管工作。从节点</p>
+                <p class="one_indent">3. OSR: 异步副本集合(Out-of-Sync Replicas)。OSR是指当前与主副本不保持同步的副本集合。这些副本可能由于网络故障或其他原因而与主副本失去同步。</p>
+                <p class="one_indent">4. HW: 高水位（High Watermark）。HW是指已经被所有副本复制的最高偏移量。当消费者从分区中读取消息时，它会记录当前已经读取到的偏移量，并将该偏移量作为下一次读取的起始位置。
+                    如果消费者读取到的偏移量小于HW，那么它只能读取到已经被所有副本复制的消息；如果消费者读取到的偏移量大于HW，那么它可能会读取到未被所有副本复制的消息。</p>
+                <p class="one_indent">5. LEO: 日志末尾偏移量（Log End Offset）。LEO是指分区中最后一条消息的偏移量。当生产者向分区中写入消息时，它会将该消息的偏移量记录在LEO中。消费者从分区中读取消息时，它可以通过LEO来判断是否已经读取了所有的消息。</p>
+
             </div>
             <div id="box7" class="box">
                 <p>一、创建型模式</p>
@@ -648,6 +697,17 @@ db.orders.aggregate([
 
             </div>
             <div id="box8" class="box">
+                <p class="col">压缩算法</p>
+                <p class="one_indent">1. gzip：支持多种压缩级别（1-9），级别越高压缩率越高但速度越慢。</p>
+                <p class="one_indent">2. brotil：结合上下文建模和熵编码，优化对 Web 内容的压缩效率。</p>
+                <p class="one_indent">3. Zstd: 支持‌多线程压缩‌和可调字典，兼顾高压缩率与实时性</p>
+                <p class="one_indent">4. LZ4‌: 仅使用哈希表匹配重复字符串，无复杂熵编码步骤</p>
+                <img src="../../assets/img/suanfa1.png" class="img lazyload" alt="">
+                <img src="../../assets/img/suanfa2.png" class="img lazyload" alt="">
+                <img src="../../assets/img/suanfa3.png" class="img lazyload" alt="">
+
+
+
                 <p class="col">冒泡排序</p>
                 <pre>
 package main  
@@ -758,6 +818,33 @@ func BinarySearch(arr []int, target int) int {
                 <p class="one_indent">平均qps: 40000 / 600s = 666</p>
                 <p class="one_indent">峰值qps: 平均qps*并发系数（通常取3-5）=666 * 5 = 3330</p>
                 <p class="one_indent">单台机器qps: 单台机器qps = 单台机器cpu核数 * 并发系数</p>
+                <p class="one_indent">流程：1.商品id作为库存key与用户购买集合key，如</p>
+                <p class="one_indent">    stockKey := fmt.Sprintf("seckill:stock:%d", productID)</p>
+                <p class="one_indent">    userKey := fmt.Sprintf("seckill:user:%d", productID)</p>
+                <p class="one_indent">2. 初始化库存与购买集合</p>
+                <p class="one_indent">3. 用过lua脚本，判断库存key大于0以及用户集合key中未购买，则秒杀成功，扣减库存，添加用户购买集合</p>
+                <pre>
+    luaScript := `
+    local stockKey = KEYS[1]
+    local userKey = KEYS[2]
+    local userId = ARGV[1]
+    local stock = tonumber(redis.call('get', stockKey))
+    
+    if stock <= 0 then
+        return 0
+    end
+    
+    if redis.call('sismember', userKey, userId) == 1 then
+        return 0
+    end
+    
+    redis.call('decr', stockKey)
+    redis.call('sadd', userKey, userId)
+    return 1
+    `
+                </pre>
+                <p class="one_indent">4. 秒杀成功则推到mq异步生成订单</p>
+                <p class="one_indent">5. 订单生成后，推送给用户，用户支付后，更新订单状态</p>
             
                 <p class="col">学校系统--高并发</p>
                 <p class="one_indent">简介：多个系统获取组织树、班级、年纪、学科等信息,通过协程加上读写锁获取redis缓存数据实现高并发。
@@ -950,6 +1037,24 @@ g,admin,bob
                 <p class="one_indent">2. 服务器接到请求后，给予相应的响应信息，其格式为一个状态行，包括信息的协议版本号、一个成功或错误的代码，后边是 MIME
                     信息包括服务器信息、实体信息和可能的内容</p>
 
+                <p class="col">http请求类型</p>
+                <p class="one_indent">get: 请求指定的页面信息，并返回实体主体</p>
+                <p class="one_indent">post: 向指定资源提交数据进行处理请求，数据被包含在请求体中</p>
+                <p class="one_indent">put: 向指定资源位置上传其最新内容</p>
+                <p class="one_indent">delete: 请求服务器删除Request-URI所标识的资源</p>
+                <p class="one_indent">head: 类似于get请求，只不过返回的响应中没有具体的内容，用于获取报头</p>
+                <p class="one_indent">options: 允许客户端查看服务器的性能，比如允许哪些方法可以使用，哪些方法不允许使用</p>
+                <p class="one_indent">trace: 回显服务器收到的请求，主要用于测试或诊断</p>
+                <p class="one_indent">patch: 用于对资源进行部分修改</p>
+
+                <p class="col">http2</p>
+                <p class="one_indent">1. 二进制协议：HTTP2采用二进制格式传输数据，而非HTTP1.x的文本格式，因此能更有效地利用网络资源</p>
+                <p class="one_indent">2. 多路复用：HTTP2在同一个连接上可以创建多个流，每个流都有自己的请求-响应消息，互不干扰，提高了并发性</p>
+                <p class="one_indent">3. 头部压缩：HTTP2在客户端和服务器端使用HPACK算法对传输的头部进行压缩，进一步减少了开销</p>
+                <p class="one_indent">4. 服务器推送：HTTP2允许服务器向客户端推送资源，但是需要客户端先发起请求</p>
+                <p class="one_indent">5. 安全性：HTTP2在传输层和应用层之间增加了新的安全层，提高了安全性</p>
+                <p class="one_indent">6. 性能优化：HTTP2通过多路复用、头部压缩、服务器推送等技术，进一步优化了Web页面的加载速度</p>
+
                 <p class="col">HTTPS协议</p>
                 <p class="one_indent">HTTP + SSL / TLS，也就是在 HTTP 上又加了一层处理加密信息的模块。服务端和客户端的信息传输都会通过 TLS
                     进行加密，所以传输的数据都是加密后的数据</p>
@@ -1045,39 +1150,6 @@ g,admin,bob
 
             </div>
             <div id="box18" class="box">
-                <p class="col">rpc</p>
-                <p class="one_indent">远程过程调用（Remote Procedure Call，RPC）是一种通过网络从远程计算机程序上请求服务，而不需要了解底层网络技术的协议。
-                    RPC协议假定某些传输协议如TCP/IP或其他的可靠传输协议如UDP，为通信双方提供一个抽象层，使得像调用本地函数一样调用远程过程。
-                    RPC 协议包括序列化、协议编解码器和网络传输栈</p>
-                <p class="one_indent">RPC与HTTP协议的区别：</p>
-                <p class="one_indent">1. RPC协议是远程过程调用协议，而HTTP协议是用于Web应用的协议，两者的目标不同</p>
-                <p class="one_indent">2. RPC‌优先使用‌二进制协议‌（如Protobuf、Thrift），而HTTP‌协议‌使用‌文本协议‌（如JSON、XML）</p>
-
-                <p class="col">rpc调用过程</p>
-                <p class="one_indent">1. 客户端调用远程过程，并将参数序列化为字节流</p>
-                <p class="one_indent">2. 客户端通过网络发送字节流到服务器</p>
-                <p class="one_indent">3. 服务器收到字节流，反序列化为参数</p>
-                <p class="one_indent">4. 服务器调用本地的远程过程</p>
-                <p class="one_indent">5. 服务器将结果序列化为字节流</p>
-                <p class="one_indent">6. 服务器通过网络发送字节流到客户端</p>
-                <p class="one_indent">7. 客户端收到字节流，反序列化为结果</p>
-                <p class="one_indent">8. 客户端调用返回结果</p>
-
-                <p class="col">grpc</p>
-                <p class="one_indent">使用protocol buffer作为序列化协议（编码解码），http2.0作为通讯协议的RPC协议的rpc框架</p>
-                <p class="one_indent">使用原理：</p>
-                <p class="one_indent">1. 服务定义从.proto开始，定义了服务的接口、方法、入参、出参等信息</p>
-                <p class="one_indent">2. 使用protoc命令编译.proto文件，生成相应的.go文件</p>
-                <p class="one_indent">3. 客户端调用服务时，通过grpc的stub调用，将参数序列化为字节流，通过http2.0发送给服务端</p>
-                <p class="one_indent">4. 服务端收到字节流，反序列化为参数，调用本地的远程过程</p>
-                <p class="one_indent">5. 本地的远程过程执行，并将结果序列化为字节流</p>
-                <p class="one_indent">6. 服务端通过http2.0发送字节流给客户端</p>
-                <p class="one_indent">7. 客户端收到字节流，反序列化为结果</p>
-                <p class="one_indent">8. 客户端调用返回结果</p>
-
-           
-            </div>
-            <div id="box19" class="box">
                 <p class="col">CAP定理</p>
                 <p class="one_indent">三个特性（不可能同时满足）：</p>
                 <p class="one_indent">1. 一致性（Consistency）：所有节点在同一时间具有相同的数据</p>
@@ -1086,68 +1158,178 @@ g,admin,bob
                 <p class="one_indent">CAP理论指出，一个分布式系统不可能同时满足一致性、可用性和分区容错性这三个特性。在实际的分布式系统中，不能同时保证这三个特性，最多只能同时满足两个。
                     因此，根据CAP理论，只能选择两个，而不能同时选择三个。在实际的分布式系统中，通常采用的是AP或CP模型。</p>
                     <p class="one_indent">CP：可能牺牲可用性，如etcd、zookeeper</p>
+
+                <p class="col">Protobuf</p>
+                <p class="one_indent">1.1 为什么在微服务里面会选中protobuf多一些</p>
+                <p class="one_indent">protobuf是一种二进制协议,具有广泛的编程语言支持,序列化和反序列化速度更快，生成的数据体积更小,在微服务之间传输大量数据时非常重要，可以提高性能和减少带宽消耗</p>
+                <p class="one_indent">1.2 Protobuf2和3的区别</p>
+                <p class="one_indent">Proto3精简了语法，只支持单一的字段语法，即所有字段都是可选的，并且不存在required 和optional的概念</p>
+                <p class="one_indent">Proto3中默认值的概念被移除，字段不再具有默认值，而是始终具有零值</p>
+                <p class="one_indent">Proto3中的枚举从0开始，但不再支持自增，枚举值必须显式设置。</p>
+                <p class="one_indent">1.3 Protobuf中每个字段后的序号作用</p>
+                <p class="one_indent">序号的主要作用之一是允许在未来修改消息的定义时保持向后兼容性。
+                    因为序号是唯一的标识符，Protobuf可以在解析数据时根据序号而不是字段名来识别字段。这意味着可以添加、删除或重新排列字段，而不会破坏与旧版本数据的兼容性。</p>
+                <p class="one_indent">通过指定序号，可以控制消息中字段的顺序。这对于使消息结构更有组织性和可读性很有帮助。虽然Protobuf不要求字段按序号排序，但通常建议按顺序编写字段定义。</p>
+                <p class="one_indent">序号确保了字段的唯一性。不同字段不能拥有相同的序号。这有助于防止消息定义中的重复字段或冲突。</p>
+
+                <p class="col">gRPC 和 HTTP/RESTful</p>
+                <p class="one_indent">gRPC 和 HTTP/RESTful 都可以用于分布式系统的通信，但两者之间也存在一些差异，如：</p>
+                <p class="one_indent">1. 协议：gRPC 使用 HTTP/2 协议，而 HTTP/RESTful 使用 HTTP 协议</p>
+                <p class="one_indent">2. 序列化：gRPC 使用 Protocol Buffers 作为序列化协议，而 HTTP/RESTful 使用 JSON 作为序列化协议</p>
+                <p class="one_indent">3. 错误处理：gRPC 使用状态码和错误信息来表示错误，而 HTTP/RESTful 使用 HTTP 状态码</p>
+                <p class="one_indent">4. 性能：gRPC 性能更好，尤其是在高并发场景下，而 HTTP/RESTful 性能一般</p>
+                <p class="one_indent">5. 适用场景：gRPC 更适合高性能、高并发的场景，而 HTTP/RESTful 更适合低延迟、低并发的场景</p>
+
+                <p class="col">grpc通信方式与使用场景</p>
+                <p class="one_indent">1. 简单rpc：</p>
+                <p class="one_indent">1.1 一般的rpc调⽤，传⼊⼀个请求对象，返回⼀个返回对象</p>
+                <p class="one_indent">1.2 这种模式，每⼀次都是发起⼀个独⽴的tcp连接，经历一次三次握⼿和四次挥⼿</p>
+                <p class="one_indent">1.3 适用场景：标准rpc通信</p>
+                <p class="one_indent">2. 服务器流失rpc：</p>
+                <p class="one_indent">2.1 一传⼊⼀个请求对象，服务端可以返回多个结果对象</p>
+                <p class="one_indent">2.2 服务端流 RPC 下，客户端发出⼀个请求，但不会⽴即得到⼀个响应，⽽是在服务端与客户端之间建⽴⼀个单向的流，服务端可以随时向流中写⼊多个响应消息，最后主动关闭流，⽽客户端需要监听这个流，不断获取响应直到流关闭</p>
+                <p class="one_indent">2.3 适用场景：实时数据推送，如股票行情推送，实时日志监控等</p>
+                <p class="one_indent">3. 客户端流式rpc：</p>
+                <p class="one_indent">3.1 客户端传⼊多个请求对象，服务端返回⼀个结果对象</p>
+                <p class="one_indent">3.2 客户端流式rpc 客户端传⼊多个请求对象，服务端返回⼀个响应结果</p>
+                <p class="one_indent">3.3 适用场景：物联网设备上传数据，如传感器数据上传，文件上传等</p>
+                <p class="one_indent">4. 双向流rpc：</p>
+                <p class="one_indent">4.1 结合客户端流式RPC和服务端流式RPC，可以传⼊多个请求对象，返回多个结果对象</p>
+                <p class="one_indent">4.2 双向流式rpc 结合客户端流式rpc和服务端流式rpc，可以传⼊多个对象，返回多个响应对象</p>
+                <p class="one_indent">4.3 适用场景：聊天应用</p>
+
+                <p class="col">多路复用</p>
+                <p class="one_indent">1. ‌gRPC的多路复用‌是指在同一个TCP连接上，可以同时进行多个请求和回应，复用一条TCP连接，从而提高网络利用率和系统性能。</p>
+                <p class="one_indent">2. 原理：基于HTTP/2协议，该协议引入了二进制分帧机制，将请求和回应分割成一系列的帧，通过流的方式进行传输‌</p>
+                <p class="one_indent">3. 优点：</p>
+                <p class="one_indent">3.1. 减少了TCP连接的建立和关闭次数，从而节省了服务器资源和带宽</p>
+                <p class="one_indent">3.2. 降低了延迟，提高了吞吐量</p>
+                <p class="one_indent">3.3. 降低了网络拥塞，提高了网络利用率</p>
+                <p class="one_indent">3.4. 实现了请求的优先级，提高了服务的响应速度</p>
+
+                <p class="col">容错机制</p>
+                <p class="one_indent">1. 超时重试：在超时时间内，如果服务端没有响应，客户端可以重新发送请求，直到成功或超时</p>
+                <pre>
+func userHandler(w http.ResponseWriter, r *http.Request) {
+    // 设置整个请求的最大处理时间为3秒
+    ctx, cancel := context.WithTimeout(r.Context(), 3*time.Second)
+    defer cancel() // 非常重要！确保资源释放
+
+    // 将带有超时的ctx传递给后续逻辑
+    user, err := userService.GetUser(ctx, userID)
+    if err != nil {
+        if errors.Is(err, context.DeadlineExceeded) {
+            http.Error(w, "Request timed out", http.StatusGatewayTimeout)
+            return
+        }
+        // 处理其他错误
+    }
+    // ... 返回响应
+}
+// 在调用下游服务时设置更短的超时（例如1秒）
+callCtx, cancel := context.WithTimeout(ctx, 1*time.Second)
+defer cancel()
+resp, err := userClient.GetUser(callCtx, &userReq)
+                </pre>
+                <p class="one_indent">2. 熔断：hystrix-go、sony/gobreake熔断器，当服务端的错误率超过一定阈值时，停止向该服务端发送请求，并在一段时间后恢复，避免向失败的服务端发送大量请求</p>
+                <p class="one_indent">3. 限流：限制客户端在一段时间内向服务端发送请求的数量，避免服务端过载</p>
+                <p class="one_indent">4. 降级：当服务端发生故障时，将请求转移到备用服务端，如缓存服务，主动关闭或简化一些非关键功能，以保证核心功能的可用性。</p>
+
+
+                <p class="col">横向扩展和纵向扩展</p>
+                <p class="one_indent">1. 横向扩展：增加服务器的数量，提高服务器的处理能力，以提高系统的处理能力</p>
+                <p class="one_indent">2. 纵向扩展：增加服务器的配置，如增加CPU、内存、磁盘等，以提高服务器的处理能力</p>
+
+                <p class="col">日志收集工具</p>
+                <p class="one_indent">将日志输出到标准输出或文件，然后由收集工具进行采集和分析,如 ELK 栈：Elasticsearch、Logstash、Kibana</p>
+
+        
+           
+            </div>
+            <div id="box19" class="box">
+             <p class="col">分布式事务</p>
+                <p class="one_indent">1. 2PC:两阶段提交（Two-Phase Commit）,强一致性，通过事务的准备和提交两个阶段来实现数据的一致性。缺点是性能低，且存在单点故障问题。</p>
+                <p class="one_indent">1.1 准备阶段：事务协调者向所有参与者发送事务执行的请求，并进入准备阶段。每个参与者会执行以下操作：</p>
+                <p class="one_indent">检查自己是否能够成功完成该事务，包括检查事务操作是否合法和是否有足够的资源。</p>
+                <p class="one_indent">如果参与者准备好了，它会向协调者发送一个“同意”消息。</p>
+                <p class="one_indent">如果参与者不能准备好，它会向协调者发送一个“中止”消息。</p>
+                <p class="one_indent">1.2 提交阶段：如果所有参与者都在准备阶段发送了“同意”消息，那么协调者会向所有参与者发送一个提交请求。每个参与者会执行以下操作：</p>
+                <p class="one_indent">执行事务的实际操作，将数据持久化或执行其他必要的操作。</p>
+                <p class="one_indent">一旦操作成功，它会向协调者发送一个“已提交”消息，表示它已成功提交事务。</p>
+                <p class="one_indent">如果操作失败，参与者会向协调者发送一个“中止”消息，表示事务无法提交。</p>
+                <p class="one_indent">1.3 完成和恢复： 一旦协调者收到所有参与者的“已提交”消息，它会将事务标记为已提交，并通知客户端事务已成功完成。
+                    如果有任何一个参与者发送了“中止”消息或在规定时间内没有响应，协调者会将事务标记为已中止，并通知客户端事务失败。</p>
+                <p class="one_indent">2. saga事务: 通过将大型事务拆分成多个小事务并使用补偿操作来维护数据一致性</p>
+                <p class="one_indent">3. tcc事务:TCC事务将大事务拆分成三个阶段，以确保在不同节点上的操作要么全部成功，要么全部失败</p>
+                <p class="one_indent">3.1 Try阶段（尝试阶段）： 在Try阶段，事务协调器（Transaction Coordinator）会向所有参与者（各个节点或服务）发送一个尝试请求，询问它们是否愿意执行事务</p>
+                <p class="one_indent">尝试执行与该事务相关的操作，但不会将其结果持久化。这个阶段用于检查是否满足执行事务的前提条件，例如检查资源是否足够、锁定资源等。</p>
+                <p class="one_indent">3.2 Confirm阶段（确认阶段）：如果所有参与者在Try阶段成功执行了相关操作并确认可以执行事务，那么事务协调器会向所有参与者发送确认请求。每个参与者会执行以下操作：</p>
+                <p class="one_indent">确认之前Try阶段执行的操作，并将结果持久化。这个阶段将确保事务操作的执行。</p>
+                <p class="one_indent">3.3 Cancel阶段（取消阶段）：如果参与者在提交阶段执行失败，事务协调者向参与者发送事务补偿请求，参与者根据日志中的操作结果执行补偿操作。</p>
+                <p class="one_indent">撤销或回滚之前Try阶段执行的操作，以确保事务操作的撤销。</p>
+
+
+                    
                 <p class="col">分布式锁</p>
                 <p class="one_indent">1. redis:<a href="../redis/code.html">code</a>，竞争锁，当一个节点尝试获取锁时，使用 SETNX 命令设置一个特定的键（例如 “lock_key”），若键不存在，则设置成功，该节点获取锁；若键已存在，则表示锁已被其他节点持有，获取锁失败。
                     为防止死锁，获取锁的节点通常会设置一个过期时间（通过 SETEX 命令或在 SETNX 成功后使用 EXPIRE 命令），确保即使节点在持有锁期间崩溃，锁也能在一定时间后自动释放。
                     </p>
                 <p class="one_indent">2. zookeeper:ZooKeeper是一个分布式协调服务，其临时节点特性非常适合实现分布式锁</p>
-                <p class="one_indent">3. etcd:基于临时节点实现分布式锁，当节点崩溃或会话过期时，临时节点会自动被删除，从而释放锁，避免了死锁的发生，公平性和可靠性要求较高</p>
+                <p class="one_indent">3. etcd:一下这些机制赋予了Etcd实现分布式锁的能力</p>
+                <p class="one_indent">3.1 Lease机制：即租约机制，，Etcd可以为存储的Key-Value对设置租约，当租约到期，Key-Value将失效删除；同时也支持续约，通过客户端可以在租约到期之前续约，以避免Key-Value对过期失效。
+                    Lease机制可以保证分布式锁的安全性，为锁对应的Key配置租约，即使锁的持有者因故障而不能主动释放锁，锁也会因租约到期而自动释放</p>
+                <p class="one_indent">3.2 Revision机制：每个Key带有一个Revision号，每进行一次事务便加一，因此它是全局唯一的，如初始值为0，进行一次put(key,value)，Key的Revision变为1，
+                    同样的操作，再进行一次，Revision变为2；换成key1进行put(key1,value)操作，Revision将变为3；这种机制有一个作用：通过Revision的大小就可以知道写操作的顺序。
+                    在实现分布式锁时，多个客户端同时抢锁，根据Revision号大小依次获得锁，可以避免“羊群效应”（也称“惊群效应”），实现公平锁。</p>
+                <p class="one_indent">3.3 Prefix机制：即前缀机制，也称目录机制，例如，一个名为/mylock的锁，两个争抢它的客户端进行写操作，
+                    实际写入的Key分别为：key1=“/mylock/UUID1”，key2=“/mylock/UUID2”，其中，UUID表示全局唯一的ID，确保两个Key的唯一性。
+                    很显然，写操作都会成功，但返回的Revision不一样，那么，如何判断谁获得了锁呢？通过前缀“/mylock”查询，返回包含两个Key-Value对的Key-Value列表，
+                    同时也包含它们的Revision，通过Revision大小，客户端可以判断自己是否获得锁，如果抢锁失败，则等待锁释放（对应的Key被删除或者租约过期），然后再判断自己是否可以获得锁。
+</p>
+                <p class="one_indent">3.4 Watch机制：即监听机制，Watch机制支持监听某个固定的Key，
+                    也支持监听一个范围（前缀机制），当被监听的Key或范围发生变化，客户端将收到通知；
+                    在实现分布式锁时，如果抢锁失败，可通过Prefix机制返回的Key-Value列表获得Revision比自己小且相差最小的Key（称为Pre-Key），对Pre-Key进行监听，
+                    因为只有它释放锁，自己才能获得锁，如果监听到Pre-Key的DELETE事件，则说明Pre-Key已经释放，自己已经持有锁。
+</p>
+                <p class="one_indent">3.5 下面描述了使用Etcd实现分布式锁的业务流程，假设对某个共享资源设置的锁名为：/anyrtc/mylock。</p>
+                <p class="one_indent">3.5.1 准备：客户端连接Etcd，以/anyrtc/mylock为前缀创建全局唯一的Key，假设第一个客户端对应的Key=“/anyrtc/mylock/UUID1”，第二个为Key=“/anyrtc/mylock/UUID2”；
+                    客户端分别为自己的Key创建租约Lease，租约的长度根据业务耗时确定，假设为15s。</p>
+<p class="one_indent">3.5.2创建定时任务作为租约的“心跳”：在一个客户端持有锁期间，其它客户端只能等待，为了避免等待期间租约失效，客户端需创建一个定时任务作为“心跳”进行续约。此外，如果持有锁期间客户端崩溃，心跳停止，
+Key将因租约到期而被删除，从而锁释放，避免死锁。</p>
+<p class="one_indent">3.5.3客户端将自己全局唯一的Key写入Etcd：进行Put操作，将步骤1中创建的Key绑定租约写入Etcd，根据Etcd的Revision机制，假设两个客户端Put操作返回的Revision分别为1、2，
+    客户端需记录Revision用以接下来判断自己是否获得锁。</p>
+<p class="one_indent">3.5.4客户端判断是否获得锁：客户端以前缀/anyrtc/mylock读取Key-Value列表（Key-Value中带有Key对应的Revision），
+    判断自己Key的Revision是否为当前列表中最小的，如果是则认为获得锁；否则监听列表中前一个Revision比自己小的Key的删除事件，一旦监听到删除事件或者因租约失效而删除的事件，则自己获得锁。</p>
+<p class="one_indent">3.5.5执行业务：获得锁后，操作共享资源，执行业务代码。</p>
+<p class="one_indent">3.5.6释放锁：完成业务流程后，删除对应的Key释放锁。</p>
 
                 <p class="col">etcd、consul、zookeeper的区别</p>
                 <p class="one_indent">1. zookeeper:使用zap协议，拥有自己的自定义Jute RPC 协议，该协议对于 Zookeeper 而言是完全唯一的，并限制了其受支持的语言绑定</p>
                 <p class="one_indent">2. etcd:使用raft协议，参考了 ZooKeeper 的设计和实现经验，客户端基于grpc构建，支持多种语言和框架</p>
                 <p class="one_indent">3. consul:使用gossip协议，etcd 和 Consul 解决了不同的问题。如果要寻找分布式一致键值存储，那么与 Consul 相比，etcd是更好的选择。如果正在寻找端到端的集群服务发现，etcd 将没有足够的功能。可以选择 Kubernetes，Consul或 SmartStack</p>
+
+                <p class="col">raft协议</p>
+                <p class="one_indent">raft协议是一种分布式一致性算法，它被设计用来管理复制日志。</p>
+                <p class="one_indent">主要作用</p>
+                <p class="one_indent">1. 选举领导者：Raft协议通过投票过程选出一个领导者（Leader），所有的客户端请求都通过领导者进行协调和处理。</p>
+                <p class="one_indent">2. 容错恢复：一旦领导者宕机，Raft协议能通过重新选举产生新的领导者，使系统恢复正常运行。</p>
+                <p class="one_indent">3. 日志复制：领导者负责将自己的操作日志条目复制到其他的Follower节点，确保系统中的多个节点可以存储相同的数据。</p>
+                <p class="one_indent">4. 一致性保障：如果一个日志条目在领导者的日志中被提交，那么这个日志条目最终将存在于所有可用的Follower节点的日志中。</p>
+                
+
                 
             </div>
             <div id="box20" class="box">
-                <p class="col">oop</p>
-                <p class="one_indent">封装</p>
-                <p class="one_indent">继承</p>
-                <p class="one_indent">多态</p>
-                <p class="one_indent">加上抽象,则是面向对象</p>
                 
 
-                <p class="col">php垃圾回收--计数器</p>
-                <p class="one_indent">1.每个对象内含一个引用计数器</p>
-                <p class="one_indent">2.当这个对象被引用时其计数器+1</p>
-                <p class="one_indent">3. 当引用这个对象的对象被删除时,其计数器-1</p>
-                <p class="one_indent">4. 当计数器为0时,对象被回收</p>
-
-                <p class="col">php解释器</p>
-                <p class="one_indent">内置在zend引擎,其负责整个php脚本的周期运转</p>
-
-                <p class="col">php-fpm</p>
-                <p class="one_indent">进程管理器,高效管理和运行多个php解释器实例,根据需要启停php进程</p>
-                <p class="one_indent">原理:php-fpm是管理fastCGI的重要根据,fastCGI包含主进程(监控和管理工作),工作进程执行php</p>
-                <p class="col">FastCGI</p>
-                <img src="../../assets/img/fastcgi.png" alt="" class="img lazyload">
-
-                <p class="col">框架运行流程</p>
-                <p class="one_indent">1. 用户发起请求</p>
-                <p class="one_indent">2. 请求先到达入口文件(初始化框架,进入框架处理流程)</p>
-                <p class="one_indent">3. 定义常量,加载框架引导文件,自动加载函数(根据命名空间和类名查找)</p>
-                <p class="one_indent">4. 加载配置,初始化应用,创建应用实例,加载应用类库,设置应用环境</p>
-                <p class="one_indent">5. 路由规则匹配,绑定参数</p>
-                <p class="one_indent">6. 控制器调度对应的控制器类,调用模型类操作数据库,处理请求后返回响应json或渲染模板</p>
-
-                <p class="col">PHP7的新特性</p>
-                <p class="one_indent">1. 可以使用 string、int、float和 bool </p>
-                <p class="one_indent">2. 增加了对返回类型声明的支持</p>
-
-                <p class="col">防攻击</p>
-                <p class="one_indent">1. 常见攻击</p>
-                <p class="one_indent">1.1 sql注入: 攻击者通过把恶意的SQL指令插入到Web表单提交或Cookie中</p>
-                <p class="one_indent">1.2 xss攻击: 跨站点脚本攻击，由用户输入一些数据到你的网站，
-                    其中包括客户端脚本(通常JavaScript)。如果你没有过滤就输出数据到另一个web页面，这个脚本将被执行</p>
-                <p class="one_indent">1.3 csrf攻击: 跨站点请求伪造，是指一个页面发出的请求，
-                    看起来就像是网站的信任用户，但是是伪造的</p>
-                <p class="one_indent">1.4 dos攻击:大量请求，消耗服务器资源，导致网站瘫痪</p>
-                <p class="one_indent">2. 防护措施</p>
-                <p class="one_indent">2.1 输入过滤: 对用户输入的数据进行检查，过滤掉不合法的字符，并进行转义</p>
-                <p class="one_indent">2.2 输出过滤: 对输出的数据进行检查，过滤掉不合法的字符，并进行转义</p>
-                <p class="one_indent">2.3 验证码: 验证码是一种常用的防御攻击手段，它通过对用户输入进行验证，来判断用户是否是机器而不是人</p>
-                <p class="one_indent">2.4 nginx过滤限制请求</p>
-
+            </div>
+            <div id="box21" class="box">
+                <p class="col">benthos</p>
+                <p class="one_indent">流式处理框架，实时处理在不同的消息流之间进行路由，转换和聚合数据，并对有效载荷执行水合、富集、转换和过滤</p>
+                <p class="one_indent">交货保证：</p>
+                <p class="one_indent">1. batch: 在批量模式下工作。在批量模式下，Benthos 将等待一定数量的消息到达后再将这些消息发送到输出流。</p>
+                <p class="one_indent">2. buffer: 在缓冲模式下工作。在缓冲模式下，Benthos 会将消息缓存在内存中，直到可以将其发送到输出流。</p>
+                <p class="one_indent">3. queue: 在队列模式下工作。在队列模式下，Benthos 会将消息放入一个持久化队列中，直到可以将其发送到输出流。</p>
 
             </div>
         </div>
