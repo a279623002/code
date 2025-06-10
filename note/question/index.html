@@ -183,7 +183,15 @@
                 <p class="one_indent">检测逃逸命令</p>
                 <p class="one_indent">go build -gcflags="-m -m" main.go</p>
                 <p class="one_indent">优化建议：尽量避免返回局部变量的指针，预估切片容量，减少动态扩容</p>
-     
+<pre>
+func main() {
+    f := func() int {
+        x := 42 // 这个变量 x 会逃逸到堆上
+        return x
+    }
+    fmt.Println(f())
+}
+</pre>     
 
                 <p class="col">内存泄露</p>
                 <p class="one_indent">语言依赖自动垃圾回收机制来管理内存，理论上无需开发者手动释放内存。
