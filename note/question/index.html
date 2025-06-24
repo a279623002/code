@@ -183,15 +183,15 @@
                 <p class="one_indent">检测逃逸命令</p>
                 <p class="one_indent">go build -gcflags="-m -m" main.go</p>
                 <p class="one_indent">优化建议：尽量避免返回局部变量的指针，预估切片容量，减少动态扩容</p>
-<pre>
-func main() {
-    f := func() int {
-        x := 42 // 这个变量 x 会逃逸到堆上
-        return x
-    }
-    fmt.Println(f())
-}
-</pre>     
+                <pre>
+                func main() {
+                    f := func() int {
+                        x := 42 // 这个变量 x 会逃逸到堆上
+                        return x
+                    }
+                    fmt.Println(f())
+                }
+                </pre>     
 
                 <p class="col">内存泄露</p>
                 <p class="one_indent">语言依赖自动垃圾回收机制来管理内存，理论上无需开发者手动释放内存。
@@ -388,9 +388,9 @@ func leakTimer() {
             </div>
             <div id="box3" class="box">
                 <p class="col">缓存类型与使用场景</p>
-                <p class="one_indent">1. 字符串（String）：缓存用户信息、配置信息等</p>
-                <p class="one_indent">2. 哈希（Hash）：缓存对象，如用户信息、商品信息等</p>
-                <p class="one_indent">3. 列表（List）：缓存排行榜、文章列表等</p>
+                <p class="one_indent">1. 字符串（String）：缓存用户信息、配置信息、点赞数、库存数等</p>
+                <p class="one_indent">2. 哈希（Hash）：缓存对象，如用户信息、商品信息、购物车等</p>
+                <p class="one_indent">3. 列表（List）：缓文章列表、消息队列（BRPOP,无消息写入则阻塞直到有消息）等</p>
                 <p class="one_indent">4. 集合（Set）：缓存共同好友、共同关注等,集合成员是唯一</p>
                 <p class="one_indent">5. 有序集合（Sorted Set）：缓存排行榜、商品推荐等,不允许重复的成员</p>
                 <p class="one_indent">6. 二进制位图（Bitmaps）：缓存用户签到状态、商品访问记录，布隆过滤器等</p>

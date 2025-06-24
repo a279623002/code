@@ -27,19 +27,12 @@ func increment(wg *sync.WaitGroup) {
 
 func start() {
 	var wg sync.WaitGroup
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 1000000; i++ {
 		wg.Add(1)
-		increment(&wg)
+		go increment(&wg)
 	}
 	wg.Wait()
 	fmt.Print(x)
-}
-
-func t1() int {
-    a := 1
-    return func () int  {
-        return a
-    }()
 }
 
 func main() {
@@ -49,6 +42,6 @@ func main() {
 	// pm := platform.NewPlatformManager(p)
 	// pm.Start()
 	// createCycle()
-	// start()
+	start()
 
 }
