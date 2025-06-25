@@ -1,0 +1,16 @@
+type (
+	InfoReq {
+		Id int64 `json:"id"`
+	}
+	InfoReply {
+		Id         int64  `json:"id"`
+		Name       string `json:"name"`
+		created_at string `json:"created_at"`
+	}
+)
+
+service user-api {
+	@handler Info
+	post /user/Info (InfoReq) returns (InfoReply)
+}
+

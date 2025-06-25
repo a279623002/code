@@ -52,8 +52,8 @@ $ goctl model mysql ddl -src user.sql -dir . -c
 * 方式二
 ```
 $ cd service/user/model
-goctl model mysql datasource -url="root:root@tcp(127.0.0.1:3306)/go-zero-shiro" -table="gzs_user" -c -dir . -custType=goZero,gorm -style=goZero
-goctl model mysql datasource -url="mysql://root:root@tcp(127.0.0.1:3306)/go-zero-shiro" -table="gzs_user" -dir="./model" -custType=goZero,cache,gorm -style=goZero
+goctl model mysql datasource --url="root:root@tcp(127.0.0.1:3306)/go-zero-shiro" --table="gzs_user" -c --dir . --custType=goZero,gorm --style=goZero
+goctl model mysql datasource --url="root:root@tcp(127.0.0.1:3306)/go-zero-shiro" --table="gzs_user" --dir="./model" --custType=goZero,cache,gorm --style=goZero
 ```
 ##### 编写api文件
 1. 生成api服务

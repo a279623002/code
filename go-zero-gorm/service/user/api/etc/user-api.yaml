@@ -1,0 +1,10 @@
+Name: user-api
+Host: 127.0.0.1
+Port: 8002
+UserRpc:
+  Etcd:
+    Hosts:
+      - 172.31.160.1:12379
+      - 172.31.160.1:22379
+      - 172.31.160.1:32379
+    Key: user.rpc
