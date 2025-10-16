@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>shiro code</title>
+    <script src="./assets/js/jquery-3.6.0.min.js"></script>
+    <script src="./assets/js/font.js"></script>
+    <link rel="stylesheet" href="./assets/css/public.css">
+    <link rel="stylesheet" href="./assets/css/index.css">
+    <style>
+        .ball {
+            width: .75rem;
+            height: .75rem;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin: .1rem;
+            font-weight: bold;
+            font-size: .48rem;
+        }
+
+        .red-ball {
+            background-color: #FF4136;
+            color: white;
+        }
+
+        .blue-ball {
+            background-color: #0074D9;
+            color: white;
+        }
+
+        #result-container {
+            margin-top: 20px;
+            font-size: 24px;
+        }
+    </style>
+</head>
+
+<body>
+    <header></header>
+    <main>
+        <a id="generate-double" class="col" href="javascript:void(0)">双色球号码</a>
+        <div id="result-container"></div>
+
+        <script>
+            $(document).ready(function () {
+                $('#generate-double').click(function () {
+                    // 生成6个不重复的红球（1-33）  
+                    let redBalls = [];
+                    while (redBalls.length < 6) {
+                        let num = Math.floor(Math.random() * 33) + 1;
+                        if (!redBalls.includes(num)) {
+                            redBalls.push(num);
+                        }
+                    }
+                    redBalls.sort((a, b) => a - b);
+
+                    // 生成1个蓝球（1-16）  
+                    let blueBall = Math.floor(Math.random() * 16) + 1;
+
+                    // 清空结果容器  
+                    $('#result-container').empty();
+
+                    // 渲染红球  
+                    redBalls.forEach(ball => {
+                        $('<div>').addClass('ball red-ball').text(ball).appendTo('#result-container');
+                    });
+
+                    // 渲染蓝球  
+                    $('<div>').addClass('ball blue-ball').text(blueBall).appendTo('#result-container');
+                });
+            });  
+        </script>
+    </main>
+</body>
+
+
+</html>
