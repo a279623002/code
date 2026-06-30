@@ -1,0 +1,18 @@
+Name: order-api
+Host: 0.0.0.0
+Port: 8888
+
+# Etcd 服务发现
+OrderRpc:
+  Etcd:
+    Hosts:
+      - 127.0.0.1:2379
+    Key: order-rpc
+
+# 日志配置
+Log:
+  ServiceName: order-api
+  Mode: console
+  Path: logs
+  Level: info
+  KeepDays: 7

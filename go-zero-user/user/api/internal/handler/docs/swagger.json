@@ -1,0 +1,211 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "User Service API",
+    "description": "go-zero 用户管理微服务 API 文档，订单操作通过 order-rpc 解耦调用",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:8889",
+      "description": "本地开发环境"
+    }
+  ],
+  "tags": [
+    {
+      "name": "user",
+      "description": "用户管理"
+    }
+  ],
+  "paths": {
+    "/api/user": {
+      "post": {
+        "tags": ["user"],
+        "summary": "创建用户",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateUserResp"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/{id}": {
+      "get": {
+        "tags": ["user"],
+        "summary": "查询用户详情",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/GetUserResp" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/{id}/orders": {
+      "get": {
+        "tags": ["user"],
+        "summary": "查询用户订单（调用 order-rpc）",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "format": "int32", "default": 1 }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "schema": { "type": "integer", "format": "int32", "default": 20 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/GetUserOrdersResp" }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["user"],
+        "summary": "为用户下单（调用 order-rpc）",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/PlaceOrderReq" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PlaceOrderResp" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int64" },
+          "username": { "type": "string" },
+          "phone": { "type": "string" },
+          "email": { "type": "string" },
+          "created_at": { "type": "string" },
+          "updated_at": { "type": "string" }
+        }
+      },
+      "UserOrder": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int64" },
+          "order_no": { "type": "string" },
+          "total_amount": { "type": "number", "format": "double" },
+          "status": { "type": "integer", "format": "int32", "description": "1-待支付 2-已支付 3-已发货 4-已完成 5-已取消" },
+          "remark": { "type": "string" },
+          "created_at": { "type": "string" },
+          "updated_at": { "type": "string" }
+        }
+      },
+      "CreateUserReq": {
+        "type": "object",
+        "required": ["username", "phone"],
+        "properties": {
+          "username": { "type": "string" },
+          "phone": { "type": "string" },
+          "email": { "type": "string" }
+        }
+      },
+      "CreateUserResp": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int64" }
+        }
+      },
+      "GetUserResp": {
+        "type": "object",
+        "properties": {
+          "user": { "$ref": "#/components/schemas/User" }
+        }
+      },
+      "GetUserOrdersResp": {
+        "type": "object",
+        "properties": {
+          "list": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/UserOrder" }
+          },
+          "total": { "type": "integer", "format": "int64" }
+        }
+      },
+      "PlaceOrderReq": {
+        "type": "object",
+        "required": ["total_amount"],
+        "properties": {
+          "total_amount": { "type": "number", "format": "double" },
+          "remark": { "type": "string" }
+        }
+      },
+      "PlaceOrderResp": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int64" },
+          "order_no": { "type": "string" }
+        }
+      }
+    }
+  }
+}

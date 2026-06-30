@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package order;
+option go_package = "go-zero-order/order/rpc/types/order";
+
+// 订单状态：1-待支付 2-已支付 3-已发货 4-已完成 5-已取消
+message Order {
+  int64 id = 1;
+  string order_no = 2;
+  int64 user_id = 3;
+  double total_amount = 4;
+  int32 status = 5;
+  string remark = 6;
+  string created_at = 7;
+  string updated_at = 8;
+}
+
+message CreateOrderReq {
+  int64 user_id = 1;
+  double total_amount = 2;
+  string remark = 3;
+}
+
+message CreateOrderResp {
+  int64 id = 1;
+  string order_no = 2;
+}
+
+message GetOrderReq {
+  int64 id = 1;
+}
+
+message GetOrderResp {
+  Order order = 1;
+}
+
+message ListOrderReq {
+  int64 user_id = 1;
+  int32 page = 2;
+  int32 page_size = 3;
+}
+
+message ListOrderResp {
+  repeated Order list = 1;
+  int64 total = 2;
+}
+
+message UpdateOrderStatusReq {
+  int64 id = 1;
+  int32 status = 2;
+}
+
+message UpdateOrderStatusResp {
+  bool success = 1;
+}
+
+service OrderRpc {
+  rpc CreateOrder(CreateOrderReq) returns (CreateOrderResp);
+  rpc GetOrder(GetOrderReq) returns (GetOrderResp);
+  rpc ListOrder(ListOrderReq) returns (ListOrderResp);
+  rpc UpdateOrderStatus(UpdateOrderStatusReq) returns (UpdateOrderStatusResp);
+}

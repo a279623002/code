@@ -1,0 +1,23 @@
+Name: order-rpc
+ListenOn: 0.0.0.0:8080
+
+# 数据库配置
+DB:
+  DataSource: root:123456@tcp(127.0.0.1:3306)/go_zero_order?charset=utf8mb4&parseTime=True&loc=Local
+  MaxIdleConns: 10
+  MaxOpenConns: 100
+  ConnMaxLifetime: 3600
+
+# Etcd 服务注册与发现
+Etcd:
+  Hosts:
+    - 127.0.0.1:2379
+  Key: order-rpc
+
+# 日志配置
+Log:
+  ServiceName: order-rpc
+  Mode: console
+  Path: logs
+  Level: info
+  KeepDays: 7

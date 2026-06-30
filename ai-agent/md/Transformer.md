@@ -96,13 +96,61 @@
 ![alt text](../images/transformer01.png)
 * <strong>注意：</strong>
     以机器翻译举例：
-    * 原文：我爱中国（进 Encoder）
-    * 真实目标译文：I love China
-    * 把目标序列整体右移一位，开头加起始符<Start>，得到 Decoder 输入： <Start> I love China
-    * shifted right 右移的目的：模型当前步只能预测下一个词，不能偷看后面真实词；
-    * 流程：该序列先做 Output Embedding 词嵌入 + 位置编码，才送入第一层 Masked 多头注意力。
-    1. 左侧 Inputs → Embedding + 位置编码 → N 层 Encoder → 输出特征，引线连到右侧 Decoder 每层的交叉注意力；
-    2. 右侧单独一条支路：Outputs (shifted right) → Output Embedding + 位置编码 → 直接进第一层 Masked 注意力
+    ```
+    Encoder + Decoder 完整流程示例（Transformer 机器翻译场景）
+    任务：中文输入 我爱猫 → 英文输出 I love cats
+    基础参数
+    输入词表：我 / 爱 / 猫
+    输出词表：I/love/cats/<start>/<end>
+    一、Encoder 编码器流程（只处理源文本：我爱猫）
+    Encoder 堆叠 N 层，每层结构完全一样：
+    词嵌入 → 位置编码 → 多头自注意力（Self-Attn）→ Add&Norm → FFN → Add&Norm
+
+    步骤 1：输入预处理
+    分词：[我, 爱, 猫]
+    词编码转向量 + 加上位置编码，得到输入矩阵 
+ 
+    步骤 2：多头自注意力（Encoder 自注意力：只看自身输入）
+    用权重矩阵把 X映射出 Q,K,V（全部来自输入 X），缩放,softmax 归一化权重，乘 V 得到注意力输出
+    残差连接：输入 + 注意力结果，层归一化 Norm
+
+    步骤 3：前馈网络 FFN
+    两层线性变换 + 激活，再残差 + Norm
+
+    步骤 4：Encoder 输出
+    最终得到记忆矩阵 Memory
+    含义：把整句中文全部编码成全局上下文信息，后面给 Decoder 使用
+
+    二、Decoder 解码器流程（生成英文：I love cats）
+    Decoder 每层 3 个模块，顺序：
+    掩码自注意力 → Add&Norm → 交叉注意力 → Add&Norm → FFN → Add&Norm
+    Decoder 是逐词生成，一次只输出一个单词，循环直到输出 <end>
+    初始状态
+    解码器输入开头标志：<start>
+
+    第 1 轮：输入 <start>，预测第一个词 I
+    模块 1：掩码多头自注意力（Masked Self-Attention）
+    输入：<start> 的向量
+    掩码作用：生成时看不到未来未生成的单词，防止提前偷看后面文字
+    Q/K/V 全部来自 Decoder 当前已输出序列
+    模块 2：交叉注意力 Cross-Attention（Encoder-Decoder Attention）
+    Q：来自 Decoder 上一层输出（当前生成的词向量）
+    K、V：全部来自 Encoder 输出的 Memory（中文整句上下文）
+    作用：生成每个英文单词时，对应去匹配中文里相关语义
+    模块 3：FFN + Norm，最后线性 + softmax 预测词汇
+    本轮输出概率最高单词：I
+
+    第 2 轮：Decoder 输入序列 <start>, I，预测 love
+    掩码自注意力：<start> 只能看自己，I 能看 <start> 和自己，看不到未来词
+    交叉注意力：拿当前 <start>,I 的 Q，去匹配中文记忆 我、爱、猫，匹配到 “爱” 的语义
+    预测输出：love
+
+    第 3 轮：输入 <start>, I, love，预测 cats
+    交叉注意力匹配中文 “猫”，输出 cats
+    
+    第 4 轮：输入 <start>, I, love, cats，预测 <end>
+    出现结束符，生成终止，完整句子：I love cats
+    ```
 
 
 ---

@@ -1,0 +1,25 @@
+Name: user-api
+Host: 0.0.0.0
+Port: 8889
+
+# 用户数据库配置
+DB:
+  DataSource: root:123456@tcp(127.0.0.1:3306)/go_zero_user?charset=utf8mb4&parseTime=True&loc=Local
+  MaxIdleConns: 10
+  MaxOpenConns: 100
+  ConnMaxLifetime: 3600
+
+# 订单服务 RPC 发现（通过 etcd 解耦）
+OrderRpc:
+  Etcd:
+    Hosts:
+      - 127.0.0.1:2379
+    Key: order-rpc
+
+# 日志配置
+Log:
+  ServiceName: user-api
+  Mode: console
+  Path: logs
+  Level: info
+  KeepDays: 7

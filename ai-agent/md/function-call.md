@@ -1,8 +1,5 @@
 # Agent开发面试｜Function Call函数调用（可直接口述标准答案）
 
-**适用方向**：Agent工具调用、FunctionCall落地、Schema设计、调用链路排查、异常容错
-
-**使用说明**：纯工程向、面试口语化答案，全覆盖面试官最爱问的「Schema\+链路\+错误处理」三大核心考点
 
 ## 一、Function Call 基础认知（必问基础）
 
