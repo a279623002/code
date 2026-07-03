@@ -7,9 +7,9 @@ import (
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/rest"
 
-	"go-zero-service/order/api/internal/config"
-	"go-zero-service/order/api/internal/handler"
-	"go-zero-service/order/api/internal/svc"
+	"go-zero-order/order/api/internal/config"
+	"go-zero-order/order/api/internal/handler"
+	"go-zero-order/order/api/internal/svc"
 )
 
 var configFile = flag.String("f", "etc/order.yaml", "the config file")

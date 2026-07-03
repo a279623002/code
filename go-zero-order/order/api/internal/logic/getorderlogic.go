@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	"go-zero-service/order/api/internal/svc"
-	"go-zero-service/order/api/internal/types"
-	"go-zero-service/order/rpc/types/order"
+	"go-zero-order/order/api/internal/svc"
+	"go-zero-order/order/api/internal/types"
+	"go-zero-order/order/rpc/types/order"
 )
 
 type GetOrderLogic struct {

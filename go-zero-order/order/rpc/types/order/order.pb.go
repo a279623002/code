@@ -573,7 +573,7 @@ const file_order_proto_rawDesc = "" +
 	"\vCreateOrder\x12\x15.order.CreateOrderReq\x1a\x16.order.CreateOrderResp\x123\n" +
 	"\bGetOrder\x12\x12.order.GetOrderReq\x1a\x13.order.GetOrderResp\x126\n" +
 	"\tListOrder\x12\x13.order.ListOrderReq\x1a\x14.order.ListOrderResp\x12N\n" +
-	"\x11UpdateOrderStatus\x12\x1b.order.UpdateOrderStatusReq\x1a\x1c.order.UpdateOrderStatusRespB'Z%go-zero-service/order/rpc/types/orderb\x06proto3"
+	"\x11UpdateOrderStatus\x12\x1b.order.UpdateOrderStatusReq\x1a\x1c.order.UpdateOrderStatusRespB'Z%go-zero-order/order/rpc/types/orderb\x06proto3"
 
 var (
 	file_order_proto_rawDescOnce sync.Once

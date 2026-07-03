@@ -1,4 +1,4 @@
-module go-zero-service
+module go-zero-order
 
 go 1.25.0
 

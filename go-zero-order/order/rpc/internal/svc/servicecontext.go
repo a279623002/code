@@ -1,9 +1,9 @@
 package svc
 
 import (
-	"go-zero-service/common/gorm"
-	"go-zero-service/order/rpc/internal/config"
-	"go-zero-service/order/rpc/internal/model"
+	"go-zero-order/common/gorm"
+	"go-zero-order/order/rpc/internal/config"
+	"go-zero-order/order/rpc/internal/model"
 )
 
 // ServiceContext rpc 服务上下文

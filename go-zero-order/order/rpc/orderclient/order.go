@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/zeromicro/go-zero/zrpc"
-	"go-zero-service/order/rpc/types/order"
+	"go-zero-order/order/rpc/types/order"
 )
 
 // Order 暴露给 api 层使用的 rpc 客户端

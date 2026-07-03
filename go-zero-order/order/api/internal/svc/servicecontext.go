@@ -1,8 +1,8 @@
 package svc
 
 import (
-	"go-zero-service/order/api/internal/config"
-	"go-zero-service/order/rpc/orderclient"
+	"go-zero-order/order/api/internal/config"
+	"go-zero-order/order/rpc/orderclient"
 )
 
 // ServiceContext api 网关服务上下文

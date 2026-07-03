@@ -3,7 +3,7 @@ package handler
 import (
 	"net/http"
 
-	"go-zero-service/order/api/internal/svc"
+	"go-zero-order/order/api/internal/svc"
 
 	"github.com/zeromicro/go-zero/rest"
 )
