@@ -126,11 +126,11 @@
     掩码自注意力 → Add&Norm → 交叉注意力 → Add&Norm → FFN → Add&Norm
     Decoder 是逐词生成，一次只输出一个单词，循环直到输出 <end>
     初始状态
-    解码器输入开头标志：<start>
+    解码器输入开头标志：&lt;start&gt;
 
-    第 1 轮：输入 <start>，预测第一个词 I
+    第 1 轮：输入 &lt;start&gt;，预测第一个词 I
     模块 1：掩码多头自注意力（Masked Self-Attention）
-    输入：<start> 的向量
+    输入：&lt;start&gt; 的向量
     掩码作用：生成时看不到未来未生成的单词，防止提前偷看后面文字
     Q/K/V 全部来自 Decoder 当前已输出序列
     模块 2：交叉注意力 Cross-Attention（Encoder-Decoder Attention）
@@ -140,15 +140,15 @@
     模块 3：FFN + Norm，最后线性 + softmax 预测词汇
     本轮输出概率最高单词：I
 
-    第 2 轮：Decoder 输入序列 <start>, I，预测 love
-    掩码自注意力：<start> 只能看自己，I 能看 <start> 和自己，看不到未来词
-    交叉注意力：拿当前 <start>,I 的 Q，去匹配中文记忆 我、爱、猫，匹配到 “爱” 的语义
+    第 2 轮：Decoder 输入序列 &lt;start&gt;, I，预测 love
+    掩码自注意力：&lt;start&gt; 只能看自己，I 能看 &lt;start&gt; 和自己，看不到未来词
+    交叉注意力：拿当前 &lt;start&gt;,I; 的 Q，去匹配中文记忆 我、爱、猫，匹配到 “爱” 的语义
     预测输出：love
 
-    第 3 轮：输入 <start>, I, love，预测 cats
+    第 3 轮：输入 &lt;start&gt;, I, love，预测 cats
     交叉注意力匹配中文 “猫”，输出 cats
     
-    第 4 轮：输入 <start>, I, love, cats，预测 <end>
+    第 4 轮：输入 &lt;start&gt;, I, love, cats，预测 &lt;end&gt;
     出现结束符，生成终止，完整句子：I love cats
     ```
 
