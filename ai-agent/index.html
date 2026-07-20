@@ -155,7 +155,12 @@
                 // 4. 引用
                 .replace(/^> (.*$)/gim, '<blockquote>$1</blockquote>')
                 // 5. 图片（必须在斜体 * 处理之前，因为 alt 可能含 *）
-                .replace(/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1">')
+                // md 在 md/ 目录，引用 ../images/xxx 指向 ai-agent/images/xxx
+                // 渲染到 index.html 时浏览器按 ai-agent/ 解析路径，需要去掉前导的 ../
+                .replace(/!\[(.*?)\]\((.*?)\)/g, (m, alt, src) => {
+                    src = src.replace(/^\.\.\//, '');
+                    return `<img src="${src}" alt="${alt}">`;
+                })
                 // 6. 粗斜体、粗体、斜体
                 .replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>')
                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
