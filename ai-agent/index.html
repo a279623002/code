@@ -162,6 +162,8 @@
 
     <script>
         function parseMarkdown(md) {
+            // 0. 统一换行符（Windows \r\n / 旧 Mac \r → \n），否则表格/段落等跨行正则全失效
+            md = md.replace(/\r\n?/g, '\n');
             let html = md
                 // 1. 代码块（多行，必须最先处理，避免内部 **、* 被破坏）
                 .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
