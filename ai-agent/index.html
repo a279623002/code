@@ -85,10 +85,16 @@
             margin: 0.5rem auto;
         }
 
+        .md-content .table-wrap {
+            overflow-x: auto;
+            margin: 0.5rem 0;
+            max-width: 100%;
+        }
+
         .md-content table {
             border-collapse: collapse;
             width: 100%;
-            margin: 0.5rem 0;
+            min-width: max-content;
             font-size: 0.75rem;
         }
 
@@ -198,7 +204,7 @@
                     const parseRow = (line) => line.split('|').map(s => s.trim()).filter(Boolean);
                     const headers = parseRow(lines[0]);
                     const rows = lines.slice(2).map(parseRow);
-                    let t = '<table><thead><tr>';
+                    let t = '<div class="table-wrap"><table><thead><tr>';
                     headers.forEach(h => t += `<th>${h}</th>`);
                     t += '</tr></thead><tbody>';
                     rows.forEach(row => {
@@ -206,12 +212,12 @@
                         row.forEach(cell => t += `<td>${cell}</td>`);
                         t += '</tr>';
                     });
-                    t += '</tbody></table>';
+                    t += '</tbody></table></div>';
                     return t;
                 })
                 // 9. 段落（排除已有的块级与图片/表格标签）
                 .replace(/\n\n/g, '</p><p>')
-                .replace(/^(?!<(h\d|ul|p|li|blockquote|img|pre|code|table|thead|tbody|tr|th|td))(.+)$/gim, '<p>$2</p>');
+                .replace(/^(?!<(h\d|ul|p|li|blockquote|img|pre|code|table|thead|tbody|tr|th|td|div))(.+)$/gim, '<p>$2</p>');
             return html;
         }
 
