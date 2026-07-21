@@ -180,6 +180,7 @@
             <a href="javascript:void(0);" class="col md-btn" data-file="Extra05-AgentSkills解读.md">skills</a>
         </div>
         <div class="row">
+            <a href="javascript:void(0);" class="col md-btn" data-file="mark.md">redis应用场景</a>
             <a href="javascript:void(0);" class="col md-btn" data-file="mark.md">mark</a>
         </div>
         <a href="javascript:history.go(-1);" class="back"></a>
@@ -193,6 +194,41 @@
     </div>
 
     <script>
+        // 递归下降解析多级列表：- 或 * 开头，按前导空白宽度判层级
+        // 同一 ul 内同级 li 合并，缩进变深时开嵌套 ul
+        function buildNestedList(block) {
+            const lines = block.trimEnd().split('\n');
+            const items = [];
+            for (const line of lines) {
+                const m = line.match(/^([ \t]*)[-*][ \t]+(.*)$/);
+                if (!m) continue;
+                items.push({
+                    indent: m[1].replace(/\t/g, '    ').length,  // tab 统一算 4 空格
+                    content: m[2]
+                });
+            }
+            if (items.length === 0) return block;
+            // 递归：消费 items[startIdx..]，返回 (html, 消费到的下一个下标)
+            // 仅处理 indent > baseIndent 的项；遇到 <= baseIndent 停止（交给上层）
+            const walk = (startIdx, baseIndent) => {
+                let html = '<ul>', i = startIdx;
+                while (i < items.length && items[i].indent > baseIndent) {
+                    html += '<li>' + items[i].content;
+                    // 下一项缩进更深 → 嵌子列表
+                    if (i + 1 < items.length && items[i + 1].indent > items[i].indent) {
+                        const [subHtml, nextIdx] = walk(i + 1, items[i].indent);
+                        html += subHtml + '</li>';
+                        i = nextIdx;
+                    } else {
+                        html += '</li>';
+                        i++;
+                    }
+                }
+                return [html + '</ul>', i];
+            };
+            return walk(0, -1)[0];
+        }
+
         function parseMarkdown(md) {
             // 0. 统一换行符（Windows \r\n / 旧 Mac \r → \n），否则表格/段落等跨行正则全失效
             md = md.replace(/\r\n?/g, '\n');
@@ -218,9 +254,8 @@
                 .replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>')
                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                 .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                // 7. 列表（支持多行 li 整体包 ul）
-                .replace(/^- (.*$)/gim, '<li>$1</li>')
-                .replace(/(?:<li>.*<\/li>\n?)+/g, '<ul>$&</ul>')
+                // 7. 列表（递归下降，支持多级缩进 + - 或 * 开头）
+                .replace(/((?:^[ \t]*[-*][ \t]+.*\n?)+)/gm, (block) => buildNestedList(block))
                 // 8. 表格（连续以 | 开头，第二行是分隔行 |---|，在段落之前处理避免被 <p> 包裹）
                 .replace(/((?:^\|.*\n)+)/gm, (block) => {
                     const lines = block.trim().split('\n');
