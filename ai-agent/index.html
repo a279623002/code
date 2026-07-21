@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <title>note</title>
     <script src="../assets/js/jquery-3.6.0.min.js"></script>
+    <script src="../assets/js/markdown-it.min.js"></script>
     <script src="../assets/js/font.js"></script>
     <link rel="stylesheet" href="../assets/css/public.css">
     <link rel="stylesheet" href="../assets/css/note.css">
@@ -194,92 +195,44 @@
     </div>
 
     <script>
-        // 递归下降解析多级列表：- 或 * 开头，按前导空白宽度判层级
-        // 同一 ul 内同级 li 合并，缩进变深时开嵌套 ul
-        function buildNestedList(block) {
-            const lines = block.trimEnd().split('\n');
-            const items = [];
-            for (const line of lines) {
-                const m = line.match(/^([ \t]*)[-*][ \t]+(.*)$/);
-                if (!m) continue;
-                items.push({
-                    indent: m[1].replace(/\t/g, ' ').length,  // tab 统一算 4 空格
-                    content: m[2]
-                });
-            }
-            if (items.length === 0) return block;
-            // 递归：消费 items[startIdx..]，返回 (html, 消费到的下一个下标)
-            // 仅处理 indent > baseIndent 的项；遇到 <= baseIndent 停止（交给上层）
-            const walk = (startIdx, baseIndent) => {
-                let html = '<ul>', i = startIdx;
-                while (i < items.length && items[i].indent > baseIndent) {
-                    html += '<li>' + items[i].content;
-                    // 下一项缩进更深 → 嵌子列表
-                    if (i + 1 < items.length && items[i + 1].indent > items[i].indent) {
-                        const [subHtml, nextIdx] = walk(i + 1, items[i].indent);
-                        html += subHtml + '</li>';
-                        i = nextIdx;
-                    } else {
-                        html += '</li>';
-                        i++;
-                    }
-                }
-                return [html + '</ul>', i];
-            };
-            return walk(0, -1)[0];
-        }
+        // 初始化 markdown-it（UMD 全局变量 window.markdownit）
+        // html:false  禁用原始 HTML 标签防 XSS
+        // linkify:true 自动识别裸链接
+        // typographer:false 中文项目关闭，避免 "智能" 引号变英文引号
+        // breaks:false 双换行才分段，遵循 CommonMark
+        const md = window.markdownit({
+            html: false,
+            linkify: true,
+            typographer: false,
+            breaks: false
+        });
 
-        function parseMarkdown(md) {
-            // 0. 统一换行符（Windows \r\n / 旧 Mac \r → \n），否则表格/段落等跨行正则全失效
-            md = md.replace(/\r\n?/g, '\n');
-            let html = md
-                // 1. 代码块（多行，必须最先处理，避免内部 **、* 被破坏）
-                .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
-                // 2. 行内代码（优先于粗斜体，避免代码中的 ** 被误转）
-                .replace(/`(.*?)`/g, '<code>$1</code>')
-                // 3. 标题（块级，先处理避免被段落包裹）
-                .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-                .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-                .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-                // 4. 引用
-                .replace(/^> (.*$)/gim, '<blockquote>$1</blockquote>')
-                // 5. 图片（必须在斜体 * 处理之前，因为 alt 可能含 *）
-                // md 在 md/ 目录，引用 ../images/xxx 指向 ai-agent/images/xxx
-                // 渲染到 index.html 时浏览器按 ai-agent/ 解析路径，需要去掉前导的 ../
-                .replace(/!\[(.*?)\]\((.*?)\)/g, (m, alt, src) => {
-                    src = src.replace(/^\.\.\//, '');
-                    return `<img src="${src}" alt="${alt}">`;
-                })
-                // 6. 粗斜体、粗体、斜体
-                .replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>')
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                // 7. 列表（递归下降，支持多级缩进 + - 或 * 开头）
-                .replace(/((?:^[ \t]*[-*][ \t]+.*\n?)+)/gm, (block) => buildNestedList(block))
-                // 8. 表格（连续以 | 开头，第二行是分隔行 |---|，在段落之前处理避免被 <p> 包裹）
-                .replace(/((?:^\|.*\n)+)/gm, (block) => {
-                    const lines = block.trim().split('\n');
-                    if (lines.length < 2) return block;
-                    // 第二行必须是分隔行（只含 - : | 空格）
-                    if (!/^[\s\-:|]+$/.test(lines[1].trim())) return block;
-                    const parseRow = (line) => line.split('|').map(s => s.trim()).filter(Boolean);
-                    const headers = parseRow(lines[0]);
-                    const rows = lines.slice(2).map(parseRow);
-                    let t = '<div class="table-wrap"><table><thead><tr>';
-                    headers.forEach(h => t += `<th>${h}</th>`);
-                    t += '</tr></thead><tbody>';
-                    rows.forEach(row => {
-                        t += '<tr>';
-                        row.forEach(cell => t += `<td>${cell}</td>`);
-                        t += '</tr>';
-                    });
-                    t += '</tbody></table></div>';
-                    return t;
-                })
-                // 9. 段落（排除已有的块级与图片/表格标签）
-                .replace(/\n\n/g, '</p><p>')
-                .replace(/^(?!<(h\d|ul|p|li|blockquote|img|pre|code|table|thead|tbody|tr|th|td|div))(.+)$/gim, '<p>$2</p>');
-            return html;
+        // 自定义图片渲染：剥 ../ 前缀
+        // md 在 md/ 目录，引用 ../images/xxx 指向 ai-agent/images/xxx
+        // 渲染到 index.html 时浏览器按 ai-agent/ 解析路径，需要去掉前导的 ../
+        const defaultImageRender = md.renderer.rules.image
+            || function (tokens, idx, options, env, self) {
+                return self.renderToken(tokens, idx, options);
+            };
+        md.renderer.rules.image = function (tokens, idx, options, env, self) {
+            const token = tokens[idx];
+            const srcIdx = token.attrIndex('src');
+            if (srcIdx >= 0 && token.attrs[srcIdx][1].startsWith('../')) {
+                token.attrs[srcIdx][1] = token.attrs[srcIdx][1].replace(/^\.\.\//, '');
+            }
+            return defaultImageRender(tokens, idx, options, env, self);
+        };
+
+        // 表格外包 .table-wrap，配合 CSS 出横向滚动条
+        md.renderer.rules.table_open = function () {
+            return '<div class="table-wrap"><table>';
+        };
+        md.renderer.rules.table_close = function () {
+            return '</table></div>';
+        };
+
+        function parseMarkdown(content) {
+            return md.render(content);
         }
 
         $(document).ready(function () {
