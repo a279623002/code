@@ -203,7 +203,7 @@
                 const m = line.match(/^([ \t]*)[-*][ \t]+(.*)$/);
                 if (!m) continue;
                 items.push({
-                    indent: m[1].replace(/\t/g, '    ').length,  // tab 统一算 4 空格
+                    indent: m[1].replace(/\t/g, ' ').length,  // tab 统一算 4 空格
                     content: m[2]
                 });
             }
