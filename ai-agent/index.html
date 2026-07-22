@@ -90,14 +90,51 @@
             overflow-wrap: anywhere;
         }
 
+        /* 行内 code 走浅色，代码块 pre 内的 code 重置为透明（避免双重背景） */
+        .md-content pre code {
+            background: transparent;
+            padding: 0;
+            border-radius: 0;
+            overflow-wrap: normal;
+        }
+
         .md-content pre {
-            background: #f0f0f0;
-            padding: 0.5rem;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 0.8rem 1rem;
             border-radius: 0.3rem;
+            border-left: 3px solid #4a90e2;
             white-space: pre;
             overflow-x: auto;
             max-width: 100%;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.8rem;
+            line-height: 1.5;
         }
+
+        /* Python 语法高亮配色（VSCode 暗色主题风格） */
+        .md-content .hl-kw {
+            color: #c586c0;
+            font-weight: bold;
+        }
+
+        /* 紫色：关键字 */
+        .md-content .hl-str {
+            color: #ce9178;
+        }
+
+        /* 橙色：字符串 */
+        .md-content .hl-com {
+            color: #6a9955;
+            font-style: italic;
+        }
+
+        /* 绿色：注释 */
+        .md-content .hl-num {
+            color: #b5cea8;
+        }
+
+        /* 浅绿：数字 */
 
         .md-content img {
             max-width: 100%;
@@ -196,16 +233,74 @@
     </div>
 
     <script>
+        // HTML 转义（markdown-it 的 highlight 回调必须返回已转义的 HTML）
+        function escapeHtml(s) {
+            return s.replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        // Python 关键字集合（仅高频，避免误判）
+        const PY_KEYWORDS = ['async', 'await', 'def', 'return', 'if', 'elif', 'else',
+            'for', 'while', 'break', 'continue', 'pass', 'import', 'from', 'as',
+            'class', 'try', 'except', 'finally', 'raise', 'with', 'lambda', 'yield',
+            'in', 'is', 'not', 'and', 'or', 'True', 'False', 'None', 'self', 'global',
+            'nonlocal', 'del', 'assert'];
+
+        // 简单 Python 语法高亮：关键字、字符串、注释、数字
+        // 不依赖 highlight.js，零依赖自包含
+        // 用占位符隔离各阶段，避免正则相互破坏（先替换的 span 被后续阶段匹配）
+        // 占位符用字母 A-Z 作为索引（不会和代码里的数字冲突）
+        function highlightPython(code) {
+            let h = escapeHtml(code);
+            const slots = [];
+            const PH = '\x00';
+            const idxStr = (i) => String.fromCharCode(0x41 + (i % 26));  // 0->A, 1->B, ...
+            const stash = (cls, text) => {
+                const i = slots.length;
+                slots.push('<span class="' + cls + '">' + text + '</span>');
+                return PH + idxStr(i) + PH;
+            };
+            // 1. 字符串（包括 f-string、r-string、b-string 等前缀组合）
+            h = h.replace(
+                /([fFrRbBuU]{0,2})(?:&quot;[^&\n]*?&quot;|&#39;[^&\n]*?&#39;)/g,
+                (m) => stash('hl-str', m)
+            );
+            // 2. 注释（# 到行尾，避开已被占位符包裹的片段）
+            h = h.replace(/#[^\n]*/g, (m) => stash('hl-com', m));
+            // 3. 关键字（单词边界）
+            const kwRe = new RegExp('\\b(' + PY_KEYWORDS.join('|') + ')\\b', 'g');
+            h = h.replace(kwRe, (m) => stash('hl-kw', m));
+            // 4. 数字
+            h = h.replace(/\b(\d+)\b/g, (m) => stash('hl-num', m));
+            // 5. 把占位符还原为 span
+            const restoreRe = /\x00([A-Z])\x00/g;
+            h = h.replace(restoreRe, (_, c) => slots[c.charCodeAt(0) - 0x41]);
+            return h;
+        }
+
         // 初始化 markdown-it（UMD 全局变量 window.markdownit）
         // html:false  禁用原始 HTML 标签防 XSS
         // linkify:true 自动识别裸链接
-        // typographer:false 中文项目关闭，避免 "智能" 引号变英文引号
+        // typographer:false 中文项目关闭，避免 "智能" 引号→英文引号
         // breaks:false 双换行才分段，遵循 CommonMark
         const md = window.markdownit({
             html: false,
             linkify: true,
             typographer: false,
-            breaks: false
+            breaks: false,
+            // 代码块高亮：返回非空字符串就替换默认渲染
+            highlight: function (code, lang) {
+                const cls = 'language-' + (lang || 'text');
+                if (lang === 'python' || lang === 'py') {
+                    return '<pre class="hljs"><code class="' + cls + '">'
+                        + highlightPython(code) + '</code></pre>';
+                }
+                // 其他语言：暂不高亮（保留原始文本）
+                return '<pre class="hljs"><code class="' + cls + '">'
+                    + escapeHtml(code) + '</code></pre>';
+            }
         });
 
         // 自定义图片渲染：剥 ../ 前缀
