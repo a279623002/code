@@ -743,7 +743,278 @@ func GetInstance() *singleton {
 
 ---
 
-## 十四、一句话总结
+## 十四、高并发高可用实战示例
+
+### 1. 高并发限流器（令牌桶）
+
+**一句话**：以固定速率往桶里放令牌，请求先拿令牌，拿到才能执行。
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "time"
+
+    "golang.org/x/time/rate"
+)
+
+func main() {
+    // 每秒产生 10 个令牌，桶容量 20
+    limiter := rate.NewLimiter(10, 20)
+
+    for i := 0; i < 30; i++ {
+        // Wait 会阻塞等到拿到令牌
+        err := limiter.Wait(context.Background())
+        if err != nil {
+            fmt.Println("error:", err)
+            return
+        }
+        fmt.Println("处理请求", i, time.Now().Format("15:04:05.000"))
+    }
+}
+```
+
+**运行结果**：前 20 个请求瞬间通过（桶里预存），后面每秒通过 10 个。
+
+---
+
+### 2. 高并发爬虫（控制最大并发数）
+
+```go
+package main
+
+import (
+    "fmt"
+    "sync"
+    "time"
+)
+
+func worker(id int, jobs <-chan int, wg *sync.WaitGroup) {
+    defer wg.Done()
+    for j := range jobs {
+        fmt.Printf("worker %d 处理任务 %d\n", id, j)
+        time.Sleep(500 * time.Millisecond) // 模拟耗时
+    }
+}
+
+func main() {
+    jobs := make(chan int, 100)
+    var wg sync.WaitGroup
+
+    // 启动 5 个 worker，最多同时处理 5 个任务
+    for w := 1; w <= 5; w++ {
+        wg.Add(1)
+        go worker(w, jobs, &wg)
+    }
+
+    for j := 1; j <= 20; j++ {
+        jobs <- j
+    }
+    close(jobs)
+
+    wg.Wait()
+    fmt.Println("全部完成")
+}
+```
+
+**运行结果**：20 个任务分批处理，每批 5 个，总共约 4 批，耗时 2 秒左右。
+
+---
+
+### 3. 高可用 HTTP 服务（graceful shutdown）
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "net/http"
+    "os"
+    "os/signal"
+    "syscall"
+    "time"
+)
+
+func main() {
+    srv := &http.Server{
+        Addr:    ":8080",
+        Handler: http.HandlerFunc(hello),
+    }
+
+    // 启动服务
+    go func() {
+        if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+            fmt.Println("listen error:", err)
+        }
+    }()
+
+    // 等待退出信号
+    quit := make(chan os.Signal, 1)
+    signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+    <-quit
+
+    fmt.Println("shutting down server...")
+
+    // 优雅关闭：给正在处理的请求 5 秒收尾时间
+    ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+    defer cancel()
+
+    if err := srv.Shutdown(ctx); err != nil {
+        fmt.Println("server forced to shutdown:", err)
+    }
+    fmt.Println("server exiting")
+}
+
+func hello(w http.ResponseWriter, r *http.Request) {
+    time.Sleep(2 * time.Second)
+    fmt.Fprintln(w, "hello")
+}
+```
+
+**关键点**：
+- `srv.Shutdown(ctx)` 会关闭监听，等待已有请求完成
+- 避免直接 kill 导致请求中断
+
+---
+
+### 4. 高并发计数器（atomic 无锁）
+
+```go
+package main
+
+import (
+    "fmt"
+    "sync"
+    "sync/atomic"
+)
+
+func main() {
+    var counter int64
+    var wg sync.WaitGroup
+
+    for i := 0; i < 1000; i++ {
+        wg.Add(1)
+        go func() {
+            defer wg.Done()
+            atomic.AddInt64(&counter, 1)
+        }()
+    }
+
+    wg.Wait()
+    fmt.Println("counter:", counter) // 1000
+}
+```
+
+**优势**：atomic 是 CPU 指令级别，比 Mutex 快得多，适合简单计数。
+
+---
+
+### 5. 对象池减少 GC 压力（sync.Pool）
+
+```go
+package main
+
+import (
+    "bytes"
+    "fmt"
+    "sync"
+)
+
+var pool = sync.Pool{
+    New: func() interface{} {
+        return new(bytes.Buffer)
+    },
+}
+
+func main() {
+    // 获取对象
+    buf := pool.Get().(*bytes.Buffer)
+    buf.WriteString("hello world")
+    fmt.Println(buf.String())
+
+    // 重置并放回池中复用
+    buf.Reset()
+    pool.Put(buf)
+}
+```
+
+**适用场景**：频繁创建销毁的大对象（如 buffer、结构体），复用减少 GC。
+
+---
+
+### 6. 熔断降级示例（go-zero breaker）
+
+```go
+package main
+
+import (
+    "errors"
+    "fmt"
+    "github.com/zeromicro/go-zero/core/breaker"
+)
+
+func main() {
+    b := breaker.NewBreaker()
+
+    for i := 0; i < 100; i++ {
+        err := b.Do("request", func() error {
+            // 模拟下游故障
+            return errors.New("service unavailable")
+        })
+        if err != nil {
+            fmt.Println(i, err)
+        }
+    }
+}
+```
+
+**效果**：连续失败后，熔断器打开，后续请求直接返回错误，不再调用下游，保护系统。
+
+---
+
+### 7. 项目实战：调度系统高并发任务下发
+
+```
+请求接入层（gin）
+    │
+    ↓ 把任务写入 Kafka / RabbitMQ
+消息队列
+    │
+    ↓ 多个消费者 goroutine 并发拉取
+任务调度服务（go-zero）
+    │
+    ↓ 调用 k8s client 创建训练 Job
+K8s 集群
+```
+
+**高并发手段**：
+- 接入层：限流 + 负载均衡
+- 任务队列：削峰填谷，避免瞬时打爆 k8s
+- 消费者：固定 worker 数量，避免 goroutine 爆炸
+- 调用 k8s：加熔断 + 重试 + 指数退避
+- 状态同步：etcd watch 实时感知任务状态
+
+---
+
+## 十五、高并发高可用设计原则
+
+| 原则 | 说明 |
+|---|---|
+| **无状态** | 服务本身不存状态，方便横向扩展 |
+| **缓存** | 热点数据放缓存，减少 DB 压力 |
+| **异步** | 非核心流程异步化，降低响应时间 |
+| **限流** | 保护自己和下游，防止被流量打崩 |
+| **熔断降级** | 故障时快速失败，返回兜底数据 |
+| **超时重试** | 避免长时间阻塞，重试带退避 |
+| **负载均衡** | 多实例分摊流量 |
+| **监控告警** | Prometheus + Grafana + 告警 |
+
+---
+
+## 十六、一句话总结
 
 - **GMP**：G 是任务，M 是线程，P 是调度器，work stealing 实现高并发
 - **GC**：三色标记 + 写屏障，Go 1.8 后 STW 很短
@@ -752,6 +1023,10 @@ func GetInstance() *singleton {
 - **Channel**：goroutine 通信管道，有缓冲/无缓冲两种
 - **Context**：传取消信号、超时、元数据
 - **锁**：Mutex、RWMutex、Once、atomic 按场景选
+- **高并发**：限流、worker pool、atomic、对象池、熔断
+- **高可用**：graceful shutdown、无状态、负载均衡、监控告警
 - **微服务**：gin/goframe 做业务，go-zero/gRPC 做 RPC，etcd 做注册发现，k8s 做部署调度
 
 > **面试口诀：GMP 调度万级并发，channel 通信不要共享内存，context 管超时和取消，slice/map 注意底层共享**
+
+> **高并发口诀：限流削峰异步化，缓存池化无状态，熔断降级超时控，监控告警保平安**
