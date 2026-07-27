@@ -324,34 +324,122 @@ if !ok {
 
 > ⚠️ 不能重复关闭 channel，不能向已关闭 channel 发送数据，都会 panic。
 
-### 5. 项目应用
+### 5. Channel 底层实现原理
+
+**核心结构**（简化版）：
 
 ```go
-// 控制最大并发数
-func worker(jobs <-chan int, wg *sync.WaitGroup) {
-    defer wg.Done()
-    for j := range jobs {
-        fmt.Println("处理任务", j)
-    }
-}
-
-func main() {
-    jobs := make(chan int, 100)
-    var wg sync.WaitGroup
-
-    // 启动 10 个 worker
-    for i := 0; i < 10; i++ {
-        wg.Add(1)
-        go worker(jobs, &wg)
-    }
-
-    for i := 0; i < 100; i++ {
-        jobs <- i
-    }
-    close(jobs)
-    wg.Wait()
+type hchan struct {
+    qcount   uint           // 当前队列中元素个数
+    dataqsiz uint           // 循环队列大小（缓冲区大小）
+    buf      unsafe.Pointer // 指向循环队列
+    elemsize uint16         // 每个元素大小
+    closed   uint32         // 是否已关闭
+    sendx    uint           // 发送位置下标
+    recvx    uint           // 接收位置下标
+    recvq    waitq          // 等待接收的 goroutine 队列
+    sendq    waitq          // 等待发送的 goroutine 队列
+    lock     mutex          // 互斥锁，保护 hchan
 }
 ```
+
+**核心原理**：
+- channel 本质上是一个**带锁的循环队列 + 两个等待队列**
+- 发送时：缓冲区有空位就放到 `buf`，没空位就把自己挂到 `sendq` 等待
+- 接收时：缓冲区有数据就取走，没数据就把自己挂到 `recvq` 等待
+- 所有对 channel 的操作都受 `lock` 保护，所以 channel 是**并发安全**的
+
+**发送流程**：
+```
+ch <- v
+   │
+   ▼
+加锁
+   │
+   ├── 有等待接收者？──→ 直接把值给对方，唤醒对方 goroutine
+   │
+   ├── 缓冲区没满？──→ 放入 buf[sendx]，sendx++
+   │
+   └── 缓冲区满了？──→ 当前 goroutine 挂到 sendq，阻塞等待
+```
+
+**接收流程**：
+```
+v := <-ch
+   │
+   ▼
+加锁
+   │
+   ├── 有等待发送者？──→ 直接拿值，唤醒对方
+   │
+   ├── 缓冲区有数据？──→ 取 buf[recvx]，recvx++
+   │
+   └── 缓冲区空了？──→ 当前 goroutine 挂到 recvq，阻塞等待
+```
+
+### 6. Select 底层实现原理
+
+**一句话**：select 会**同时监控多个 channel**，谁先就绪就执行谁；多个同时就绪时**随机选择**。
+
+**底层机制**：
+1. 对所有 case 的 channel 按地址**排序**，减少死锁概率
+2. 依次尝试每个 case：
+   - 如果某个 channel 可以发送/接收，就直接执行
+3. 如果没有就绪：
+   - 有 `default`：执行 default
+   - 无 `default`：把当前 goroutine 挂到所有 channel 的等待队列上，阻塞等待
+4. 任意一个 channel 就绪后，唤醒当前 goroutine，再从等待队列移除自己
+
+**为什么多个 case 就绪要随机选？**
+
+防止某个 channel 总是优先被选中，造成"饥饿"。
+
+### 7. Channel 死锁
+
+**一句话**：当所有 goroutine 都因为 channel 阻塞，且没有人能唤醒它们时，就发生死锁。
+
+**常见死锁场景**：
+
+```go
+// 场景 1：无缓冲 channel，发送方没有接收方
+func main() {
+    ch := make(chan int)
+    ch <- 1  // 永远阻塞，main 自己也被卡住 → fatal error: all goroutines are asleep
+}
+```
+
+```go
+// 场景 2：通道读写顺序错误
+func main() {
+    ch := make(chan int)
+    <-ch        // 先接收，但没人发送，阻塞
+    ch <- 1     // 这行永远执行不到
+}
+```
+
+```go
+// 场景 3：互相等待
+func main() {
+    ch1 := make(chan int)
+    ch2 := make(chan int)
+
+    go func() {
+        <-ch1
+        ch2 <- 2
+    }()
+
+    ch1 <- 1
+    <-ch2
+    // 上面两行在主 goroutine 里按顺序执行，子 goroutine 还没启动就到 <-ch1？
+    // 实际上这里不会死锁，但类似的双向等待模式很容易写出死锁
+}
+```
+
+**如何避免死锁**：
+- 无缓冲 channel 保证**发送和接收配对**
+- 有缓冲 channel 注意缓冲区大小，不要写满后没人读
+- 用 `select + default` 做非阻塞读写
+- 复杂场景用 context 控制超时和取消
 
 ---
 
@@ -376,6 +464,7 @@ wg.Wait() // 等所有 goroutine 完成
 ### 2. sync.Mutex / RWMutex
 
 ```go
+// 写多读少用（如状态，计数类）
 var counter int
 var mu sync.Mutex
 
@@ -387,7 +476,7 @@ func add() {
 ```
 
 ```go
-// 读多写少用 RWMutex
+// 读多写少用（如集群信息、机器信息） RWMutex
 var rw sync.RWMutex
 var data map[string]int
 
@@ -1028,5 +1117,9 @@ K8s 集群
 - **微服务**：gin/goframe 做业务，go-zero/gRPC 做 RPC，etcd 做注册发现，k8s 做部署调度
 
 > **面试口诀：GMP 调度万级并发，channel 通信不要共享内存，context 管超时和取消，slice/map 注意底层共享**
+
+> **Channel 底层口诀：一把锁、一个环形 buf、两个等待队列，发满挂 sendq，读空挂 recvq**
+
+> **Select 底层口诀：多个 case 先排序，随机选择防饥饿，没 default 就挂多个队列等唤醒**
 
 > **高并发口诀：限流削峰异步化，缓存池化无状态，熔断降级超时控，监控告警保平安**
