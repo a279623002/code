@@ -289,22 +289,74 @@ def sse():
 
 ---
 
-## 八、SCP
+## 八、MCP（Model Context Protocol）
 
-**一句话**：基于 SSH 的安全文件拷贝命令。
+**一句话**：Anthropic 提出的开放协议，让 LLM 应用能统一、安全地访问外部工具和数据源。
 
-```bash
-# 本地 → 远程
-scp file.txt user@remote:/path/
+### 1. 为什么需要 MCP？
 
-# 远程 → 本地
-scp user@remote:/path/file.txt ./
+以前每个工具都要单独对接：
 
-# 目录
-scp -r dir user@remote:/path/
+```
+LLM 应用
+   │
+   ├── 接 Slack API
+   ├── 接 GitHub API
+   ├── 接数据库
+   ├── 接文件系统
+   └── 每个都要写适配代码
 ```
 
-与 FTP 区别：SCP 全程加密，更安全。
+MCP 统一后：
+
+```
+LLM 应用 ──► MCP Client ──► MCP Server ──► 工具/数据源
+                │
+                └── 统一协议、统一鉴权、统一发现
+```
+
+### 2. MCP 核心角色
+
+| 角色 | 作用 |
+|---|---|
+| **MCP Host** | 运行 LLM 的应用（如 Claude Desktop、Cursor） |
+| **MCP Client** | Host 内的客户端，维护与 Server 的连接 |
+| **MCP Server** | 对外暴露工具、资源、Prompt 的服务端 |
+
+### 3. MCP 三种能力
+
+| 能力 | 说明 | 例子 |
+|---|---|---|
+| **Tools** | LLM 可调用的工具 | 查询数据库、发送邮件、调用 API |
+| **Resources** | 只读数据，供上下文使用 | 文件内容、文档、配置 |
+| **Prompts** | 预定义提示词模板 | 代码审查模板、报告生成模板 |
+
+### 4. 通信方式
+
+| 方式 | 场景 |
+|---|---|
+| **stdio** | 本地进程间通信，最简单 |
+| **SSE / HTTP** | 远程 Server，适合网络环境 |
+
+### 5. 与 Function Call 的区别
+
+| 对比 | Function Call | MCP |
+|---|---|---|
+| 定位 | 模型调用函数的能力 | 模型与外部系统连接的标准协议 |
+| 范围 | 单次调用 | 可暴露多个工具、资源、提示词 |
+| 生态 | 各模型接口略有差异 | 跨模型、跨平台统一标准 |
+| 发现 | 调用方预先知道函数 | 运行时发现 Server 提供的能力 |
+
+### 6. 工作流程
+
+```
+1. Host 启动时连接 MCP Server
+2. Server 返回可用 Tools/Resources/Prompts 列表
+3. LLM 根据用户请求决定调用哪个 Tool
+4. MCP Client 发送调用请求给 Server
+5. Server 执行实际工具并返回结果
+6. LLM 根据结果生成最终回答
+```
 
 ---
 
