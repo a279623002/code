@@ -112,7 +112,122 @@
 
 ---
 
-## 八、面试高频问题
+## 八、State 状态管理
+
+### 1. 为什么需要 State？
+
+编排引擎执行长流程时，需要记录每个节点的输入、输出、状态、异常信息，否则：
+- 流程中断后无法续跑
+- 多轮迭代无法拿到上一步结果
+- 失败时无法定位问题
+
+### 2. State 常见结构
+
+```json
+{
+  "workflow_id": "wf_123",
+  "status": "running",
+  "current_node": "node_b",
+  "context": {
+    "user_query": "查询北京天气",
+    "node_a_output": "北京"
+  },
+  "nodes": {
+    "node_a": {
+      "status": "success",
+      "input": {"city": "北京"},
+      "output": "北京",
+      "start_time": "2025-01-01T10:00:00",
+      "end_time": "2025-01-01T10:00:01"
+    },
+    "node_b": {
+      "status": "running",
+      "input": {"city": "北京"},
+      "output": null,
+      "retry_count": 0
+    }
+  }
+}
+```
+
+### 3. State 常见实现方式
+
+| 方式 | 说明 | 适用场景 |
+|---|---|---|
+| 内存 State | 用 `map` 或对象存当前流程状态 | 短流程、单实例 |
+| Redis | 键值存储，支持过期和分布式 | 多实例、需中断续跑 |
+| 数据库 | MySQL/PostgreSQL 持久化 | 长流程、强一致性 |
+| 事件日志 | Kafka + 事件溯源 | 高并发、需回放 |
+
+### 4. State 核心操作
+
+```python
+class WorkflowState:
+    def __init__(self, workflow_id: str, store: dict):
+        self.workflow_id = workflow_id
+        self.store = store  # 可以是内存 dict 或 Redis
+
+    def get_node_state(self, node_id: str):
+        return self.store.get(self.workflow_id, {}).get("nodes", {}).get(node_id)
+
+    def set_node_state(self, node_id: str, state: dict):
+        wf = self.store.setdefault(self.workflow_id, {"nodes": {}})
+        wf["nodes"][node_id] = state
+
+    def update_context(self, key: str, value):
+        wf = self.store.setdefault(self.workflow_id, {"context": {}})
+        wf["context"][key] = value
+
+    def get_context(self):
+        return self.store.get(self.workflow_id, {}).get("context", {})
+```
+
+### 5. 中断续跑示例
+
+```python
+def run_workflow(workflow_id, config):
+    state = load_state(workflow_id) or create_state(workflow_id)
+
+    for node in config["nodes"]:
+        node_id = node["id"]
+
+        # 已经成功的节点跳过
+        if state.get_node_state(node_id)?.status == "success":
+            continue
+
+        try:
+            result = execute_node(node, state.get_context())
+            state.set_node_state(node_id, {
+                "status": "success",
+                "output": result,
+            })
+            state.update_context(f"{node_id}_output", result)
+        except Exception as e:
+            state.set_node_state(node_id, {
+                "status": "failed",
+                "error": str(e),
+                "retry_count": state.get_node_state(node_id).get("retry_count", 0) + 1
+            })
+            if should_retry(node, state):
+                run_workflow(workflow_id, config)  # 重试
+            else:
+                handle_failure(state)
+            break
+```
+
+### 6. State 持久化流程
+
+```
+1. 节点执行前：写入状态为 running
+2. 节点执行中：实时保存上下文
+3. 节点成功后：更新状态为 success，保存输出
+4. 节点失败后：更新状态为 failed，记录异常
+5. 流程重启时：读取 State，从失败的节点继续执行
+```
+
+---
+
+## 九、面试高频问题
 
 ### Q1：什么是 Agent 编排引擎？
 
@@ -134,17 +249,25 @@
 
 **答**：节点级故障隔离、超时控制、熔断降级、状态持久化、限流。
 
+### Q6：State 在编排引擎里起什么作用？
+
+**答**：State 记录流程每个节点的输入、输出、状态、异常，支持中断续跑、重试恢复、问题定位。常用实现方式有内存 State、Redis、数据库、事件日志。
+
+### Q7：中断续跑怎么实现？
+
+**答**：节点执行前后持久化 State，流程重启时先读取 State，已经 success 的节点跳过，从失败或 running 的节点继续执行。
+
 ---
 
-## 九、项目口述模板
+## 十、项目口述模板
 
 > 请介绍你项目中的编排引擎。
 
-我在项目中落地了中心化 Agent 编排引擎。通过 JSON/YAML 配置定义工作流，支持顺序、并行、条件分支、循环迭代四种编排模式。引擎负责任务拆解、节点调度、数据流转和结果聚合，下层统一适配子 Agent、Skill、Plugin 和 RAG 能力。节点间通过全局上下文数据池解耦，新增流程无需改核心代码。同时做了节点级故障隔离、超时重试、熔断降级和状态持久化，保证复杂流程稳定可控。
+我在项目中落地了中心化 Agent 编排引擎。通过 JSON/YAML 配置定义工作流，支持顺序、并行、条件分支、循环迭代四种编排模式。引擎负责任务拆解、节点调度、数据流转和结果聚合，下层统一适配子 Agent、Skill、Plugin 和 RAG 能力。节点间通过全局上下文数据池解耦，新增流程无需改核心代码。同时用 State 记录每个节点的输入输出和状态，支持中断续跑和失败重试，配套节点级故障隔离、超时重试、熔断降级和状态持久化，保证复杂流程稳定可控。
 
 ---
 
-## 十、一句话总结
+## 十一、一句话总结
 
 - **编排引擎 = 复杂任务的调度指挥中心**
 - **四大模式：顺序、并行、分支、循环**

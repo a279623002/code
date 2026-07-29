@@ -150,6 +150,16 @@ print(result)  # hello
 
 **一句话**：CPython 里任何时刻只有**一个线程**在执行 Python 字节码。
 
+**通俗解释**：
+- 多线程就像多个工人，但 CPython 只给了一根工具（GIL）
+- 同一时间只有一个工人能用工具干活，其他人只能等着
+- IO 操作（网络请求、读写文件）时工人会把工具交出去，别人才能接手
+- CPU 计算时工人抓牢工具不放，其他人只能干瞪眼
+
+**所以**：
+- IO 密集型任务 → 多线程能提速（等待时别人可以用工具）
+- CPU 密集型任务 → 多线程没法并行（大家都抢一根工具，反而更慢）
+
 **为什么要有**：保护引用计数，防止多线程同时改对象内存导致崩溃。
 
 **结论**：
@@ -213,14 +223,21 @@ lock = threading.Lock()
 def add():
     global total
     for _ in range(100_000):
-        with lock:          # 拿到锁才执行
-            total += 1      # 这行不是原子操作
+        # GIL 只保证字节码级别互斥
+        # 但 total += 1 实际会翻译成多行字节码，中间可能被打断
+        with lock:
+            total += 1
 
 threads = [threading.Thread(target=add) for _ in range(10)]
 for t in threads: t.start()
 for t in threads: t.join()
-print(total)  # 1000000 ✅ 没锁会远小于这个数
+print(total)  # 1000000 ✅ 加锁保证正确
 ```
+
+> 注意：在 CPython 中，因为 GIL 的存在，纯 `int` 的 `+=` 在很多情况下确实不容易出错。但 `total += 1` 不是原子操作，理论上仍可能在字节码执行中间被其他线程打断。面试时要强调的是：
+> - GIL 不等于线程安全
+> - 多线程共享可变状态时，**必须加锁或原子操作**
+> - 只有明确是原子操作时才不需要锁（如 `queue.put`、`dict` 的某些单步操作）
 
 **常见原语**：
 | 原语 | 作用 |
@@ -483,7 +500,7 @@ v2 = embed_cached("什么是 RAG")  # 直接命中缓存，0 耗时
 
 ## 六、Lambda
 
-**一句话**：写一行匿名函数。
+**一句话**：写一行匿名函数,lambda x: x["age"]等价于func(x) return x["age"]。
 
 ```python
 # 排序
@@ -495,6 +512,11 @@ print(students)
 # map
 print(list(map(lambda x: x * 2, [1, 2, 3])))
 # [2, 4, 6]
+
+# 等价写法
+def get_age(student):
+    return student["age"]
+print(students.sort(key=get_age))
 ```
 
 **限制**：只能写单个表达式，复杂逻辑请用 `def`。

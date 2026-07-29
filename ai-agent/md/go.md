@@ -1251,10 +1251,10 @@ import "fmt"
 func gen(nums ...int) <-chan int {
     out := make(chan int)
     go func() {
+        defer close(out)  // goroutine 退出前关闭 channel
         for _, n := range nums {
             out <- n
         }
-        close(out)
     }()
     return out
 }
@@ -1263,10 +1263,10 @@ func gen(nums ...int) <-chan int {
 func sq(in <-chan int) <-chan int {
     out := make(chan int)
     go func() {
+        defer close(out)  // goroutine 退出前关闭 channel
         for n := range in {
             out <- n * n
         }
-        close(out)
     }()
     return out
 }
@@ -1280,6 +1280,15 @@ func main() {
     }
 }
 ```
+
+**为什么返回 channel 没问题？**
+
+1. **函数立即返回 `out`，但 goroutine 还在运行**，继续往 `out` 里发数据
+2. **调用方用 `for range out` 读取**，能正常收到所有数据
+3. **goroutine 发完数据后 `close(out)`**，调用方的 `range` 检测到关闭就退出循环
+4. **关键规则：谁发送谁关闭**。这里 `gen` 和 `sq` 内部启动的 goroutine 是发送方，所以由它们关闭 channel
+
+> ⚠️ 注意：返回的 channel 不能在外部再关闭，否则会 panic。发送方 goroutine 已经负责关闭了。
 
 **场景**：数据处理流水线、ETL、多阶段计算。
 

@@ -26,6 +26,34 @@
 | 后置 | 答案与检索/工具结果校验 |
 | 模型 | 幻觉 BadCase 微调 |
 
+**示例：忠实度 Prompt 约束**
+
+```python
+system_prompt = """
+你是一名严谨的助手。请严格遵守以下规则：
+1. 只基于提供的参考资料和工具返回结果回答问题
+2. 如果资料不足，明确回答"无法从现有资料中找到答案"
+3. 禁止推测、禁止编造、禁止用通用知识补充
+"""
+```
+
+**示例：答案与检索结果校验（简单版）**
+
+```python
+def check_faithfulness(answer: str, sources: list[str]) -> bool:
+    """简单校验：答案中的关键实体是否出现在检索结果中"""
+    # 提取答案中的数字、专有名词等
+    import re
+    entities = re.findall(r"\d+|\b[A-Z][a-z]+\b", answer)
+    source_text = " ".join(sources)
+    hit_count = sum(1 for e in entities if e in source_text)
+    return len(entities) == 0 or hit_count / len(entities) > 0.7
+
+# 如果校验不通过，返回兜底话术
+if not check_faithfulness(answer, sources):
+    answer = "根据现有资料无法确认，建议您补充更多信息。"
+```
+
 ---
 
 ## 二、上下文干扰
@@ -49,6 +77,32 @@
 | 结构化组装 | 区分当前需求、历史、检索结果 |
 | 需求覆盖 | 用户更新需求时标记旧参数失效 |
 
+**示例：话题锁定 + 需求覆盖**
+
+```python
+class DialogManager:
+    def __init__(self):
+        self.topic = None        # 当前主话题
+        self.slots = {}          # 当前槽位参数
+
+    def update(self, user_input: str, intent: str, slots: dict):
+        # 意图切换且置信度高，才更新话题
+        if intent != self.topic and confidence > 0.8:
+            self.topic = intent
+            self.slots = slots    # 新话题清空旧槽位
+        else:
+            # 同话题：新槽位覆盖旧槽位
+            self.slots.update(slots)
+
+    def build_prompt(self):
+        return f"""
+当前话题：{self.topic}
+当前参数：{self.slots}
+历史摘要：{self.summary}
+用户最新输入：{self.last_user_input}
+"""
+```
+
 ---
 
 ## 三、长文本退化
@@ -71,6 +125,57 @@
 | 按需加载 | 向量记忆召回相关内容 |
 | 滑动窗口 | 保留近期对话，淘汰久远内容 |
 | 关键信息置顶 | 核心规则固定放 Prompt 头部 |
+
+**滑动窗口策略**
+
+```python
+class SlidingWindowMemory:
+    def __init__(self, max_turns: int = 5, max_tokens: int = 3000):
+        self.max_turns = max_turns
+        self.max_tokens = max_tokens
+        self.history = []
+
+    def add(self, role: str, content: str):
+        self.history.append({"role": role, "content": content})
+        self._compact()
+
+    def _compact(self):
+        # 1. 保留最近 N 轮完整对话
+        if len(self.history) > self.max_turns * 2:
+            old = self.history[: -self.max_turns * 2]
+            recent = self.history[-self.max_turns * 2 :]
+            # 2. 久远内容做摘要
+            summary = self.summarize(old)
+            self.history = [{"role": "system", "content": f"历史摘要：{summary}"}] + recent
+
+    def summarize(self, messages):
+        text = "\n".join([m["content"] for m in messages])
+        # 调用 LLM 或简单提取关键信息
+        return text[:200] + "..."  # 简化示例
+
+    def get_context(self):
+        return self.history
+```
+
+**关键信息置顶**
+
+```python
+system_prompt = f"""
+【核心规则】
+1. 只使用下面【参考资料】回答
+2. 当前任务类型：{task_type}
+3. 用户核心需求：{core_intent}
+
+【参考资料】
+{sources}
+
+【历史摘要】
+{summary}
+
+【近期对话】
+{recent_history}
+"""
+```
 
 ---
 
@@ -97,6 +202,58 @@
 | 死循环 | 调用次数上限、重复调用拦截 |
 | 空结果 | 禁止编造，标准化兜底 |
 
+**示例：工具调用治理**
+
+```python
+import time
+from functools import wraps
+
+class ToolExecutor:
+    def __init__(self):
+        self.call_history = {}   # 防重复调用
+        self.max_retry = 3
+        self.max_calls = 10      # 单轮最大调用次数
+
+    def execute(self, tool_name: str, params: dict) -> dict:
+        # 1. 参数校验
+        if not self.validate_params(tool_name, params):
+            return {"error": "参数缺失", "missing": self.get_missing_params(tool_name, params)}
+
+        # 2. 防死循环：单轮调用次数上限
+        if self.call_history.get(tool_name, 0) >= self.max_calls:
+            return {"error": "调用次数超过上限"}
+
+        # 3. 有限重试
+        for attempt in range(self.max_retry):
+            try:
+                result = self.call_tool(tool_name, params)
+                self.call_history[tool_name] = self.call_history.get(tool_name, 0) + 1
+                return result
+            except TimeoutError:
+                if attempt == self.max_retry - 1:
+                    return {"error": "工具调用超时", "fallback": "请稍后重试"}
+                time.sleep(0.5 * (attempt + 1))
+
+        return {"error": "未知错误"}
+
+    def validate_params(self, tool_name, params):
+        required = self.tool_schemas[tool_name]["required"]
+        return all(k in params and params[k] is not None for k in required)
+
+    def get_missing_params(self, tool_name, params):
+        required = self.tool_schemas[tool_name]["required"]
+        return [k for k in required if k not in params or params[k] is None]
+```
+
+**示例：空结果兜底**
+
+```python
+def build_answer(tool_result, sources):
+    if tool_result.get("error") or not tool_result.get("data"):
+        return "当前查询未返回有效结果，请检查参数或稍后重试。"
+    return f"根据查询结果：{tool_result['data']}"
+```
+
 ---
 
 ## 五、面试高频问题
@@ -117,7 +274,11 @@
 
 **答**：分片、摘要、按需向量召回、滑动窗口、关键信息置顶。
 
-### Q5：工具调用失败怎么兜底？
+### Q5：滑动窗口具体怎么做？
+
+**答**：保留最近 N 轮完整对话，把更久远的内容压缩成摘要，同时控制总 Token 在模型上限内，保证上下文信息密度。
+
+### Q6：工具调用失败怎么兜底？
 
 **答**：参数校验、有限重试、降级提示、禁止编造、死循环拦截。
 
@@ -135,5 +296,5 @@
 
 - **幻觉：检索 + 约束 + 校验**
 - **上下文干扰：降噪 + 锁定 + 覆盖**
-- **长文本退化：摘要 + 按需 + 置顶**
+- **长文本退化：摘要 + 按需 + 置顶 + 滑动窗口**
 - **工具失效：校验 + 重试 + 拦截 + 兜底**
