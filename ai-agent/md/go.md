@@ -1116,10 +1116,357 @@ K8s 集群
 - **高可用**：graceful shutdown、无状态、负载均衡、监控告警
 - **微服务**：gin/goframe 做业务，go-zero/gRPC 做 RPC，etcd 做注册发现，k8s 做部署调度
 
+---
+
+## 十七、并发模型与并发模式
+
+### 1. CSP 并发模型
+
+**一句话**：Go 采用 **CSP（Communicating Sequential Processes）** 并发模型，核心思想是"**不要通过共享内存通信，而要通过通信共享内存**"。
+
+```
+传统多线程：
+线程 A ──→ 共享变量 ←── 线程 B
+          ↑ 加锁保护
+
+CSP：
+线程 A ──→ channel ──→ 线程 B
+            通信传递数据
+```
+
+**优势**：
+- 数据所有权清晰
+- 避免锁竞争
+- 更容易推理和避免死锁
+
+---
+
+### 2. 常见并发模式
+
+#### （1）生产者-消费者模式
+
+```go
+package main
+
+import (
+    "fmt"
+    "sync"
+    "time"
+)
+
+func producer(ch chan<- int, wg *sync.WaitGroup) {
+    defer wg.Done()
+    for i := 1; i <= 5; i++ {
+        ch <- i
+        fmt.Println("生产:", i)
+        time.Sleep(100 * time.Millisecond)
+    }
+}
+
+func consumer(ch <-chan int, wg *sync.WaitGroup) {
+    defer wg.Done()
+    for v := range ch {
+        fmt.Println("消费:", v)
+        time.Sleep(200 * time.Millisecond)
+    }
+}
+
+func main() {
+    ch := make(chan int, 3)
+    var wg sync.WaitGroup
+
+    wg.Add(1)
+    go producer(ch, &wg)
+
+    wg.Add(1)
+    go consumer(ch, &wg)
+
+    wg.Wait()
+    close(ch)
+}
+```
+
+**场景**：消息队列、任务流水线、日志处理。
+
+---
+
+#### （2）Worker Pool 模式
+
+```go
+package main
+
+import (
+    "fmt"
+    "sync"
+    "time"
+)
+
+func worker(id int, jobs <-chan int, results chan<- int, wg *sync.WaitGroup) {
+    defer wg.Done()
+    for j := range jobs {
+        fmt.Printf("worker %d 处理任务 %d\n", id, j)
+        time.Sleep(time.Second)
+        results <- j * 2
+    }
+}
+
+func main() {
+    jobs := make(chan int, 100)
+    results := make(chan int, 100)
+
+    var wg sync.WaitGroup
+    // 3 个 worker
+    for w := 1; w <= 3; w++ {
+        wg.Add(1)
+        go worker(w, jobs, results, &wg)
+    }
+
+    // 9 个任务
+    for j := 1; j <= 9; j++ {
+        jobs <- j
+    }
+    close(jobs)
+
+    wg.Wait()
+    close(results)
+
+    for r := range results {
+        fmt.Println("结果:", r)
+    }
+}
+```
+
+**场景**：控制并发数、批量任务处理、爬虫、图片处理。
+
+---
+
+#### （3）Pipeline 流水线模式
+
+```go
+package main
+
+import "fmt"
+
+// 阶段 1：生成数据
+func gen(nums ...int) <-chan int {
+    out := make(chan int)
+    go func() {
+        for _, n := range nums {
+            out <- n
+        }
+        close(out)
+    }()
+    return out
+}
+
+// 阶段 2：平方
+func sq(in <-chan int) <-chan int {
+    out := make(chan int)
+    go func() {
+        for n := range in {
+            out <- n * n
+        }
+        close(out)
+    }()
+    return out
+}
+
+func main() {
+    c := gen(2, 3, 4)
+    out := sq(c)
+
+    for v := range out {
+        fmt.Println(v) // 4, 9, 16
+    }
+}
+```
+
+**场景**：数据处理流水线、ETL、多阶段计算。
+
+---
+
+#### （4）Fan-Out / Fan-In 模式
+
+**Fan-Out**：一个输入分发到多个 goroutine 并行处理。
+**Fan-In**：多个 goroutine 的结果合并到一个 channel。
+
+```go
+package main
+
+import (
+    "fmt"
+    "sync"
+)
+
+// Fan-Out: 多个 worker 同时消费
+func fanOut(in <-chan int, workerCount int) []<-chan int {
+    outs := make([]<-chan int, workerCount)
+    for i := 0; i < workerCount; i++ {
+        ch := make(chan int)
+        outs[i] = ch
+        go func(out chan<- int) {
+            defer close(out)
+            for n := range in {
+                out <- n * n
+            }
+        }(ch)
+    }
+    return outs
+}
+
+// Fan-In: 合并多个 channel
+func fanIn(chs ...<-chan int) <-chan int {
+    out := make(chan int)
+    var wg sync.WaitGroup
+    for _, ch := range chs {
+        wg.Add(1)
+        go func(c <-chan int) {
+            defer wg.Done()
+            for n := range c {
+                out <- n
+            }
+        }(ch)
+    }
+    go func() {
+        wg.Wait()
+        close(out)
+    }()
+    return out
+}
+
+func main() {
+    in := make(chan int)
+    go func() {
+        for i := 1; i <= 9; i++ {
+            in <- i
+        }
+        close(in)
+    }()
+
+    outs := fanOut(in, 3)
+    merged := fanIn(outs...)
+
+    for v := range merged {
+        fmt.Println(v)
+    }
+}
+```
+
+**场景**：并行计算、MapReduce、分布式任务。
+
+---
+
+#### （5）Context 取消传播模式
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "time"
+)
+
+func worker(ctx context.Context, id int) {
+    for {
+        select {
+        case <-ctx.Done():
+            fmt.Printf("worker %d 退出\n", id)
+            return
+        default:
+            fmt.Printf("worker %d 工作中\n", id)
+            time.Sleep(300 * time.Millisecond)
+        }
+    }
+}
+
+func main() {
+    ctx, cancel := context.WithCancel(context.Background())
+
+    for i := 1; i <= 3; i++ {
+        go worker(ctx, i)
+    }
+
+    time.Sleep(1 * time.Second)
+    cancel() // 通知所有 worker 退出
+    time.Sleep(500 * time.Millisecond)
+}
+```
+
+**场景**：批量任务取消、超时控制、优雅关闭。
+
+---
+
+#### （6）读写锁分离模式
+
+```go
+package main
+
+import (
+    "fmt"
+    "sync"
+)
+
+var (
+    cache = make(map[string]string)
+    rw    sync.RWMutex
+)
+
+func get(key string) string {
+    rw.RLock()
+    defer rw.RUnlock()
+    return cache[key]
+}
+
+func set(key, val string) {
+    rw.Lock()
+    defer rw.Unlock()
+    cache[key] = val
+}
+
+func main() {
+    set("name", "go")
+    fmt.Println(get("name"))
+}
+```
+
+**场景**：配置缓存、热点数据、读多写少的共享资源。
+
+---
+
+### 3. 并发模式选择速查
+
+| 模式 | 核心组件 | 适用场景 |
+|---|---|---|
+| 生产者-消费者 | channel + goroutine | 任务缓冲、解耦生产消费速度 |
+| Worker Pool | 固定数量 worker | 控制并发、批量处理 |
+| Pipeline | 多个 channel 串联 | 多阶段数据处理 |
+| Fan-Out/Fan-In | 多个 goroutine + 合并 | 并行计算、聚合结果 |
+| Context 取消 | context.Context | 超时、取消、优雅退出 |
+| 读写锁分离 | sync.RWMutex | 读多写少的热点数据 |
+
+---
+
+## 十八、一句话总结
+
+- **GMP**：G 是任务，M 是线程，P 是调度器，work stealing 实现高并发
+- **GC**：三色标记 + 写屏障，Go 1.8 后 STW 很短
+- **Slice**：底层数组 + len/cap，append 可能扩容，注意共享底层数组
+- **Map**：哈希表，负载因子 6.5 或溢出桶多会扩容，并发不安全
+- **Channel**：goroutine 通信管道，有缓冲/无缓冲两种
+- **Context**：传取消信号、超时、元数据
+- **锁**：Mutex、RWMutex、Once、atomic 按场景选
+- **并发模型**：CSP，通过通信共享内存
+- **并发模式**：生产者-消费者、Worker Pool、Pipeline、Fan-Out/Fan-In、Context 取消、读写锁分离
+- **高并发**：限流、worker pool、atomic、对象池、熔断
+- **高可用**：graceful shutdown、无状态、负载均衡、监控告警
+
 > **面试口诀：GMP 调度万级并发，channel 通信不要共享内存，context 管超时和取消，slice/map 注意底层共享**
 
 > **Channel 底层口诀：一把锁、一个环形 buf、两个等待队列，发满挂 sendq，读空挂 recvq**
 
 > **Select 底层口诀：多个 case 先排序，随机选择防饥饿，没 default 就挂多个队列等唤醒**
+
+> **并发模式口诀：生产消费解耦忙，worker pool 控并发，pipeline 分阶段，fan-out/fan-in 并行算，context 一把取消杀**
 
 > **高并发口诀：限流削峰异步化，缓存池化无状态，熔断降级超时控，监控告警保平安**
