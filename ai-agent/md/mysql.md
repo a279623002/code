@@ -38,7 +38,8 @@
 | **唯一索引** | 值唯一，允许 null |
 | **普通索引** | 无唯一约束 |
 | **联合索引** | 多个字段组合 |
-| **覆盖索引** | 索引包含查询所需全部字段 |
+| **全文索引** | 文本字段，支持模糊查询 |
+| **空间索引** | 空间数据索引 |
 
 ### 3. 联合索引最左前缀
 
@@ -104,7 +105,7 @@ EXPLAIN SELECT * FROM t WHERE a = 1;
 
 | 字段 | 含义 |
 |---|---|
-| `type` | 访问类型：system > const > eq_ref > ref > range > index > ALL |
+| `type` | 访问类型：system（只有1条记录） > const（常量查询） > eq_ref（主键、唯一索引查询） > ref（非唯一索引查询） > range（范围查询） > index（索引查询） > ALL（全表扫描） |
 | `key` | 实际使用的索引 |
 | `rows` | 扫描行数，越小越好 |
 | `Extra` | Using index（覆盖索引）、Using where、Using filesort（需要排序优化） |
@@ -204,6 +205,7 @@ SELECT name, age FROM user WHERE name = 'A';  -- 不用回表
 
 - **快照读**：普通 SELECT 走 MVCC，读取事务开始时的快照，不会幻读
 - **当前读**：`SELECT ... FOR UPDATE` 加间隙锁，阻止其他事务插入
+- **MVCC**：多版本并发控制，不加锁实现读写并发，读不阻塞写、写不阻塞读（普通快照读），用来解决并发冲突，提升并发性能
 
 ---
 
