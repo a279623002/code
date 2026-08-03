@@ -18,7 +18,7 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                      控制平面（Control Plane）                 │
+│                      控制平面（Control Plane）               │
 │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌────────────┐  │
 │  │ API Server│  │ etcd    │  │Scheduler │  │Controller  │  │
 │  │           │  │         │  │          │  │Manager     │  │
@@ -48,15 +48,15 @@
 | 组件 | 作用 | 面试一句话 |
 |---|---|---|
 | **API Server** | 所有请求的入口 | "K8s 的前台接待，所有操作都经过它" |
-| **etcd** | 分布式键值存储，保存集群状态 | "K8s 的数据库" |
+| **etcd** | 分布式键值存储，所有资源（Pod、Service、Deployment、配置、密钥、权限）,保存集群状态 | "K8s 的数据库",只有apiserver能写入 |
 | **Scheduler** | 负责把 Pod 调度到合适的 Node | "HR，决定新员工去哪个部门" |
-| **Controller Manager** | 维持集群期望状态 | "监工，发现实际状态和配置不一样就修复" |
+| **Controller Manager** | 控制器管理器,持续调谐：当前状态 ↔ 期望状态 | "监工，发现实际状态和配置不一样就修复" |
 
 ### 工作节点组件（Node）
 
 | 组件 | 作用 |
 |---|---|
-| **kubelet** | 每个 Node 上的"小管家"，负责创建/销毁 Pod，汇报状态 |
+| **kubelet** | 节点代理，每个 Node 上的"小管家"，对接 apiserver，管理本机所有 Pod，汇报状态 |
 | **kube-proxy** | 负责 Service 的网络转发和负载均衡 |
 | **Container Runtime** | 真正运行容器，比如 containerd、Docker |
 
@@ -73,6 +73,9 @@
 - 适合"主容器 + 辅助容器"场景，比如应用容器 + 日志收集容器
 
 ```yaml
+# metadata：元数据（名字、命名空间、标签、注解）
+# spec：期望规格，你想要资源长成什么样
+# status：实际状态，集群真实运行情况（只读，不能手动改）
 apiVersion: v1
 kind: Pod
 metadata:
@@ -92,6 +95,22 @@ kubectl get pods
 kubectl describe pod nginx-pod
 kubectl logs nginx-pod
 kubectl delete pod nginx-pod
+# 查当前命名空间所有Pod，带IP和节点
+kubectl get pods -o wide
+# 查kube-system命名空间全部Pod详情
+kubectl -n kube-system get pods -owide
+# 查看所有节点详细硬件与运行时
+kubectl get nodes -o wide
+# 查看deployment使用的镜像版本
+kubectl get deploy -o wide
+# 全命名空间pod宽表
+kubectl get pods -A -owide
+# 按标签查pod并展示标签
+kubectl get pods -l app=order --show-labels
+# 实时监控+宽输出
+kubectl get deploy -owide -w
+# 导出yaml不创建
+kubectl create job test --image=busybox --dry-run=client -o yaml
 ```
 
 ### 2. Deployment
@@ -129,6 +148,7 @@ kubectl scale deployment nginx-deploy --replicas=5
 kubectl rollout status deployment/nginx-deploy
 kubectl rollout history deployment/nginx-deploy
 kubectl rollout undo deployment/nginx-deploy   # 回滚
+
 ```
 
 ### 3. Service
@@ -296,9 +316,10 @@ kubectl logs <pod-name> --previous  # 看上一次崩溃日志
 ### Q4：Service 是怎么实现负载均衡的？
 
 **答**：
-- Service 通过 **selector** 找到后端 Pod
-- kube-proxy 维护 iptables / IPVS 规则，把请求转发到 Pod
-- 每个 Service 分配一个 ClusterIP，集群内稳定访问
+- Service 通过 spec.selector 根据标签匹配 Pod，生成后端端点列表 Endpoints；
+- apiserver 维护 Endpoints 资源，实时同步所有正常运行 Pod 的 IP + 端口；
+- 全节点 kube-proxy 持续监听 apiserver 的 Service、Endpoints 变更；
+- kube-proxy 在本机写入转发规则，所有访问 Service ClusterIP 的流量被转发到真实 Pod。
 
 ### Q5：K8s 是怎么做滚动更新的？
 
@@ -360,6 +381,98 @@ resources:
 - 指定 GPU 资源（`nvidia.com/gpu: 1`），让任务调度到目标算力卡
 - 训练容器挂载 PVC 读取数据集、写入模型
 - 训练完成后通过 prometheus 采集该时间段指标，生成工况报告
+
+### Q11：资源下发-集群部署-用户访问全流程
+**答**：
+- 阶段1： 用户提交资源（Deployment+Service），经由apiserver完成全集群配置同步
+- 阶段2： 客户端发起请求，经由DNS、kube-proxy、CNI，最终到达业务Pod
+
+**详细流程**
+**步骤 1：客户端 kubectl 请求接入 apiserver**
+
+运维执行 `kubectl apply -f nginx-all.yaml`：
+1. kubectl 携带 token/证书访问 kube-apiserver
+2. apiserver 完成认证、鉴权、准入控制校验
+3. 校验通过，把 Deployment、Service 写入 etcd
+
+> 重点：只有 apiserver 能读写 etcd，其他组件不直连。
+
+**步骤 2：controller-manager 感知 etcd 变动，创建 Pod**
+
+kube-controller-manager 持续监听 apiserver 资源变化：
+1. Deployment 控制器监听到新增 Deployment
+2. 控制器发现当前没有对应 Pod，向 apiserver 发起请求创建Pod对象并写入etcd
+3. Pod 此时只存在etcd，但容器还没启动
+
+**步骤 3：scheduler 调度 Pod**
+
+调度器持续监听未绑定 node 的 Pod：
+1. 预选：过滤资源不足、污点、亲和性不满足的节点
+2. 优选：打分选出最优节点（如 node2）
+3. scheduler 调用 apiserver，更新 Pod 的spec.nodeName绑定节点，数据落 etcd
+
+**步骤 4：kubelet 拉起容器**
+
+node2 上的 kubelet 一直监听 apiserver 本机 Pod 列表：
+1. kubelet 发现有 Pod 调度到本机，拉取 Pod 完整 spec
+2. 调用容器运行时（containerd）拉取镜像，创建并启动容器
+3. kubelet 配置容器网络（CNI）、数据卷、就绪 / 存活探针；
+4. 容器运行后，kubelet 持续上报 Pod 状态（running/error）给 apiserver，更新 etcd 里 Pod 的 status 字段
+
+**步骤 5：Endpoints 生成，kube-proxy 同步规则**
+
+1. Endpoints 控制器（controller-manager 内置）：根据 Service 的spec.selector匹配所有带app=nginx的就绪 Pod，自动生成 Endpoints 资源，保存所有正常 Pod 的 IP + 端口；
+2. 集群所有节点 kube-proxy 监听 Service/Endpoints 变化
+3. kube-proxy 在本机 Linux 内核（ipvs/iptables）写入转发规则，绑定 Service 的 ClusterIP，做好四层负载均衡配置
+
+**步骤 6：CoreDNS 同步域名**
+
+CoreDNS 监听 apiserver 内所有 Service，自动生成 DNS 记录：
+nginx.default.svc.cluster.local 固定解析为 Service 的 ClusterIP。
+
+至此集群配置全部就绪。
+
+#### 阶段 2：用户访问流量全链路
+
+**场景 A：集群内 Pod 访问 Service 域名**
+
+客户端 `client-pod` 执行：
+```bash
+curl nginx.default.svc.cluster.local
+```
+
+1. **DNS 解析**：CoreDNS 返回 Service ClusterIP
+2. **本机 ipvs 负载均衡**：内核根据 ipvs 规则选中一个后端 Pod IP
+3. **CNI 路由**：
+   - 同节点：Calico 本机网桥直达目标容器
+   - 跨节点：Calico IPIP/VXLAN 封装，送到目标节点后解包
+4. **业务处理**：nginx 容器处理请求，响应原路返回
+
+> **联动自愈**：Pod 就绪探针失败 → Endpoints 剔除该 Pod → kube-proxy 删除转发规则 → 流量不再发到故障 Pod。
+
+**场景 B：外网通过 NodePort 访问**
+
+用户访问 `节点公网IP:30080`：
+1. 流量进入任意宿主机 30080 端口
+2. kube-proxy 将 NodePort 流量导向 Service ClusterIP
+3. 后续流程同场景 A
+
+**场景 C：外网通过 Ingress 访问（生产主流）**
+
+用户访问 `nginx.test.com`：
+1. 域名解析到 Ingress Controller 的公网 IP
+2. 流量到达 ingress-nginx Pod
+3. Ingress Controller 根据域名匹配后端 Service
+4. 在集群内部访问 Service（重复场景 A 链路）
+5. 业务响应经 Ingress 返回外网用户
+
+> Ingress 层实现 SSL、路径路由、限流等七层能力。
+
+**极简主干时间线**
+kubectl → apiserver → etcd
+→ controller-manager 创建 Pod → scheduler 选节点 → kubelet 启动容器
+→ Endpoints 更新 → kube-proxy 配置内核负载规则 + CoreDNS 生成域名
+→ 用户请求 DNS 解析 → 内核负载 → CNI 路由 → Pod 接收请求
 
 ---
 
