@@ -266,16 +266,15 @@
         // 简单 Python 语法高亮：关键字、字符串、注释、数字
         // 不依赖 highlight.js，零依赖自包含
         // 用占位符隔离各阶段，避免正则相互破坏（先替换的 span 被后续阶段匹配）
-        // 占位符用 \x00 + 数字 + \x01，支持任意多个 slot，且不会被数字正则误匹配
+        // 占位符用 HTML 注释 <!--PY_SLOT_N-->，支持任意多个 slot
+        // 不会和代码内容冲突，也不会被后续正则误匹配
         function highlightPython(code) {
             let h = escapeHtml(code);
             const slots = [];
-            const PH_START = '\x00';
-            const PH_END = '\x01';
             const stash = (cls, text) => {
                 const i = slots.length;
                 slots.push('<span class="' + cls + '">' + text + '</span>');
-                return PH_START + i + PH_END;
+                return '<!--PY_SLOT_' + i + '-->';
             };
             // 1. 字符串（包括 f-string、r-string、b-string 等前缀组合）
             h = h.replace(
@@ -290,7 +289,7 @@
             // 4. 数字
             h = h.replace(/\b(\d+)\b/g, (m) => stash('hl-num', m));
             // 5. 把占位符还原为 span
-            const restoreRe = /\x00(\d+)\x01/g;
+            const restoreRe = /<!--PY_SLOT_(\d+)-->/g;
             h = h.replace(restoreRe, (_, num) => slots[parseInt(num, 10)]);
             return h;
         }
