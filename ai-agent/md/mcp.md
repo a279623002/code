@@ -51,8 +51,105 @@ LLM 应用
 
 **关系**：
 - 一个 Host 可以连接多个 MCP Server
+- 每个 Server 对应一个 Client，Client 负责维护连接和标准协议通信
 - 一个 Server 只负责暴露自己的能力，不内置路由逻辑
 - Server 不直接调用其他 Server，由 Host 统筹调度
+
+**三者关系图**：
+
+```
+          ┌──────────────────────────────────────────┐
+          │                  Host                     │
+          │  ┌─────────┐    ┌─────────┐    ┌────────┐ │
+          │  │ Client  │    │ Client  │    │ Client │ │
+          │  │ 连接 A  │    │ 连接 B  │    │ 连接 C │ │
+          │  └────┬────┘    └────┬────┘    └───┬────┘ │
+          └───────┼──────────────┼─────────────┼──────┘
+                  │              │             │
+                  ▼              ▼             ▼
+            ┌─────────┐    ┌─────────┐   ┌─────────┐
+            │ Server A│    │ Server B│   │ Server C│
+            │ 文件系统 │    │ 数据库  │   │  搜索   │
+            └─────────┘    └─────────┘   └─────────┘
+```
+
+**代码示例：一个简单 MCP Host 连接两个 Server**
+
+```python
+# server_a.py：文件系统 Server（stdio 模式）
+from mcp.server import Server
+from mcp.types import Tool, TextContent
+
+app = Server("file-server")
+
+@app.list_tools()
+async def list_tools():
+    return [Tool(name="read_file", description="读取文件", inputSchema={"type": "object", "properties": {"path": {"type": "string"}}})]
+
+@app.call_tool()
+async def call_tool(name: str, arguments: dict):
+    if name == "read_file":
+        with open(arguments["path"], "r", encoding="utf-8") as f:
+            return [TextContent(type="text", text=f.read())]
+    raise ValueError(f"未知工具: {name}")
+
+# 通过 stdio 启动：python server_a.py
+```
+
+```python
+# server_b.py：数据库 Server（stdio 模式）
+from mcp.server import Server
+from mcp.types import Tool, TextContent
+
+app = Server("db-server")
+
+@app.list_tools()
+async def list_tools():
+    return [Tool(name="query_sql", description="执行 SQL", inputSchema={"type": "object", "properties": {"sql": {"type": "string"}}})]
+
+@app.call_tool()
+async def call_tool(name: str, arguments: dict):
+    if name == "query_sql":
+        # 实际调用数据库
+        result = db.execute(arguments["sql"])
+        return [TextContent(type="text", text=str(result))]
+    raise ValueError(f"未知工具: {name}")
+```
+
+```python
+# host.py：Host 统筹多个 Client
+import asyncio
+from mcp import ClientSession, StdioServerParameters
+from mcp.client.stdio import stdio_client
+
+async def run():
+    # 配置两个本地 Server
+    servers = [
+        StdioServerParameters(command="python", args=["server_a.py"]),
+        StdioServerParameters(command="python", args=["server_b.py"]),
+    ]
+
+    all_tools = {}
+    for params in servers:
+        async with stdio_client(params) as (read, write):
+            async with ClientSession(read, write) as session:
+                await session.initialize()
+                tools = await session.list_tools()
+                all_tools[params.args[0]] = tools
+
+    # LLM 根据用户问题决定调用哪个 Server 的哪个 Tool
+    # 例如：用户说"查一下订单表"，LLM 选择 db-server.query_sql
+    print("可用工具:", all_tools)
+
+asyncio.run(run())
+```
+
+**代码说明**：
+- Host 启动时分别为每个 Server 创建一个 Client
+- Client 通过 `session.initialize()` 完成握手
+- `list_tools()` 动态发现 Server 提供的工具
+- LLM 根据用户意图选择 Tool，Client 通过 `call_tool()` 发起调用
+- Server 只负责执行自己的工具，不感知其他 Server
 
 ---
 
