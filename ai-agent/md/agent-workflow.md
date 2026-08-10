@@ -49,9 +49,73 @@
 ```
 顺序：A → B → C
 并行：A ─┬─ B
-       └─ C
+         └─ C
 分支：A → 条件判断 → B 或 C
 循环：A → B → 满足条件？→ 是结束 / 否继续
+```
+
+### 代码示例
+
+**顺序编排**
+
+```python
+# 文档处理流水线：解析 → 切片 → 入库 → 更新索引
+def run_sequential():
+    raw_text = parse_document("report.pdf")
+    chunks = split_chunks(raw_text)
+    save_to_vector_db(chunks)
+    update_index()
+    return "完成"
+```
+
+**并行编排**
+
+```python
+import concurrent.futures
+
+# 同时查知识库、联网搜索、统计指标
+def run_parallel(query):
+    with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool:
+        future_kb = pool.submit(search_knowledge, query)
+        future_web = pool.submit(search_web, query)
+        future_stat = pool.submit(get_statistics, query)
+
+        kb_result = future_kb.result()
+        web_result = future_web.result()
+        stat_result = future_stat.result()
+
+    return merge_results(kb_result, web_result, stat_result)
+```
+
+**条件分支编排**
+
+```python
+# 根据问题复杂度选择处理路径
+def run_branch(query, intent):
+    if intent == "simple":
+        return direct_answer(query)
+    elif intent == "complex":
+        return deep_analysis(query)
+    elif intent == "risky":
+        return block_and_report(query)
+    else:
+        return clarify_question(query)
+```
+
+**循环迭代编排**
+
+```python
+# 多轮检索补全，最多 5 轮
+def run_loop(query, max_rounds=5):
+    context = []
+    for i in range(max_rounds):
+        result = search(query, context)
+        context.append(result)
+
+        if is_sufficient(query, context):
+            return generate_answer(query, context)
+
+    return generate_answer(query, context, incomplete=True)
 ```
 
 ---
