@@ -228,6 +228,28 @@ kubectl get pods -n dev
 kubectl get all --all-namespaces
 ```
 
+### 7. Ingress
+
+**一句话**：提供**外部访问**的路由规则，支持**域名**和**路径**。
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-ingress
+spec:
+  rules:
+    - host: nginx.com
+      http:
+        paths:
+          - path: /
+            backend:
+              service:
+                name: nginx-svc
+                port:
+                  number: 80
+```
+
 ---
 
 ## 四、常用命令速查表
