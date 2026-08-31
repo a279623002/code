@@ -1,246 +1,170 @@
-# 微服务 CAP 理论 + 选型策略 + 开发示例
+# 一、CAP回顾 + 微服务选型结论
+> CAP：Consistency一致性 / Availability可用性 / Partition‑tolerance分区容错
+- **P(分区容错)**：分布式网络一定会出现网络抖动、丢包、断连；**微服务必须保证P**，所以只能二选一：`AP` or `CP`
+1. **AP（绝大多数业务选择）：可用性优先，最终一致性**
+    电商、订单、用户中心、后台管理、网关。
+    实现方案：注册中心(Nacos/Eureka) + 本地缓存 + MQ异步补偿 + 最终一致
+2. **CP（强一致场景）：一致性优先，牺牲部分可用性**
+    分布式锁、资金账户、库存扣减、配置中心。
+    实现方案：etcd / zookeeper / redis‑redlock
 
-## 一、先回顾 CAP 三要素
+> 生产最常见选型：**业务微服务选 AP；强一致组件选 CP**
 
-> 
-> 在**分布式环境（多节点）**下，三者**不可能同时满足**，只能三选二
+# 二、Go‑Zero + Nacos AP示例（最终一致性，最常用）
+## 场景说明
+两个微服务：
+- user‑service 用户服务
+- order‑service 订单服务
+下单后异步更新用户积分，**不强实时一致，走MQ最终一致(AP方案)**，网络分区时两个服务都还能对外可用。
 
-- **C 一致性 Consistency**：所有节点同一时刻看到一样的数据。更新后任意节点读取都是最新值。
-- **A 可用性 Availability**：每个请求都**能收到响应**，不会卡死/超时失败（但返回的数据可能旧）。
-- **P 分区容错 Partition tolerance**：网络故障、消息丢包、节点断开，**系统依然可以运行**。
+## 1、go-zero 依赖 go.mod
+```go
+module cap-demo
 
-> 
-> ⚠️ 重点：**分布式系统 P 是必须保证的，你不能放弃分区容错。**
-> 所以真实选型只有两个选择：
-> 
-> 
-> 1. **AP：放弃强一致性，保可用 + 分区容错（绝大多数微服务业务）**
-> 2. **CP：放弃可用性，保强一致 + 分区容错（强数据业务）**
-> 不存在 CA，放弃 P 就不是分布式。
+go 1.22
 
-## 二、业务场景怎么选 AP / CP
-
-### 1）AP（优先选，互联网微服务默认方案）
-
-> 
-> 最终一致性，高可用优先，短暂数据不一致可以接受
-> 适合绝大多数业务：
-
-- 用户信息、商品列表、订单查询、首页数据、推荐、评论
-- 支付状态查询（短暂延迟没关系，最后同步成正确即可）
-**最终一致性实现方案**：
-- MQ异步通知、本地消息表、Seata AT/TCC、Redis缓存延迟更新、Canal binlog同步> 
-> 牺牲强一致，换来极高可用性，网络抖动服务不会挂。
-
-### 2）CP（强一致，可用性降低）
-
-> 
-> 网络分区发生时，服务阻塞等待，直到数据达成一致，期间不可用
-> 适合强资金、强库存、锁场景：
-
-- 库存扣减、转账交易、分布式锁、订单状态强流转、资金账户
-**CP组件例子**：Zookeeper、etcd、Redis Redlock、Seata‑TCC
-
-### 快速选型对照表
-
-| 选型 | 特征 | 典型组件 | 业务案例 |
-| --- | --- | --- | --- |
-| AP | 高可用，最终一致 | Nacos,Eureka,RocketMQ/Kafka,Seata‑AT | 普通订单、用户、商品 |
-| CP | 强一致，网络故障可能不可用 | Zookeeper,Etcd,Seata‑TCC | 库存、资金、分布式锁 |
-
-> 
-> ✅ **国内微服务主流选型：注册配置中心 Nacos(AP) + 分布式事务 AT(AP最终一致)**
-
-# 三、开发实战示例：SpringCloud Alibaba AP方案（最常用）
-
-架构：订单服务 `order‑service` 远程调用 库存服务 `stock‑service`，保证**最终一致性（AP）**
-技术栈：SpringBoot + SpringCloudAlibaba + Nacos + Seata‑AT + Mysql
-
-## 1. AP思路说明（最终一致性）
-
-1. 订单服务创建订单
-2. 远程调用库存扣减
-3. 如果库存扣减失败，通过Seata回滚；
-4. 允许短暂不一致，最终数据统一，优先保证服务可用。
-
-> 
-> Seata‑AT 就是典型 **AP（最终一致性）**，不是强一致。
-
-### 1）父pom依赖
-
-```
-<dependencyManagement>
-    <dependencies>
-        <dependency>
-            <groupId>com.alibaba.cloud</groupId>
-            <artifactId>spring-cloud-alibaba-dependencies</artifactId>
-            <version>2022.0.0.0</version>
-            <type>pom</type>
-            <scope>import</scope>
-        </dependency>
-    </dependencies>
-</dependencyManagement>
+require (
+	github.com/zeromicro/go-zero v1.7.0
+	github.com/zeromicro/go‑zrpc/nacos v1.7.0
+	github.com/streadway/amqp v1.1.0
+)
 ```
 
-### 2）订单服务 application.yml
-
-```
-server:
-  port: 8081
-spring:
-  application:
-    name: order-service
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/db_order?useUnicode=true
-    username: root
-    password: 123456
-  cloud:
-    nacos:
-      discovery:
-        server-addr: 127.0.0.1:8848
-    seata:
-      tx-service-group: my_tx_group
+## 2、order‑service 订单微服务 (AP，注册到Nacos)
+### order.yaml
+```yaml
+Name: order.rpc
+ListenOn: 0.0.0.0:8081
+Etcd:
+  Hosts:
+  - 127.0.0.1:8848
+  Key: order.rpc
 ```
 
-### 3）库存服务 application.yml
+### order.go
+```go
+package main
 
-```
-server:
-  port: 8082
-spring:
-  application:
-    name: stock-service
-  datasource:
-    url: jdbc:mysql://127.0.0.1:3306/db_stock?useUnicode=true
-    username: root
-    password: 123456
-  cloud:
-    nacos:
-      discovery:
-        server-addr: 127.0.0.1:8848
-    seata:
-      tx-service-group: my_tx_group
-```
+import (
+	"context"
+	"fmt"
+	"github.com/zeromicro/go-zero/core/service"
+	"github.com/zeromicro/go‑zrpc"
+	"github.com/zeromicro/go‑zrpc/resolver/nacos"
+	"cap‑demo/rpc/orderpb"
+)
 
-> 
-> seata 需要每个库创建回滚日志表 `undo_log`
+type OrderServer struct{}
 
-```
-CREATE TABLE `undo_log` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `branch_id` bigint(20) NOT NULL,
-  `xid` varchar(100) NOT NULL,
-  `context` varchar(128) NOT NULL,
-  `rollback_info` longblob NOT NULL,
-  `log_status` int(11) NOT NULL,
-  `log_created` datetime NOT NULL,
-  `log_modified` datetime NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `ux_undo_log` (`xid`,`branch_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-```
+func (s *OrderServer) CreateOrder(ctx context.Context, req *orderpb.CreateReq) (*orderpb.CreateResp, error) {
+	// 1.本地落库订单
+	orderId := fmt.Sprintf("ORD‑%d", req.UserId)
+	fmt.Printf("创建订单 %s,用户:%d\n",orderId,req.UserId)
 
-### 4）订单服务代码，开启分布式事务 @GlobalTransactional（AP最终一致）
+	// AP核心:不同步调用用户服务更新积分，发消息异步做最终一致
+	err := sendMqUserPointEvent(req.UserId, 10)
+	if err != nil{
+		// MQ发送失败只打日志，订单仍然成功！可用性优先(AP)
+		fmt.Println("mq发送失败，后续补偿任务重试")
+	}
 
-```
-@RestController
-@RequestMapping("/order")
-public class OrderController {
+	return &orderpb.CreateResp{OrderId:orderId,Success:true},nil
+}
 
-    @Autowired
-    private OrderMapper orderMapper;
+func sendMqUserPointEvent(userId int64, addPoint int32) error{
+	// rabbitmq发送消息代码省略
+	return nil
+}
 
-    @Autowired
-    private StockFeignClient stockFeignClient;
-
-    //全局事务注解，Seata AT模式 AP最终一致性
-    @GlobalTransactional
-    @PostMapping("/create")
-    public String createOrder(Long productId,Integer count){
-        //1.创建订单
-        Order order = new Order();
-        order.setProductId(productId);
-        order.setCount(count);
-        orderMapper.insert(order);
-
-        //2.远程扣减库存
-        stockFeignClient.deduct(productId,count);
-
-        return "下单成功";
-    }
+func main() {
+	nacos.Register()
+	srv := zrpc.MustNewServer(zrpc.RpcServerConf{
+		ServiceConf: service.ServiceConf{
+			Name: "order.rpc",
+		},
+		ListenOn: "0.0.0.0:8081",
+		Etcd: zrpc.EtcdConf{
+			Hosts: []string{"127.0.0.1:8848"},
+			Key: "order.rpc",
+		},
+	})
+	orderpb.RegisterOrderServer(srv, &OrderServer{})
+	srv.Start()
 }
 ```
 
-### 5）Feign远程调用接口
+## 3、user‑service 用户积分消费服务
+```go
+package main
 
-```
-@FeignClient("stock-service")
-public interface StockFeignClient {
-    @PostMapping("/stock/deduct")
-    String deduct(@RequestParam Long productId, @RequestParam Integer count);
+// 消费MQ消息，异步更新积分，最终一致性
+func ConsumePointMsg(){
+	// 监听rabbitmq，收到消息更新用户积分
+	// 失败可以重试，保证最终一致
 }
 ```
+> AP特性：订单成功后，短时间内查用户积分看不到新增，**短暂不一致，最终一致；网络分区时订单服务不会阻塞等待用户服务**。
 
-### 6）库存服务
+# 三、CP示例：Go + Etcd 分布式锁(强一致性)
+> CP场景：库存扣减，必须强一致；网络分区时宁可失败不可超卖。
+```go
+package main
 
-```
-@RestController
-@RequestMapping("/stock")
-public class StockController {
+import (
+	"context"
+	"fmt"
+	"go.etcd.io/etcd/client/v3"
+	"time"
+)
 
-    @Autowired
-    private StockMapper stockMapper;
+func main(){
+	cli,err := clientv3.New(clientv3.Config{
+		Endpoints:[]string{"127.0.0.1:2379"},
+		DialTimeout:5*time.Second,
+	})
+	if err != nil{
+		panic(err)
+	}
+	defer cli.Close()
 
-    @PostMapping("/deduct")
-    public String deduct(Long productId,Integer count){
-        stockMapper.deductStock(productId,count);
-        //模拟异常，触发分布式回滚
-        // int i= 1/0;
-        return "库存扣减成功";
-    }
+	lease,err := cli.Grant(context.Background(), 10)
+	if err != nil{
+		panic(err)
+	}
+	key := "/stock/lock/1001"
+	// TryLock
+	txn := cli.Txn(context.Background()).
+		If(clientv3.Compare(clientv3.CreateRevision(key),"=",0)).
+		Then(clientv3.OpPut(key,"locked",clientv3.WithLease(lease.ID))).
+		Else(clientv3.OpGet(key))
+
+	resp,err := txn.Commit()
+	if err != nil{
+		panic(err)
+	}
+	if !resp.Succeeded{
+		// 获取锁失败，CP策略：直接返回失败，不允许继续扣库存(牺牲可用性换一致性)
+		fmt.Println("获取锁失败，库存操作拒绝")
+		return
+	}
+
+	fmt.Println("拿到分布式锁，扣减库存")
+	// 库存扣减业务...
+
+	cli.Revoke(context.Background(), lease.ID)
 }
 ```
+> CP行为：etcd集群出现分区，锁获取失败，业务直接报错，**不会继续执行业务，保证数据一致性，放弃可用性**
 
-> 
-> 👉 AT模式工作原理（AP）：
-> 一阶段：执行业务SQL，记录undo_log，**立刻提交本地事务，释放锁**（高可用）
-> 二阶段：成功什么都不做；失败异步补偿回滚。
-> 执行期间不阻塞，优先可用性，属于**最终一致性 AP**。
+# 四、AP与CP代码选型对比总结
+|方案|选型|业务特征|Go实现方式|
+|---|---|---|---|
+|AP(首选)|可用性优先，最终一致|订单、用户、商品|go‑zero/rpc + Nacos + RabbitMQ/Kafka异步|
+|CP|一致性优先|库存、账户资金、分布式锁|etcd / redis redlock|
 
-# 四、CP 方案示例（强一致，TCC）
+# 五、微服务开发实操建议（Go栈）
+1. 普通业务微服务：**AP + Nacos**，异步消息解耦实现最终一致
+2. 强一致资源：单独走CP组件(etcd/redis锁)，**不要强行让整个微服务集群做CP**
+3. 补偿机制：MQ死信队列 + 定时任务扫描，修复不一致数据
 
-如果库存场景你要用CP强一致，选 Seata‑TCC，网络分区时会锁住资源直到事务完成，可用性下降。
-TCC三段式：Try - Confirm - Cancel
-
-```
-@LocalTCC
-public interface StockTccService {
-    //Try：预留资源，冻结库存
-    @TwoPhaseBusinessAction(name = "stockTcc",commitMethod = "confirm",rollbackMethod = "cancel")
-    boolean tryDeduct(@BusinessActionContextParameter(paramName = "pid") Long pid,
-                       @BusinessActionContextParameter(paramName = "cnt") Integer cnt);
-    //Confirm：正式扣减
-    boolean confirm(BusinessActionContext ctx);
-    //Cancel：释放冻结库存，回滚
-    boolean cancel(BusinessActionContext ctx);
-}
-```
-
-> 
-> TCC属于手动补偿方案，偏向CP，适合资金等高可靠场景，开发成本高。
-
-# 五、注册中心 CAP对比
-
-1. **Nacos 默认 AP**：集群网络分区，依然可以注册发现，保证可用，短时间可能读到旧实例列表。
-Nacos 也可以切换成 CP模式（使用Raft）
-2. **Eureka AP**：经典AP，网络故障节点不会剔除
-3. **Zookeeper CP**：网络分区时，没有过半节点可用，整个集群不可用
-
-# 六、总结开发选型口诀
-
-1. **90%普通微服务业务：选 AP（最终一致性），Nacos+Seata‑AT**
-2. **资金、库存、锁等高风险业务：选 CP，TCC / Redis分布式锁 / etcd**
-3. **永远不要幻想CAP三选CA，分布式系统P必选**
-
-如果你需要，我可以给你一份完整可运行的 AP微服务项目demo，包含nacos、seata服务端启动脚本。
+如果你需要，我可以给你一份**可直接运行的完整Go‑Zero AP Demo，含proto文件、MQ消费者完整代码**。
