@@ -146,3 +146,151 @@ Redis依赖机器系统时间做过期。
 4. 统计续期成功节点数，如果成功数 < quorum → 锁丢失，看门狗停止
 
 如果你需要我可以给你一份 **红锁+看门狗续期完整版Go代码**。
+```go
+package main
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"sync"
+	"time"
+
+	"github.com/redis/go-redis/v9"
+)
+
+type WatchDogLock struct {
+	client        *redis.Client
+	key           string
+	val           string
+	ttl           time.Duration
+	maxHoldTime   time.Duration // 新增：锁最大持有时间（硬天花板）
+	startLockTime time.Time
+	cancelFunc    context.CancelFunc
+	wg            sync.WaitGroup
+	locked        bool
+	mu            sync.Mutex
+}
+
+func NewWatchDogLock(rdb *redis.Client, lockKey string, ttl time.Duration, maxHoldTime time.Duration) *WatchDogLock {
+	return &WatchDogLock{
+		client:      rdb,
+		key:         lockKey,
+		val:         fmt.Sprintf("%d", time.Now().UnixNano()),
+		ttl:         ttl,
+		maxHoldTime: maxHoldTime,
+	}
+}
+
+func (l *WatchDogLock) TryLock(ctx context.Context) (bool, error) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	ok, err := l.client.SetNX(ctx, l.key, l.val, l.ttl).Result()
+	if err != nil || !ok {
+		return ok, err
+	}
+
+	l.locked = true
+	l.startLockTime = time.Now()
+
+	// 子上下文继承上层ctx，上层超时会连带关闭看门狗
+	childCtx, cancel := context.WithCancel(ctx)
+	l.cancelFunc = cancel
+	l.wg.Add(1)
+	go l.watchDog(childCtx)
+	return true, nil
+}
+
+func (l *WatchDogLock) watchDog(ctx context.Context) {
+	defer l.wg.Done()
+	ticker := time.NewTicker(l.ttl / 2)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ctx.Done():
+			fmt.Println("看门狗退出:上下文取消/超时")
+			return
+		case <-ticker.C:
+			// 硬租期校验：超过最大持有时间，强制停止看门狗
+			if time.Since(l.startLockTime) >= l.maxHoldTime {
+				fmt.Println("看门狗退出：超过锁最大租期，放弃锁")
+				return
+			}
+
+			// lua 续期脚本
+			script := redis.NewScript(`
+				if redis.call("GET",KEYS[1]) == ARGV[1] then
+					return redis.call("EXPIRE",KEYS[1],ARGV[2])
+				else
+					return 0
+				end
+			`)
+			res, err := script.Run(ctx, l.client, []string{l.key}, l.val, int(l.ttl.Seconds())).Int64()
+			if err != nil {
+				fmt.Printf("看门狗续期失败 err:%v\n", err)
+				return
+			}
+			if res == 0 {
+				fmt.Println("看门狗退出：锁已不属于当前客户端，锁丢失")
+				return
+			}
+			fmt.Println("看门狗续锁成功")
+		}
+	}
+}
+
+func (l *WatchDogLock) UnLock(ctx context.Context) error {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	if !l.locked {
+		return errors.New("未持有锁")
+	}
+	l.cancelFunc()
+	l.wg.Wait()
+
+	script := redis.NewScript(`
+		if redis.call("GET",KEYS[1]) == ARGV[1] then
+			return redis.call("DEL",KEYS[1])
+		end
+		return 0
+	`)
+	_, err := script.Run(ctx, l.client, []string{l.key}, l.val).Result()
+	l.locked = false
+	return err
+}
+
+func main() {
+	rdb := redis.NewClient(&redis.Options{Addr: "127.0.0.1:6379"})
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second) //业务最大超时
+	defer cancel()
+
+	// TTL=10s，硬最大租期 25s
+	lock := NewWatchDogLock(rdb, "stock:lock:1001", 10*time.Second, 25*time.Second)
+	ok, err := lock.TryLock(ctx)
+	if err != nil || !ok {
+		fmt.Println("抢锁失败")
+		return
+	}
+	fmt.Println("拿到锁，执行业务")
+
+	//模拟业务卡死，不会调用Unlock
+	time.Sleep(30 * time.Second)
+
+	_ = lock.UnLock(ctx)
+	fmt.Println("释放锁")
+}
+
+```
+
+---
+
+# 六、看门狗锁抢夺完整时序
+
+协程A抢到锁 → Redis写入key
+协程B、C循环TryLock，SetNX失败 → 抢锁阻塞
+
+触发释放三选一：
+1.A调用Unlock → key删除 → B立刻抢到锁
+2.ctx超时 / 超过最大租期 →看门狗停止续期 →等待TTL(10s)后key过期 →B抢到锁
+3.进程宕机 →看门狗goroutine死亡 →等待TTL过期 →B抢到锁
