@@ -603,7 +603,7 @@ func bar() func() int {
 // 3. 大对象或不确定大小
 func big() {
     // 1. 栈空间很小（关键根源）
-    // Go 每个 goroutine 初始栈只有 1‑2MB
+    // Go 每个 goroutine 初始栈只有 2kb
     // 编译器尝试把底层数组分配在栈上，但数组太大，goroutine 栈放不下 → 直接分配到堆，发生逃逸。
     // 2. 第二个逃逸原因（更常见！返回切片导致逃逸）
     // 就算切片不大，只要把切片返回给外层函数，底层数组必须逃逸到堆：
@@ -618,14 +618,12 @@ func print(x interface{}) {
 ```
 
 1. 大对象或不确定大小
-
-   |场景 |	是否必然逃逸	| 解决方案 |
-   |--|--|--|
-   |子函数 make + return 大切片 |	上层|	上层预分配切片，传参填充|
-   |循环内频繁创建销毁大切片缓冲区 |	✅逃逸 + GC 压力| sync.Pool 复用底层数组|
-   |单次使用、生命周期只在函数内，数组过大栈放不下|	✅逃逸堆分配	|一次性全局分配，复用 buffer|
-   |切片很小，不 return，函数内用完	|❌可以栈分配|	无需处理|
-
+   | 场景                      | 是否必然逃逸      | 解决方案              |
+   | ----------------------- | ----------- | ----------------- |
+   | 子函数 make + return 大切片   | 上层          | 上层预分配切片，传参填充      |
+   | 循环内频繁创建销毁大切片缓冲区         | ✅逃逸 + GC 压力 | sync.Pool 复用底层数组  |
+   | 单次使用、生命周期只在函数内，数组过大栈放不下 | ✅逃逸堆分配      | 一次性全局分配，复用 buffer |
+   | 切片很小，不 return，函数内用完     | ❌可以栈分配      | 无需处理              |
 2. interface{} 传参
 
 > 👉 值类型 (int/struct) 转 interface {} → 装箱 (boxing)，装箱的值必须分配在堆上，触发逃逸
@@ -910,29 +908,7 @@ func noLeak() {
 | 监控     | Prometheus + Grafana    |
 | 日志     | zap + ELK / Loki        |
 
-### 2. 项目实战：调度系统的微服务拆分
 
-```
-┌─────────────┐      ┌─────────────┐      ┌─────────────┐
-│   API 网关   │────→│  算力资源服务 │────→│  任务调度服务 │
-│   (gin)     │      │  (goframe)  │      │  (go-zero)  │
-└─────────────┘      └──────┬──────┘      └──────┬──────┘
-                            │                    │
-                            ↓                    ↓
-                     ┌─────────────┐      ┌─────────────┐
-                     │  prometheus │      │     k8s     │
-                     │   minio     │      │   算力卡     │
-                     └─────────────┘      └─────────────┘
-```
-
-**关键技术点**：
-
-- 通过 k8s client 动态创建训练 Job
-- 用 etcd 做任务状态同步
-- prometheus 采集算力指标
-- minio 存模型和数据集
-
-***
 
 ## 十三、面试高频问题
 
@@ -941,7 +917,7 @@ func noLeak() {
 **答**：
 
 - goroutine 由 Go 运行时调度，线程由 OS 调度
-- goroutine 栈 2KB 起步，可自动扩缩；线程栈固定 1-8MB
+- goroutine 栈 2KB 起步，可自动扩缩,最大1GB；线程栈固定 1-8MB，不能自动扩容
 - 切换成本：goroutine 约 200ns，线程约 1-2μs
 - 一个 Go 程序可轻松启动百万级 goroutine，线程通常几千就吃力
 
@@ -1122,64 +1098,6 @@ func main() {
 
 ***
 
-### 3. 高可用 HTTP 服务（graceful shutdown）
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "net/http"
-    "os"
-    "os/signal"
-    "syscall"
-    "time"
-)
-
-func main() {
-    srv := &http.Server{
-        Addr:    ":8080",
-        Handler: http.HandlerFunc(hello),
-    }
-
-    // 启动服务
-    go func() {
-        if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-            fmt.Println("listen error:", err)
-        }
-    }()
-
-    // 等待退出信号
-    quit := make(chan os.Signal, 1)
-    signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-    <-quit
-
-    fmt.Println("shutting down server...")
-
-    // 优雅关闭：给正在处理的请求 5 秒收尾时间
-    ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-    defer cancel()
-
-    if err := srv.Shutdown(ctx); err != nil {
-        fmt.Println("server forced to shutdown:", err)
-    }
-    fmt.Println("server exiting")
-}
-
-func hello(w http.ResponseWriter, r *http.Request) {
-    time.Sleep(2 * time.Second)
-    fmt.Fprintln(w, "hello")
-}
-```
-
-**关键点**：
-
-- `srv.Shutdown(ctx)` 会关闭监听，等待已有请求完成
-- 避免直接 kill 导致请求中断
-
-***
-
 ### 4. 高并发计数器（atomic 无锁）
 
 ```go
@@ -1275,30 +1193,6 @@ func main() {
 
 ***
 
-### 7. 项目实战：调度系统高并发任务下发
-
-```
-请求接入层（gin）
-    │
-    ↓ 把任务写入 Kafka / RabbitMQ
-消息队列
-    │
-    ↓ 多个消费者 goroutine 并发拉取
-任务调度服务（go-zero）
-    │
-    ↓ 调用 k8s client 创建训练 Job
-K8s 集群
-```
-
-**高并发手段**：
-
-- 接入层：限流 + 负载均衡
-- 任务队列：削峰填谷，避免瞬时打爆 k8s
-- 消费者：固定 worker 数量，避免 goroutine 爆炸
-- 调用 k8s：加熔断 + 重试 + 指数退避
-- 状态同步：etcd watch 实时感知任务状态
-
-***
 
 ## 十五、高并发高可用设计原则
 
@@ -1312,21 +1206,6 @@ K8s 集群
 | **超时重试** | 避免长时间阻塞，重试带退避             |
 | **负载均衡** | 多实例分摊流量                   |
 | **监控告警** | Prometheus + Grafana + 告警 |
-
-***
-
-## 十六、一句话总结
-
-- **GMP**：G 是任务，M 是线程，P 是调度器，work stealing 实现高并发
-- **GC**：三色标记 + 写屏障，Go 1.8 后 STW 很短
-- **Slice**：底层数组 + len/cap，append 可能扩容，注意共享底层数组
-- **Map**：哈希表，负载因子 6.5 或溢出桶多会扩容，并发不安全
-- **Channel**：goroutine 通信管道，有缓冲/无缓冲两种
-- **Context**：传取消信号、超时、元数据
-- **锁**：Mutex、RWMutex、Once、atomic 按场景选
-- **高并发**：限流、worker pool、atomic、对象池、熔断
-- **高可用**：graceful shutdown、无状态、负载均衡、监控告警
-- **微服务**：gin/goframe 做业务，go-zero/gRPC 做 RPC，etcd 做注册发现，k8s 做部署调度
 
 ***
 
