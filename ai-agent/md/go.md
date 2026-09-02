@@ -768,8 +768,31 @@ func main() {
 |---|---|---|
 | 基本类型、struct、array | 值拷贝 | 不影响 |
 | slice、map、channel、指针 | 引用拷贝 | 影响 |
+| interface（接口类型） | 值拷贝 (typ,val) 双字段 | 接口本身拷贝；是否影响外层，取决于包裹的数据是不是共享底层(指针 /slice/map /chan) |
+| func（函数类型） | 拷贝函数指针 | 函数本身不可修改；闭包捕获变量共享 |
 
 > ⚠️ slice 和 map 本身是引用类型，但内部结构是值拷贝，append 扩容会导致底层数组变化。
+
+**延申interface{}**
+
+interface{} 属于接口类型，不是值类型也不是引用类型。
+内存结构（64 位）：2 个指针 (typ, val)。
+
+1. 当把值类型赋给 interface {}：会拷贝一份值存入接口的 val。
+
+```go
+n:=10
+var x interface{} = n // int值被拷贝进去
+```
+
+2. 当把指针 / 引用类型赋给 interface {}：val 存指针，底层数据共享。
+
+```go
+m := make(map[string]int)
+var x interface{} = m // val存map头指针
+```
+
+> ⚠️ interface {} nil 陷阱：只有 typ、val 同时 nil，接口变量才等于 nil。
 
 ---
 
