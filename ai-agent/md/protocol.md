@@ -166,7 +166,124 @@ HTTP + SSL/TLS = HTTPS，在传输层对数据进行加密。
 | 对称加密 | 快，双方用同一个密钥 | 传输数据 |
 | 非对称加密 | 慢，公钥加密私钥解密 | 握手时交换密钥 |
 
-### 4. 证书验证
+### 4. 常见加密方式有哪些？
+
+按密钥使用方式分两类：
+
+```
+加密
+├── 对称加密：加解密用同一个密钥
+│     ├── AES（最常用）
+│     ├── DES（已淘汰）
+│     └── 3DES
+│
+└── 非对称加密：公钥加密、私钥解密
+      ├── RSA（最常用）
+      ├── ECC（椭圆曲线，更轻量）
+      └── DSA（多用于签名）
+```
+
+按功能还可以分：
+
+| 类型 | 作用 | 常见算法 |
+|---|---|---|
+| 加密 | 保证数据机密性 | AES、RSA、SM2/SM4 |
+| 哈希 | 保证数据完整性 | SHA-256、MD5 |
+| 数字签名 | 保证身份认证 + 不可抵赖 | RSA-SHA256、ECDSA |
+
+### 5. AES 对称加密怎么加解密？
+
+```python
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad, unpad
+import base64
+
+# 密钥必须是 16/24/32 字节
+key = b"1234567890123456"
+
+def aes_encrypt(plain_text: str) -> str:
+    cipher = AES.new(key, AES.MODE_ECB)
+    padded = pad(plain_text.encode(), AES.block_size)
+    encrypted = cipher.encrypt(padded)
+    return base64.b64encode(encrypted).decode()
+
+def aes_decrypt(cipher_text: str) -> str:
+    cipher = AES.new(key, AES.MODE_ECB)
+    encrypted = base64.b64decode(cipher_text)
+    padded = cipher.decrypt(encrypted)
+    return unpad(padded, AES.block_size).decode()
+
+secret = aes_encrypt("hello world")
+print(secret)
+print(aes_decrypt(secret))
+```
+
+**面试重点**：
+- AES 密钥长度决定安全强度：128/192/256 位
+- 实际生产推荐 AES-GCM 模式，自带认证，比 ECB 安全
+- 密钥必须安全分发，不能明文传输
+
+### 6. RSA 非对称加密怎么加解密？
+
+```python
+from Crypto.PublicKey import RSA
+from Crypto.Cipher import PKCS1_v1_5
+import base64
+
+# 生成密钥对
+key = RSA.generate(2048)
+private_key = key.export_key()
+public_key = key.publickey().export_key()
+
+def rsa_encrypt(plain_text: str, pub_key: bytes) -> str:
+    rsakey = RSA.import_key(pub_key)
+    cipher = PKCS1_v1_5.new(rsakey)
+    encrypted = cipher.encrypt(plain_text.encode())
+    return base64.b64encode(encrypted).decode()
+
+def rsa_decrypt(cipher_text: str, pri_key: bytes) -> str:
+    rsakey = RSA.import_key(pri_key)
+    cipher = PKCS1_v1_5.new(rsakey)
+    decrypted = cipher.decrypt(base64.b64decode(cipher_text), None)
+    return decrypted.decode()
+
+secret = rsa_encrypt("hello world", public_key)
+print(rsa_decrypt(secret, private_key))
+```
+
+**面试重点**：
+- 公钥可以公开，私钥必须保密
+- RSA 适合加密小数据（如对称密钥），大数据用 AES
+- HTTPS 握手时用 RSA/ECC 交换 AES 会话密钥
+
+### 7. 哈希和数字签名
+
+```python
+import hashlib
+
+# 哈希：任意数据 → 固定长度摘要
+digest = hashlib.sha256("hello".encode()).hexdigest()
+print(digest)
+```
+
+**数字签名流程**：
+
+```
+发送方：原文 → SHA-256 摘要 → 私钥加密摘要 → 得到签名
+接收方：原文 → SHA-256 摘要
+        签名 → 公钥解密 → 得到摘要
+        两个摘要对比，一致则原文未被篡改且来自发送方
+```
+
+| 概念 | 作用 |
+|---|---|
+| 加密 | 防窃取 |
+| 哈希 | 防篡改 |
+| 数字签名 | 防伪造 + 不可否认 |
+
+---
+
+### 8. 证书验证
 
 1. 客户端拿到服务端证书
 2. 用 CA 公钥验证证书签名
