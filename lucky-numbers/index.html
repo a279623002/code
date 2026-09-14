@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Lucky Numbers - 幸运号码</title>
+  <style>
+    :root {
+      --bg: #0a0a1a;
+      --card-bg: rgba(20, 20, 50, 0.9);
+      --text: #e0e0ff;
+      --red: #E74C3C;
+      --blue: #3498DB;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+      height: 100dvh;
+      width: 100vw;
+      position: fixed;
+      top: 0; left: 0;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+      touch-action: manipulation;
+    }
+
+    #app {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+    }
+
+    .header {
+      text-align: center;
+      padding: 8px 16px 2px;
+      flex-shrink: 0;
+      z-index: 10;
+    }
+    .header h1 {
+      font-size: min(5.5vw, 26px);
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffd700, #ff6b6b, #ffd700);
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 3s ease-in-out infinite;
+    }
+    @keyframes shimmer {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .mode-toggle {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      padding: 4px 16px;
+      flex-shrink: 0;
+      z-index: 10;
+    }
+    .mode-btn {
+      padding: 8px 22px;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 20px;
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      font-size: min(3.5vw, 14px);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+    .mode-btn.active {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-color: transparent;
+      box-shadow: 0 4px 20px rgba(102,126,234,0.4);
+    }
+    .mode-btn:active { transform: scale(0.95); }
+
+    .canvas-container {
+      flex: 1;
+      position: relative;
+      min-height: 0;
+      cursor: grab;
+    }
+    .canvas-container:active { cursor: grabbing; }
+    .canvas-container canvas { display: block; }
+
+    /* Labels on canvas */
+    .sphere-label {
+      position: absolute;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.6);
+      border-radius: 12px;
+      padding: 3px 12px;
+      font-size: min(2.8vw, 12px);
+      font-weight: 600;
+      color: #fff;
+      pointer-events: none;
+      white-space: nowrap;
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+    .sphere-label.left { top: 4%; }
+    .sphere-label.right { top: 4%; }
+
+    /* Results */
+    .results-area {
+      flex-shrink: 0;
+      z-index: 10;
+      padding: 6px 12px;
+    }
+    .results-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      justify-content: center;
+      align-items: center;
+      min-height: 36px;
+      padding: 6px 10px;
+      border-radius: 14px;
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+    }
+    .result-ball {
+      width: min(9vw, 38px);
+      height: min(9vw, 38px);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: min(3.8vw, 15px);
+      color: #fff;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.4), inset 0 -2px 3px rgba(0,0,0,0.2), inset 0 2px 3px rgba(255,255,255,0.25);
+      animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+    }
+    .result-ball.red { background: radial-gradient(circle at 35% 35%, #ff6b6b, #c0392b); }
+    .result-ball.blue { background: radial-gradient(circle at 35% 35%, #5dade2, #2471a3); }
+    .result-placeholder {
+      color: rgba(255,255,255,0.3);
+      font-size: min(3.2vw, 13px);
+    }
+    .result-label {
+      font-size: min(2.8vw, 11px);
+      color: rgba(255,255,255,0.5);
+      margin-right: 2px;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0) rotate(180deg); opacity: 0; }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
+
+    /* Controls */
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      padding: 6px 12px 14px;
+      flex-shrink: 0;
+      z-index: 10;
+    }
+    .action-btn {
+      padding: 12px 28px;
+      border: none;
+      border-radius: 26px;
+      font-size: min(4.2vw, 16px);
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      letter-spacing: 1px;
+    }
+    .action-btn:active { transform: scale(0.93); }
+    .draw-btn {
+      background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+      color: #fff;
+      box-shadow: 0 5px 22px rgba(238,90,36,0.45);
+      flex: 1;
+      max-width: 200px;
+    }
+    .draw-btn:disabled {
+      background: #555;
+      box-shadow: none;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+    .reset-btn {
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+      border: 2px solid rgba(255,255,255,0.18);
+      padding: 12px 20px;
+    }
+
+    @media (max-width: 400px) {
+      .header { padding: 6px 10px 0; }
+      .header h1 { font-size: 5.5vw; }
+      .mode-btn { padding: 6px 14px; font-size: 3.2vw; }
+      .controls { padding: 4px 10px 10px; }
+      .action-btn { padding: 10px 18px; font-size: 3.8vw; }
+      .results-area { padding: 4px 8px; }
+      .result-ball { width: 8.5vw; height: 8.5vw; font-size: 3.5vw; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="header"><h1>Lucky Numbers</h1></div>
+    <div class="mode-toggle">
+      <button class="mode-btn active" data-mode="ssq" id="btnSSQ">双色球</button>
+      <button class="mode-btn" data-mode="dlt" id="btnDLT">大乐透</button>
+    </div>
+    <div class="canvas-container" id="canvasContainer">
+      <div class="sphere-label left" id="labelLeft"></div>
+      <div class="sphere-label right" id="labelRight"></div>
+    </div>
+    <div class="results-area">
+      <div class="results-container" id="resultsContainer">
+        <span class="result-placeholder">点击下方按钮开始抽奖</span>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="action-btn draw-btn" id="btnDraw">开始抽奖</button>
+      <button class="action-btn reset-btn" id="btnReset">重置</button>
+    </div>
+  </div>
+
+  <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+
+    // ==================== CONFIG ====================
+    const CONFIG = {
+      ssq: {
+        name: '双色球',
+        pools: [
+          { name: '红球', color: '#C0392B', bright: '#ff6b6b', count: 33, draw: 6, cssClass: 'red' },
+          { name: '蓝球', color: '#1F618D', bright: '#5dade2', count: 16, draw: 1, cssClass: 'blue' },
+        ],
+      },
+      dlt: {
+        name: '大乐透',
+        pools: [
+          { name: '前区', color: '#C0392B', bright: '#ff6b6b', count: 35, draw: 5, cssClass: 'red' },
+          { name: '后区', color: '#1F618D', bright: '#5dade2', count: 12, draw: 2, cssClass: 'blue' },
+        ],
+      },
+    };
+
+    // ==================== DOM ====================
+    const canvasContainer = document.getElementById('canvasContainer');
+    const resultsContainer = document.getElementById('resultsContainer');
+    const labelLeft = document.getElementById('labelLeft');
+    const labelRight = document.getElementById('labelRight');
+    const btnDraw = document.getElementById('btnDraw');
+    const btnReset = document.getElementById('btnReset');
+    const btnSSQ = document.getElementById('btnSSQ');
+    const btnDLT = document.getElementById('btnDLT');
+
+    // ==================== STATE ====================
+    let currentMode = 'ssq';
+    let isDrawing = false;
+    let drawSequence = [];       // [{sphereIdx, poolIdx}] - ordered list of draws to perform
+    let drawSeqIndex = 0;
+    let results = [];            // [{number, poolIdx, cssClass}]
+    let exitingBall = null;     // {sphere, ball, progress, startPos}
+    let spheres = [];            // [{group, balls:[], glass, platform, ring, radius, config:{count,draw,color,bright}}]
+
+    // ==================== THREE.JS SETUP ====================
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.Fog(0x0a0a1a, 15, 30);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.1;
+    canvasContainer.appendChild(renderer.domElement);
+
+    const camera = new THREE.PerspectiveCamera(40, 2, 0.5, 40);
+    camera.position.set(0, 1.5, 14);
+    camera.lookAt(0, 0, 0);
+
+    // Lighting
+    scene.add(new THREE.AmbientLight(0x303050, 2));
+    const key = new THREE.DirectionalLight(0xffffff, 3.5);
+    key.position.set(4, 8, 6);
+    scene.add(key);
+    const fill = new THREE.DirectionalLight(0x6666cc, 1.5);
+    fill.position.set(-4, 1, -3);
+    scene.add(fill);
+    const rim = new THREE.DirectionalLight(0xff8866, 1.2);
+    rim.position.set(0, -1, 4);
+    scene.add(rim);
+    scene.add(new THREE.PointLight(0x667eea, 25, 14, 2));
+    scene.add(new THREE.PointLight(0xff6b6b, 18, 12, 2));
+
+    // Background particles
+    const pGeo = new THREE.BufferGeometry();
+    const pCount = 300;
+    const pPos = new Float32Array(pCount * 3);
+    for (let i = 0; i < pCount; i++) {
+      pPos[i * 3] = (Math.random() - 0.5) * 22;
+      pPos[i * 3 + 1] = (Math.random() - 0.5) * 22;
+      pPos[i * 3 + 2] = (Math.random() - 0.5) * 16;
+    }
+    pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+    const pMat = new THREE.PointsMaterial({ color: 0x8899ff, size: 0.025, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending });
+    const particles = new THREE.Points(pGeo, pMat);
+    scene.add(particles);
+
+    // Ground grid
+    const gridHelper = new THREE.PolarGridHelper(8, 32, 24, 64, 0x222244, 0x111133);
+    gridHelper.position.y = -5;
+    scene.add(gridHelper);
+
+    // ==================== TEXTURE HELPERS ====================
+    function createBallTexture(number, baseColor, brightColor) {
+      const size = 256;
+      const c = document.createElement('canvas');
+      c.width = c.height = size;
+      const ctx = c.getContext('2d');
+
+      const g = ctx.createRadialGradient(size * 0.32, size * 0.28, size * 0.04, size * 0.5, size * 0.5, size * 0.5);
+      g.addColorStop(0, brightColor);
+      g.addColorStop(0.45, baseColor);
+      g.addColorStop(1, '#0a0000');
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(size / 2, size / 2, size / 2 - 8, 0, Math.PI * 2);
+      ctx.fill();
+
+      const sg = ctx.createRadialGradient(size * 0.28, size * 0.22, 0, size * 0.5, size * 0.5, size * 0.38);
+      sg.addColorStop(0, 'rgba(255,255,255,0.45)');
+      sg.addColorStop(0.5, 'rgba(255,255,255,0.08)');
+      sg.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = sg;
+      ctx.beginPath();
+      ctx.arc(size / 2, size / 2, size / 2 - 8, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 96px -apple-system, "PingFang SC", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.shadowColor = 'rgba(0,0,0,0.55)';
+      ctx.shadowBlur = 10;
+      ctx.fillText(String(number), size / 2, size / 2 + 4);
+
+      const tex = new THREE.CanvasTexture(c);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.minFilter = THREE.LinearMipmapLinearFilter;
+      tex.magFilter = THREE.LinearFilter;
+      tex.generateMipmaps = true;
+      return tex;
+    }
+
+    // ==================== CREATE SPHERE ====================
+    const BALL_RADIUS = 0.28;
+    const ballGeo = new THREE.SphereGeometry(BALL_RADIUS, 28, 20);
+
+    function createSphereGroup(config, position, isLeft) {
+      const radius = 2.5;
+      const group = new THREE.Group();
+      group.position.copy(position);
+      scene.add(group);
+
+      // Glass sphere
+      const glassGeo = new THREE.SphereGeometry(radius, 56, 40);
+      const glassMat = new THREE.MeshPhysicalMaterial({
+        color: 0xffffff, metalness: 0.04, roughness: 0.12,
+        transparent: true, opacity: 0.1, envMapIntensity: 0.3,
+      });
+      const glass = new THREE.Mesh(glassGeo, glassMat);
+      group.add(glass);
+
+      // Wire rings
+      const ringGeo = new THREE.TorusGeometry(radius, 0.025, 12, 72);
+      const ringMat = new THREE.MeshStandardMaterial({ color: 0xaaaaaa, metalness: 0.85, roughness: 0.25, emissive: 0x222222, emissiveIntensity: 0.4 });
+      const ringH = new THREE.Mesh(ringGeo, ringMat);
+      group.add(ringH);
+      const ringV = new THREE.Mesh(ringGeo, ringMat.clone());
+      ringV.rotation.x = Math.PI / 2;
+      group.add(ringV);
+
+      // Platform
+      const platGeo = new THREE.CylinderGeometry(1.2, 1.5, 0.25, 40);
+      const platMat = new THREE.MeshStandardMaterial({ color: 0x222244, metalness: 0.5, roughness: 0.45 });
+      const plat = new THREE.Mesh(platGeo, platMat);
+      plat.position.y = -radius - 0.12;
+      plat.castShadow = plat.receiveShadow = true;
+      group.add(plat);
+
+      // Glow ring on platform
+      const glowGeo = new THREE.TorusGeometry(1.35, 0.04, 12, 56);
+      const glowMat = new THREE.MeshStandardMaterial({
+        color: config.draw > 1 ? 0xff6644 : 0x4488ff,
+        emissive: config.draw > 1 ? 0xff4422 : 0x3366cc,
+        emissiveIntensity: 1.5,
+        roughness: 0.15,
+      });
+      const glowRing = new THREE.Mesh(glowGeo, glowMat);
+      glowRing.rotation.x = Math.PI / 2;
+      glowRing.position.y = -radius + 0.01;
+      group.add(glowRing);
+
+      // Exit tube (top)
+      const tubeGeo = new THREE.CylinderGeometry(0.35, 0.4, 0.5, 24);
+      const tubeMat = new THREE.MeshStandardMaterial({ color: 0x888888, metalness: 0.7, roughness: 0.3 });
+      const tube = new THREE.Mesh(tubeGeo, tubeMat);
+      tube.position.y = radius + 0.2;
+      group.add(tube);
+
+      // Tube ring
+      const tubeRingGeo = new THREE.TorusGeometry(0.38, 0.03, 8, 32);
+      const tubeRing = new THREE.Mesh(tubeRingGeo, ringMat.clone());
+      tubeRing.position.y = radius + 0.45;
+      group.add(tubeRing);
+
+      // Balls
+      const balls = [];
+      for (let i = 0; i < config.count; i++) {
+        const num = i + 1;
+        const tex = createBallTexture(num, config.color, config.bright);
+        const mat = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.32, metalness: 0.04 });
+        const mesh = new THREE.Mesh(ballGeo, mat);
+        mesh.castShadow = true;
+
+        // Random position inside sphere
+        const innerR = radius - BALL_RADIUS - 0.05;
+        const r = Math.random() * innerR * 0.85;
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        mesh.position.set(
+          r * Math.sin(phi) * Math.cos(theta),
+          r * Math.sin(phi) * Math.sin(theta),
+          r * Math.cos(phi)
+        );
+
+        group.add(mesh);
+        balls.push({
+          mesh,
+          number: num,
+          velocity: new THREE.Vector3((Math.random() - 0.5) * 0.02, (Math.random() - 0.5) * 0.02, (Math.random() - 0.5) * 0.02),
+          drawn: false,
+          weight: Math.random(),
+        });
+      }
+
+      return {
+        group,
+        balls,
+        glass,
+        glassMat,
+        platform: plat,
+        glowRing,
+        radius,
+        config,
+        isLeft,
+        worldPos: position.clone(),
+        tube,
+        tubeTop: position.y + radius + 0.45,
+      };
+    }
+
+    function buildSpheres(mode) {
+      // Cleanup old
+      spheres.forEach(s => {
+        scene.remove(s.group);
+        s.group.traverse(child => {
+          if (child.material) {
+            if (child.material.map) child.material.map.dispose();
+            if (Array.isArray(child.material)) child.material.forEach(m => { if (m.map) m.map.dispose(); m.dispose(); });
+            else child.material.dispose();
+          }
+          if (child.geometry) child.geometry.dispose();
+        });
+      });
+      spheres = [];
+
+      const cfg = CONFIG[mode];
+      // Determine spacing based on screen aspect
+      const aspect = canvasContainer.clientWidth / Math.max(canvasContainer.clientHeight, 1);
+      const spacing = aspect > 1.3 ? 3.4 : 2.7;
+
+      cfg.pools.forEach((pool, i) => {
+        const x = i === 0 ? -spacing : spacing;
+        const s = createSphereGroup(pool, new THREE.Vector3(x, 0, 0), i === 0);
+        spheres.push(s);
+      });
+
+      // Labels
+      labelLeft.textContent = cfg.pools[0].name;
+      labelRight.textContent = cfg.pools[1].name;
+      updateLabels();
+    }
+
+    function updateLabels() {
+      if (spheres.length < 2) return;
+      const s0 = toScreen(spheres[0].worldPos.clone().add(new THREE.Vector3(0, spheres[0].radius + 0.8, 0)));
+      const s1 = toScreen(spheres[1].worldPos.clone().add(new THREE.Vector3(0, spheres[1].radius + 0.8, 0)));
+      labelLeft.style.left = s0.x + 'px';
+      labelLeft.style.top = s0.y + 'px';
+      labelRight.style.left = s1.x + 'px';
+      labelRight.style.top = s1.y + 'px';
+    }
+
+    function toScreen(worldPos) {
+      const v = worldPos.clone().project(camera);
+      return {
+        x: (v.x * 0.5 + 0.5) * canvasContainer.clientWidth,
+        y: (-v.y * 0.5 + 0.5) * canvasContainer.clientHeight,
+      };
+    }
+
+    // ==================== PHYSICS ====================
+    function physicsStep(sphere, intensity) {
+      const innerR = sphere.radius - BALL_RADIUS;
+
+      sphere.balls.forEach(ball => {
+        if (ball.drawn) return;
+
+        // Velocity
+        ball.mesh.position.x += ball.velocity.x;
+        ball.mesh.position.y += ball.velocity.y;
+        ball.mesh.position.z += ball.velocity.z;
+
+        // Sphere boundary
+        const dist = ball.mesh.position.length();
+        if (dist > innerR) {
+          const n = ball.mesh.position.clone().normalize();
+          ball.mesh.position.copy(n.multiplyScalar(innerR));
+          const dot = ball.velocity.dot(n);
+          ball.velocity.sub(n.clone().multiplyScalar(2 * dot));
+          ball.velocity.multiplyScalar(0.82);
+        }
+
+        // Gravity
+        ball.velocity.y -= 0.0004;
+
+        // Agitation
+        if (intensity > 0) {
+          ball.velocity.x += (Math.random() - 0.5) * intensity * 0.008;
+          ball.velocity.y += (Math.random() - 0.5) * intensity * 0.008;
+          ball.velocity.z += (Math.random() - 0.5) * intensity * 0.008;
+        }
+
+        // Speed clamp
+        const maxSpd = 0.12 + intensity * 0.04;
+        const spd = ball.velocity.length();
+        if (spd > maxSpd) ball.velocity.normalize().multiplyScalar(maxSpd);
+
+        // Spin
+        ball.mesh.rotation.x += ball.velocity.y * 4;
+        ball.mesh.rotation.y += ball.velocity.x * 4;
+        ball.mesh.rotation.z += ball.velocity.z * 3;
+      });
+
+      // Ball-ball collisions (sphere-local)
+      const bs = sphere.balls;
+      for (let i = 0; i < bs.length; i++) {
+        if (bs[i].drawn) continue;
+        for (let j = i + 1; j < bs.length; j++) {
+          if (bs[j].drawn) continue;
+          const diff = new THREE.Vector3().subVectors(bs[i].mesh.position, bs[j].mesh.position);
+          const d = diff.length();
+          const minD = BALL_RADIUS * 2;
+          if (d < minD && d > 0.001) {
+            const overlap = minD - d;
+            const n = diff.normalize();
+            bs[i].mesh.position.add(n.clone().multiplyScalar(overlap / 2));
+            bs[j].mesh.position.add(n.clone().multiplyScalar(-overlap / 2));
+            const relV = bs[i].velocity.clone().sub(bs[j].velocity);
+            const valN = relV.dot(n);
+            if (valN > 0) {
+              const imp = n.clone().multiplyScalar(valN * 0.45);
+              bs[i].velocity.sub(imp);
+              bs[j].velocity.add(imp);
+            }
+          }
+        }
+      }
+    }
+
+    // ==================== DRAW LOGIC ====================
+    function startDraw() {
+      if (isDrawing) return;
+      isDrawing = true;
+      btnDraw.disabled = true;
+      results = [];
+      drawSequence = [];
+      drawSeqIndex = 0;
+      exitingBall = null;
+
+      // Reset all balls
+      spheres.forEach(s => {
+        s.balls.forEach(b => {
+          b.drawn = false;
+          b.weight = Math.random(); // fresh random weight
+          b.mesh.material.emissive = new THREE.Color(0x000000);
+          b.mesh.material.emissiveIntensity = 0;
+          b.mesh.scale.setScalar(1);
+          b.mesh.visible = true;
+          // Re-randomize position
+          const innerR = s.radius - BALL_RADIUS - 0.05;
+          const r = Math.random() * innerR * 0.7;
+          const theta = Math.random() * Math.PI * 2;
+          const phi = Math.acos(2 * Math.random() - 1);
+          b.mesh.position.set(
+            r * Math.sin(phi) * Math.cos(theta),
+            r * Math.sin(phi) * Math.sin(theta),
+            r * Math.cos(phi)
+          );
+          b.velocity.set((Math.random() - 0.5) * 0.02, (Math.random() - 0.5) * 0.02, (Math.random() - 0.5) * 0.02);
+        });
+      });
+
+      const cfg = CONFIG[currentMode];
+      cfg.pools.forEach((pool, poolIdx) => {
+        for (let d = 0; d < pool.draw; d++) {
+          drawSequence.push({ sphereIdx: poolIdx, poolIdx });
+        }
+      });
+      // Shuffle to interleave draws between spheres for more visual interest
+      // Actually, let's draw all from first sphere, then second - more like real lottery
+      // drawSequence is already ordered by pool
+
+      updateResultsView();
+      // Start agitation
+      setTimeout(() => drawNext(), 1500);
+    }
+
+    function drawNext() {
+      if (drawSeqIndex >= drawSequence.length) {
+        finishDraw();
+        return;
+      }
+
+      const seq = drawSequence[drawSeqIndex];
+      const sphere = spheres[seq.sphereIdx];
+      const available = sphere.balls.filter(b => !b.drawn);
+
+      if (available.length === 0) {
+        drawSeqIndex++;
+        setTimeout(() => drawNext(), 300);
+        return;
+      }
+
+      // Weighted random selection - pick ball based on its current Y position as a factor
+      // Higher balls (closer to exit) get bonus weight, making it feel more realistic
+      const weights = available.map(b => {
+        const yFactor = (b.mesh.position.y / sphere.radius + 1) / 2; // 0-1, higher = closer to exit
+        return b.weight * (0.3 + yFactor * 0.7); // blend random weight with position
+      });
+      const totalW = weights.reduce((s, w) => s + w, 0);
+      let rand = Math.random() * totalW;
+      let selected = available[0];
+      for (let i = 0; i < available.length; i++) {
+        rand -= weights[i];
+        if (rand <= 0) { selected = available[i]; break; }
+      }
+
+      selected.drawn = true;
+      drawSeqIndex++;
+
+      // Start exit animation
+      exitingBall = {
+        sphere,
+        ball: selected,
+        progress: 0,
+        startPos: selected.mesh.position.clone(),
+      };
+
+      // Highlight
+      selected.mesh.material.emissive = new THREE.Color(0xffffff);
+      selected.mesh.material.emissiveIntensity = 1.0;
+
+      // Add result immediately
+      results.push({
+        number: selected.number,
+        poolIdx: seq.poolIdx,
+        cssClass: CONFIG[currentMode].pools[seq.poolIdx].cssClass,
+      });
+      updateResultsView();
+
+      // Next ball after exit animation
+      setTimeout(() => {
+        exitingBall = null;
+        if (drawSeqIndex < drawSequence.length) {
+          setTimeout(() => drawNext(), 600);
+        } else {
+          finishDraw();
+        }
+      }, 1800);
+    }
+
+    function finishDraw() {
+      isDrawing = false;
+      btnDraw.disabled = false;
+      btnDraw.textContent = '再抽一次';
+      exitingBall = null;
+      spheres.forEach(s => {
+        s.balls.forEach(b => {
+          b.mesh.material.emissive = new THREE.Color(0x000000);
+          b.mesh.material.emissiveIntensity = 0;
+        });
+      });
+    }
+
+    function resetDraw() {
+      if (isDrawing) return;
+      results = [];
+      drawSequence = [];
+      drawSeqIndex = 0;
+      exitingBall = null;
+
+      spheres.forEach(s => {
+        s.balls.forEach(b => {
+          b.drawn = false;
+          b.mesh.visible = true;
+          b.mesh.material.emissive = new THREE.Color(0x000000);
+          b.mesh.material.emissiveIntensity = 0;
+          b.mesh.scale.setScalar(1);
+        });
+      });
+
+      updateResultsView();
+      btnDraw.textContent = '开始抽奖';
+      btnDraw.disabled = false;
+    }
+
+    function updateResultsView() {
+      if (results.length === 0) {
+        resultsContainer.innerHTML = '<span class="result-placeholder">点击下方按钮开始抽奖</span>';
+        return;
+      }
+
+      const cfg = CONFIG[currentMode];
+      let html = '';
+      cfg.pools.forEach((pool, pi) => {
+        const poolRes = results.filter(r => r.poolIdx === pi);
+        if (poolRes.length > 0) {
+          html += `<span class="result-label">${pool.name}:</span>`;
+          poolRes.forEach((r, i) => {
+            html += `<span class="result-ball ${r.cssClass}" style="animation-delay:${i * 0.08}s">${String(r.number).padStart(2, '0')}</span>`;
+          });
+        }
+      });
+      resultsContainer.innerHTML = html;
+    }
+
+    // ==================== CAMERA CONTROLS ====================
+    let isDragging = false, prevMouse = { x: 0, y: 0 };
+    let spherical = { theta: 0, phi: Math.PI / 2.4 };
+    let autoRotate = true;
+
+    function updateCam() {
+      const r = 14;
+      camera.position.set(
+        r * Math.sin(spherical.phi) * Math.cos(spherical.theta),
+        r * Math.cos(spherical.phi),
+        r * Math.sin(spherical.phi) * Math.sin(spherical.theta)
+      );
+      camera.lookAt(0, 0, 0);
+      updateLabels();
+    }
+    updateCam();
+
+    canvasContainer.addEventListener('pointerdown', e => {
+      if (e.target === renderer.domElement) {
+        isDragging = true;
+        autoRotate = false;
+        prevMouse.x = e.clientX;
+        prevMouse.y = e.clientY;
+      }
+    });
+    window.addEventListener('pointermove', e => {
+      if (!isDragging) return;
+      spherical.theta -= (e.clientX - prevMouse.x) * 0.004;
+      spherical.phi -= (e.clientY - prevMouse.y) * 0.004;
+      spherical.phi = Math.max(0.35, Math.min(Math.PI - 0.35, spherical.phi));
+      prevMouse.x = e.clientX;
+      prevMouse.y = e.clientY;
+      updateCam();
+    });
+    window.addEventListener('pointerup', () => {
+      isDragging = false;
+      setTimeout(() => { autoRotate = true; }, 2000);
+    });
+
+    // ==================== RESIZE ====================
+    function onResize() {
+      const w = canvasContainer.clientWidth;
+      const h = canvasContainer.clientHeight;
+      renderer.setSize(w, h);
+      camera.aspect = w / Math.max(h, 1);
+      camera.updateProjectionMatrix();
+      updateLabels();
+    }
+    window.addEventListener('resize', onResize);
+
+    // ==================== MODE SWITCH ====================
+    function switchMode(mode) {
+      if (isDrawing || currentMode === mode) return;
+      currentMode = mode;
+      btnSSQ.classList.toggle('active', mode === 'ssq');
+      btnDLT.classList.toggle('active', mode === 'dlt');
+      results = [];
+      drawSequence = [];
+      drawSeqIndex = 0;
+      exitingBall = null;
+      updateResultsView();
+      btnDraw.textContent = '开始抽奖';
+      btnDraw.disabled = false;
+      buildSpheres(mode);
+    }
+    btnSSQ.addEventListener('click', () => switchMode('ssq'));
+    btnDLT.addEventListener('click', () => switchMode('dlt'));
+
+    // ==================== BUTTONS ====================
+    btnDraw.addEventListener('click', () => {
+      if (!isDrawing) {
+        results = [];
+        updateResultsView();
+        btnDraw.textContent = '抽奖中...';
+        startDraw();
+      }
+    });
+    btnReset.addEventListener('click', resetDraw);
+
+    // ==================== ANIMATION LOOP ====================
+    const clock = new THREE.Clock();
+    let agitationLevel = 0;
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const dt = Math.min(clock.getDelta(), 0.1);
+
+      // Agitation intensity
+      let targetAgitation = 0;
+      if (isDrawing && exitingBall) targetAgitation = 4;
+      else if (isDrawing && drawSeqIndex < drawSequence.length) targetAgitation = 5;
+      else if (isDrawing) targetAgitation = 0;
+
+      agitationLevel += (targetAgitation - agitationLevel) * Math.min(dt * 3, 1);
+
+      // Physics
+      spheres.forEach(s => physicsStep(s, agitationLevel));
+
+      // Exit animation
+      if (exitingBall) {
+        const { sphere, ball, startPos } = exitingBall;
+        exitingBall.progress += dt * 0.65;
+
+        if (exitingBall.progress < 1) {
+          const t = exitingBall.progress;
+          // Ease-out cubic
+          const ease = 1 - Math.pow(1 - t, 3);
+
+          // Move to top center of sphere, then out the tube (all in sphere-local space)
+          const topLocal = new THREE.Vector3(0, sphere.radius + BALL_RADIUS, 0);
+          const outPos = new THREE.Vector3(0, sphere.radius + 0.45 + 1.5, 0);
+
+          if (t < 0.6) {
+            // Move to center-top inside sphere
+            const tt = t / 0.6;
+            ball.mesh.position.lerpVectors(startPos, topLocal, ease * tt);
+          } else {
+            // Exit through tube
+            const tt = (t - 0.6) / 0.4;
+            ball.mesh.position.lerpVectors(topLocal, outPos, ease * tt);
+            ball.mesh.scale.setScalar(1 - tt * 0.7);
+          }
+
+          // Glow pulse
+          ball.mesh.material.emissiveIntensity = 0.6 + Math.sin(t * 25) * 0.5;
+        } else {
+          ball.mesh.visible = false;
+          ball.mesh.scale.setScalar(1);
+          ball.mesh.material.emissiveIntensity = 0;
+        }
+      }
+
+      // Auto rotate
+      if (autoRotate && !isDragging) {
+        spherical.theta += 0.002 + agitationLevel * 0.001;
+        updateCam();
+      }
+
+      // Animate glow rings
+      const t = Date.now() * 0.001;
+      spheres.forEach((s, i) => {
+        s.glowRing.material.emissiveIntensity = 1.2 + Math.sin(t * 2 + i) * 0.6;
+        s.glowRing.rotation.z += dt * 0.4;
+      });
+
+      particles.rotation.y += dt * 0.04;
+
+      renderer.render(scene, camera);
+    }
+
+    // ==================== INIT ====================
+    function init() {
+      onResize();
+      buildSpheres(currentMode);
+      animate();
+    }
+    init();
+
+    console.log('Lucky Numbers ready!');
+    console.log('双色球: 红球区(33选6) | 蓝球区(16选1)');
+    console.log('大乐透: 前区(35选5) | 后区(12选2)');
+    console.log('拖拽旋转视角 | 两球池分开独立运作');
+  </script>
+</body>
+</html>
