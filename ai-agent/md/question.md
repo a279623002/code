@@ -16,8 +16,9 @@
 | 语言 | Go（主力）、Python、PHP（历史） |
 | Go 框架 | Gin、GoFrame、go-zero、Beego |
 | 存储 | MySQL、Redis、MongoDB、达梦、人大金仓 |
-| 中间件 | RabbitMQ、MQTT、Nginx |
+| 中间件 | RabbitMQ、Kafka（对比了解）、MQTT、Nginx |
 | 云原生 | Kubernetes、Prometheus、Grafana、Docker |
+| 安全与协议 | OAuth2、JWT、RSA / AES / HMAC、HTTPS、微信登录 / 支付 |
 | AI | LangChain、FastAPI、FAISS、bge-large-zh-v1.5、MarkItDown、OpenAI API |
 
 **项目主线（按重要性排序）**
@@ -61,10 +62,10 @@
 
 **参考答案**
 
-> 说得直接一点，两个原因。
-> 一是工作内容。彩讯这边我做的算力调度、机器人管控、边端助手，都是项目制交付，节奏是立项、开发、上线演示、结项，做完一个换下一个，技术选型也基本跟着客户和项目走。好处是接触面广，K8s、MQTT、RAG 都实打实摸过一遍；但系统很少长期迭代，很多设计上的取舍没机会验证，我想在一个能持续演进的系统上做深。
-> 二是我自己的方向。从 Go 业务做到云原生和 AI 应用，越往后越想在工程化和底层再走一步，比如调度、可观测性、RAG 的服务化落地，这些得有大业务体量的场景才练得出来。
-> 所以这次看机会，我最在意的是这个岗位负责的系统会不会长期投入、团队是不是认真对待技术债，公司规模和 title 反而排在后面。
+> 主要两个原因。
+> 一是接触得多但不够深。项目制交付，做完一个换下一个，K8s、MQTT、RAG 都摸过，但大多停在能用，没机会在一个系统上长期打磨。
+> 二是部分技术依赖硬件。算力调度、机器人、边端盒子这些，离开对应设备和环境就很难继续练，放着容易荒废。
+> 所以想找一个能长期投入、技术能持续用下去的平台。
 
 ---
 
@@ -374,6 +375,18 @@
 
 > Beego 服务 + crontab 定时触发任务，任务投递到 RabbitMQ；用 **direct 交换机**，每种爬虫绑定自己的 routing key 和队列，各消费者独立消费、互不影响，也便于单独扩容和失败重试。失败进死信队列人工/自动重试。去重用 Redis Set / 布隆过滤器，控速用限流 + 代理池。
 
+### 6.8 粤贸：微信扫码登录 / 扫码支付怎么接入（1 分钟速答）
+
+> 登录走微信开放平台的**扫码登录**，本质是 OAuth2 授权码模式：前端跳微信二维码页，用户扫码后微信带 `code` 回调我们后端，后端用 `code + AppID + AppSecret` 换 `openid/unionid` 和用户信息，再查/建本地账号，最后签发我们自己的登录态返回前端。关键点是 `state` 防 CSRF、`AppSecret` 只在服务端、`code` 一次性。
+> 支付走 **Native 扫码支付**：服务端调统一下单拿到 `code_url`，前端渲染成二维码；用户付款后微信异步回调 `notify_url`，我们验签、解密、比对金额和订单号，幂等更新订单状态，再返回成功应答；另外用主动查单和定时对账兜底，防止漏单。
+> 详细流程和踩坑见 8.9.10、8.10。
+
+### 6.9 爬虫策略与反爬怎么答（1 分钟速答）
+
+> 我是按「调度 → 抓取 → 去重 → 限速 → 解析 → 入库 → 监控」拆的：crontab 定时触发任务投 RabbitMQ，按站点/类型分队列，消费者独立扩容；URL 规范化和 Redis/布隆去重，用时间或 ID 游标做增量；每个域名单独限速、失败指数退避进死信；解析后清洗入库。
+> 反爬上主要是维护真实 UA/Header/Cookie、代理池、控制频率避免触发验证码；遇到 JS 签名或动态渲染就走接口或 headless 浏览器；同时遵守 robots 和合规要求，不给对方服务造成压力。
+> HTTPS 在 Go 里默认就会校验证书，正常直接请求即可，自签证书才特殊配置，抓包调试走代理；再注意连接复用、超时、重定向和 Cookie 处理。详见 8.14。
+
 ---
 
 ## 7. 场景题
@@ -654,11 +667,172 @@
 
 #### 8.4.4 RabbitMQ 和 Kafka 怎么选
 
-> RabbitMQ：延迟低、路由灵活、单条消息可靠性机制完善，适合业务消息；Kafka：高吞吐、分区顺序、可回溯消费，适合日志/大数据/流处理。
+> RabbitMQ：延迟低、路由灵活、单条消息可靠性机制完善，适合业务消息；Kafka：高吞吐、分区顺序、可回溯消费，适合日志/大数据/流处理。详细对比见 8.4.18。
 
 #### 8.4.5 消息积压怎么办
 
 > 先定位原因（消费慢/消费者挂/突发流量）；短期扩容消费者（注意分区/队列数量限制）、提高批量消费、降级非核心逻辑；长期优化消费逻辑和限流。
+
+#### 8.4.6 Kafka 的核心概念与架构
+
+> - **Broker**：一个 Kafka 节点（服务实例），多个 Broker 组成集群；
+> - **Topic**：逻辑上的消息分类，生产者发到 Topic，消费者订阅 Topic；
+> - **Partition**：Topic 的物理分片，每个分区是一个**追加写的日志文件**，**分区内有序、跨分区无序**；
+> - **Replica**：分区的副本，分 `leader` 和 `follower`，leader 对外读写，follower 同步数据，leader 挂了从 ISR 里选新 leader；
+> - **Offset**：消息在分区内的唯一位置（递增编号），消费者靠它记录消费进度；
+> - **Producer / Consumer / Consumer Group**：同组内的消费者分摊分区，一个分区同一时刻只被组内一个消费者消费；
+> - **Controller**：负责分区 leader 选举、副本状态等元数据管理（老版本靠 ZooKeeper，新版本用 KRaft）。
+> 关键差异：Kafka 的消息**消费后不会删除**，按保留策略（时间/大小）清理，所以可以重置 offset 回溯重放。
+
+#### 8.4.7 Kafka 为什么吞吐高
+
+> 1. **顺序追加写**：日志 append-only，避免磁盘随机写；
+> 2. **page cache**：读写走操作系统页缓存，不直接频繁刷盘；
+> 3. **零拷贝（sendfile）**：数据从文件直接送到 socket，少两次内存拷贝；
+> 4. **批量 + 压缩**：生产端攒批（`batch.size`、`linger.ms`），支持 lz4/zstd/snappy 压缩；
+> 5. **分区并行**：一个 Topic 多分区，生产/消费都能水平扩展；
+> 6. **稀疏索引**：用 index + timeindex 快速定位 offset，不用全量扫描；
+> 7. **拉模式**：消费者按自己的能力 fetch，不会被打爆。
+
+#### 8.4.8 生产端怎么保证可靠（acks / retries / 幂等）
+
+> - `acks=0`：发出去不等确认，最快但可能丢；`acks=1`：leader 落盘即确认；`acks=all`（-1）：ISR 中所有副本都确认，最可靠；
+> - 配 `retries` + `retry.backoff.ms` + `delivery.timeout.ms` 控制重试；
+> - `enable.idempotence=true`：开启幂等生产者，重试不会产生重复消息（依赖 `acks=all` 和重试配置）；
+> - 可靠性组合：`acks=all` + `min.insync.replicas>=2` + `replication.factor=3`，ISR 不足时宁可写失败也不丢数据；
+> - 想保证同 key 顺序：用 key 做分区，同一 key 永远落同一分区。
+> 注意：幂等生产者只解决「发送重试不重复」，不代表消费端不会重复消费。
+
+#### 8.4.9 消费端怎么保证不丢、不重复
+
+> - 关闭自动提交：`enable.auto.commit=false`，业务处理成功后再 `commitSync/commitAsync`，即 **at-least-once**；
+> - 如果先提交 offset 再处理业务，进程挂了就会丢消息；
+> - 重复消费无法完全避免（rebalance、提交失败、重试），要靠**业务幂等**：唯一键 + 唯一索引、去重表、状态机；
+> - `auto.offset.reset=earliest/latest`：只在没有已提交 offset 或 offset 越界时生效，不是「每次都从头消费」；
+> - 想端到端 exactly-once 见 8.4.14。
+> 关键参数：`max.poll.records`（单次拉多少）、`max.poll.interval.ms`（两次 poll 的最大间隔，超时会被踢出组触发 rebalance）、`session.timeout.ms`、`heartbeat.interval.ms`。
+
+#### 8.4.10 ISR / HW / LEO 是什么
+
+> - **LEO（Log End Offset）**：分区日志末端下一条消息的 offset；
+> - **ISR（In-Sync Replicas）**：和 leader 保持同步的副本集合，follower 落后超过 `replica.lag.time.max.ms` 会被踢出 ISR；
+> - **HW（High Watermark）**：ISR 中最小的 LEO，消费者**只能读到 HW 之前的消息**，保证读到的数据所有副本都有；
+> - `min.insync.replicas`：ISR 至少保留几个副本，少于阈值时 `acks=all` 的写入直接失败，防止副本不足还继续写；
+> - `unclean.leader.election.enable=false`：禁止落后太多的副本当 leader，避免丢数据（可用性换一致性）。
+> 一句话：**acks 决定写多可靠，ISR 决定当前有几个副本可信，HW 决定消费者能看到哪。**
+
+#### 8.4.11 分区和副本怎么设计
+
+> - 分区数决定**最大并行度**：消费并发上限约等于分区数（一个分区同时只能被组内一个消费者消费）；
+> - 经验值：按目标吞吐 ÷ 单分区吞吐估算，再留余量；单分区几万到十几万 QPS 视消息大小而定；
+> - 副本数一般 **3**（能容忍 1 个 broker 挂），配合 `min.insync.replicas=2`；
+> - 分区数**只能增不能减**，扩容会改变 key 到分区的映射，破坏既有顺序语义，要提前规划；
+> - key 分布不均会导致**分区热点**，可加随机后缀或自定义分区器打散。
+
+#### 8.4.12 怎么保证消息顺序
+
+> Kafka **只保证分区内有序**。
+> - 需要同一业务实体有序：用业务 ID 做 key（如订单号），同 key 落同一分区；
+> - 需要全局有序：只能单分区，牺牲并行和吞吐；
+> - 消费端要保证分区内单线程顺序处理，多线程处理会打乱顺序；
+> - 注意 rebalance、多分区、消费端并发都可能导致「看起来乱序」。
+
+#### 8.4.13 Consumer Group 与 Rebalance
+
+> 同组消费者分摊分区，实现「一条消息组内只消费一次」；不同组各自消费全量，实现广播。
+> Rebalance 触发：消费者加入/离开、心跳超时、订阅关系变化、分区数变化。
+> 影响：重平衡期间消费暂停，offset 提交时机可能导致重复消费。
+> 优化：调大 `session.timeout.ms`、合理设置 `max.poll.interval.ms`（别让单批处理太久）、用 **static membership**（`group.instance.id`）避免滚动重启触发重平衡、用 cooperative-sticky 分配器减少停顿。
+
+#### 8.4.14 Kafka 的 Exactly Once 怎么做到
+
+> 1. **幂等生产者**：`enable.idempotence=true`，重试不会重复写入；
+> 2. **事务生产者**：`transactional.id`，把「跨分区写 + offset 提交」放进一个事务，保证读-处理-写原子；
+> 3. **下游幂等**：sink 端用唯一键/事务表去重。
+> Kafka 的 EOS 主要适用于 Kafka Streams / 流处理场景；普通业务消费端更常用「at-least-once + 业务幂等」，成本更低。
+
+#### 8.4.15 消息保留与清理（delete / compact）
+
+> Kafka 不因消费而删除消息，按策略清理：
+> - **delete**：按时间（`log.retention.hours`）或大小（`log.retention.bytes`）删除整个 segment；
+> - **compact**：按 key 保留最新值，适合 changelog、CDC、状态恢复（注意 tombstone 删除标记）；
+> - 还有 `segment.ms/segment.bytes` 控制 segment 滚动。
+> 所以 Kafka 可以「回溯重放」，但存储成本要提前规划。
+
+#### 8.4.16 KRaft 和 ZooKeeper
+
+> 老架构用 ZooKeeper 存元数据、做 controller 选举；KRaft 模式把元数据管理内置到 Kafka 的 quorum controller，去掉 ZK 依赖，部署更简单、元数据扩展性更好。2.8 引入，3.x 逐步成熟，新集群建议 KRaft。
+
+#### 8.4.17 消息积压怎么排查处理（Kafka 版）
+
+> 1. 先看 lag：`kafka-consumer-groups.sh --describe --group g`，`LAG = LEO - committed offset`；
+> 2. 定位是「消费慢」还是「生产突增」：看消费耗时、下游 DB/RPC、GC、`max.poll.records`；
+> 3. 扩容消费者：**不能超过分区数**，多了会空闲；
+> 4. 分区不够就加分区（注意 key 顺序影响），或临时把消息转存到新 Topic 用更多分区并行消费；
+> 5. 优化消费逻辑：批量写、异步化、跳过非核心逻辑、加缓存；
+> 6. 生产侧限流/降级，先止血再根治。
+
+#### 8.4.18 Kafka 和 RabbitMQ 全面对比
+
+| 维度 | Kafka | RabbitMQ |
+| --- | --- | --- |
+| 定位 | 分布式流平台 / 提交日志 | 消息代理（Broker） |
+| 吞吐 | 极高，单集群可达百万级/秒 | 中等，万级~十万级/秒 |
+| 延迟 | 毫秒级，批量发送会更高 | 微秒~毫秒，低延迟更好 |
+| 消息模型 | 分区日志，消息保留、可回溯 | 队列，消费后删除 |
+| 消费方式 | 消费者**拉**，自己维护 offset | Broker **推**，消费者 ack |
+| 顺序性 | 分区内有序 | 单队列有序，多消费者竞争即无序 |
+| 路由能力 | 弱，只有 topic/partition，靠 key | 强，direct/topic/fanout/headers |
+| 回溯重放 | 支持（重置 offset） | 不支持，只能重新投递 |
+| 扩展性 | 分区水平扩展，天然分布式 | 镜像/集群，扩展相对有限 |
+| 可靠性机制 | 副本 + acks + ISR + HW | 持久化 + publisher confirm + 手动 ack + 死信 |
+| 事务 / EOS | 支持事务和 exactly-once | 无 EOS，靠业务幂等 |
+| 运维复杂度 | 较重（分区、副本、ISR、磁盘、重平衡） | 相对轻 |
+| 典型场景 | 日志、埋点、流处理、大数据、削峰缓冲、CDC | 业务解耦、任务队列、RPC、通知、低延迟消息 |
+
+> 一句话选型：**要吞吐、要回溯、要流式处理选 Kafka；要低延迟、要灵活路由、要单条可靠投递选 RabbitMQ。**
+
+#### 8.4.19 项目里为什么选 RabbitMQ 而不是 Kafka
+
+> 爬虫项目的任务是「定时触发 + 按站点分类下发 + 失败重试」，消息量不大、要求低延迟、路由隔离清晰（direct 交换机按 routing key 分队列）、需要单条 ack 和死信队列，RabbitMQ 更合适，运维也轻。
+> 如果换成每天亿级的日志/埋点采集、需要回溯重放、要做实时流计算或 CDC，我会选 Kafka。选型要看场景，不能默认 Kafka 更好。
+
+#### 8.4.20 Kafka 常见线上问题速查
+
+> 1. **Consumer Lag 持续上涨**：消费能力不足、下游慢、分区太少、消费者频繁 rebalance；
+> 2. **ISR 缩水 / UnderReplicatedPartitions**：broker 挂了、网络抖动、磁盘慢、follower 同步跟不上；
+> 3. **频繁 Rebalance**：心跳超时（GC/网络）、`session.timeout.ms` 太小、单批处理超过 `max.poll.interval.ms`；
+> 4. **消息丢失**：`acks=0/1`、`min.insync.replicas` 配置不当、自动提交 offset、unclean leader 选举；
+> 5. **重复消费**：at-least-once 本身、rebalance、offset 提交失败、重试 → 业务幂等兜底；
+> 6. **消息乱序**：跨分区、key 设计不当、消费端多线程并发处理；
+> 7. **磁盘满**：retention 配置过大、segment 太大、流量突增；
+> 8. **发送超时**：`acks=all` + ISR 不足、网络或 broker 负载高，先看 broker 指标和 ISR；
+> 9. **分区热点**：key 倾斜，加随机后缀或自定义分区器；
+> 10. **消费者被踢出组**：处理太慢或心跳配置不合理，先解决阻塞再调参数。
+
+#### 8.4.21 常用命令与关键参数
+
+```bash
+# Topic
+kafka-topics.sh --bootstrap-server broker:9092 --create --topic t --partitions 6 --replication-factor 3
+kafka-topics.sh --bootstrap-server broker:9092 --describe --topic t
+kafka-topics.sh --bootstrap-server broker:9092 --alter --topic t --partitions 12
+
+# 生产 / 消费
+kafka-console-producer.sh --bootstrap-server broker:9092 --topic t
+kafka-console-consumer.sh --bootstrap-server broker:9092 --topic t --from-beginning --group g
+
+# 消费组与 offset
+kafka-consumer-groups.sh --bootstrap-server broker:9092 --describe --group g
+kafka-consumer-groups.sh --bootstrap-server broker:9092 --group g --topic t --reset-offsets --to-earliest --execute
+
+# 配置 / 日志目录 / leader 选举
+kafka-configs.sh --bootstrap-server broker:9092 --describe --entity-type topics --entity-name t
+kafka-log-dirs.sh --bootstrap-server broker:9092 --describe
+kafka-leader-election.sh --bootstrap-server broker:9092 --election-type preferred --all-topic-partitions
+```
+
+> 关键参数：生产端 `acks`、`retries`、`enable.idempotence`、`batch.size`、`linger.ms`、`compression.type`；消费端 `group.id`、`auto.offset.reset`、`enable.auto.commit`、`max.poll.records`、`max.poll.interval.ms`、`session.timeout.ms`、`fetch.min.bytes`。
 
 ---
 
@@ -767,6 +941,458 @@
 
 ---
 
+## 8.9 认证与授权：OAuth2 / JWT / 微信登录
+
+### 8.9.1 OAuth2 是什么？四个角色分别是谁
+
+> OAuth2 是**授权协议**，解决的问题是「第三方应用如何在用户不暴露密码的前提下，拿到访问用户资源的权限」。
+> 四个角色：
+> - **Resource Owner**：用户，资源的所有者；
+> - **Client**：第三方应用（我们的平台）；
+> - **Authorization Server**：授权服务器（微信、GitLab、公司统一账号中心）；
+> - **Resource Server**：资源服务器，校验 `access_token` 后返回数据。
+> 核心产物是 `access_token`（有时还有 `refresh_token`），它代表「客户端被授权做某事」，而不是「用户是谁」。
+
+### 8.9.2 授权码模式（authorization code）完整流程
+
+> 1. 客户端把用户导向授权端点：`/authorize?response_type=code&client_id=xx&redirect_uri=xx&scope=xx&state=随机值`
+> 2. 用户在授权服务器上登录并同意授权；
+> 3. 授权服务器 302 回 `redirect_uri?code=CODE&state=STATE`；
+> 4. **客户端后端**拿 `code + client_id + client_secret` 调 token 端点换 `access_token`（可选 `refresh_token`）；
+> 5. 客户端用 `access_token` 调资源服务器接口，拿到数据后自己签发登录态（session 或 JWT）。
+> 微信扫码登录就是这套流程的定制版：scope 固定 `snsapi_login`，用 `code` 换的是微信的 `access_token + openid`。
+
+### 8.9.3 为什么必须「code 换 token」，不直接把 token 给前端
+
+> - `access_token` 一旦出现在浏览器 URL 或 history 里就会泄露，而**前端是不可信环境**；
+> - `code` **短命（一般 5 分钟）、一次性**，即使被截获，没有 `client_secret` 也换不到 token；
+> - `client_secret` 只存在服务端，保证只有合法客户端能兑换；
+> - SPA / 移动端还要求 **PKCE**（`code_verifier` + `code_challenge`），防止 code 被恶意 App 拦截后兑换。
+
+### 8.9.4 四种授权模式怎么选
+
+| 模式 | 适用场景 | 现状 |
+| --- | --- | --- |
+| 授权码 code | 有后端的 Web / 开放平台 | **首选**，最安全 |
+| 隐式 implicit | 纯前端老应用 | 已淘汰，token 直接暴露 |
+| 密码 password | 高度信任的自有客户端 | 不推荐，等于交出密码 |
+| 客户端凭证 client credentials | 服务间调用，无用户参与 | 微服务内部鉴权常用 |
+
+### 8.9.5 OAuth2 和 OpenID Connect（OIDC）的区别
+
+> OAuth2 只解决**授权**（能不能访问），不定义「用户身份」标准。OIDC 是在 OAuth2 上加了一层**认证**：授权码换 token 时额外返回 `id_token`（一个 JWT），里面有 `sub`、`name`、`email` 等用户信息，并提供 `userinfo` 接口。要「用第三方账号登录」就用 OIDC；只要「拿权限访问资源」用 OAuth2 即可。
+
+### 8.9.6 JWT 的结构和原理
+
+> 三段式，用 `.` 分隔：`Base64URL(header) . Base64URL(payload) . Base64URL(signature)`。
+> - **header**：`{"alg":"HS256","typ":"JWT"}`，声明签名算法；
+> - **payload**：claims，标准字段有 `sub`（主体）、`iss`（签发方）、`aud`（接收方）、`exp`（过期）、`iat`、`jti`（唯一 ID），也可放业务字段；
+> - **signature**：对前两段做 HMAC-SHA256（对称，`HS256`）或 RSA/ECDSA（非对称，`RS256/ES256`）。
+> 服务端验签通过就信任内容，**不需要存 session**，所以天然适合水平扩展和多服务共享登录态。
+> 注意：payload 只是 Base64URL 编码，**不是加密**，谁都能解开，所以不能放敏感信息，且必须走 HTTPS。
+
+### 8.9.7 服务端怎么校验 JWT？有哪些攻击要防
+
+> 校验顺序：解析三段 → **限定算法白名单**（只允许约定的 HS256/RS256）→ 用密钥验签 → 校验 `exp/nbf/iat` → 校验 `iss/aud` → 业务校验（用户状态、版本号）。
+> 常见攻击：
+> - `alg=none` 伪造：库必须显式指定合法算法，禁止由 token 自己决定；
+> - 算法混淆：把 RSA 公钥当 HMAC 密钥用（`HS256` 验 `RS256` 的 token），必须白名单；
+> - 密钥泄露：密钥放配置中心/KMS，不硬编码、不进仓库；
+> - 重放：token 有效期短 + `jti` 去重；
+> - XSS 偷 token：存 `HttpOnly + Secure` Cookie（配合 CSRF Token），别放 localStorage。
+
+### 8.9.8 JWT 怎么做「主动失效」/ 登出
+
+> JWT 是无状态的，天然不能即时作废，常用组合拳：
+> 1. **短有效期**：access token 5~15 分钟，配 refresh token 续期；
+> 2. **黑名单**：登出/封号时把 `jti` 写入 Redis，TTL 等于剩余有效期，网关校验时查一次；
+> 3. **版本号**：用户表存 `tokenVersion`，JWT 里带上，改密码或强制下线时版本 +1，旧 token 全部失效；
+> 4. 敏感操作（支付、改密）二次校验或要求重新登录。
+
+### 8.9.9 JWT 和 Session 怎么选
+
+> - **Session**：服务端存状态，可控、可即时失效，但要共享存储（Redis），多实例要粘性/集中存储；
+> - **JWT**：无状态、跨服务/跨域友好、扩展性好，但无法即时失效、体积大、续期和注销要额外设计。
+> 我的选择：对外 API 和微服务间用 JWT（短 token + refresh），后台管理这类需要强控制的用 Session 或「JWT + Redis 黑名单」混合。
+
+### 8.9.10 微信扫码登录流程（结合粤贸项目）
+
+> 前置：微信开放平台创建「网站应用」，拿到 `AppID/AppSecret`，配置**授权回调域名**。
+> 1. 前端跳转：`https://open.weixin.qq.com/connect/qrconnect?appid=APPID&redirect_uri=URLENCODE(回调地址)&response_type=code&scope=snsapi_login&state=STATE#wechat_redirect`
+> 2. 用户扫码确认后，微信 302 回 `redirect_uri?code=CODE&state=STATE`；
+> 3. 后端先校验 `state`（和下发时存的值比对，防 CSRF），再调 `https://api.weixin.qq.com/sns/oauth2/access_token?appid=&secret=&code=&grant_type=authorization_code`，拿到微信 `access_token`、`openid`、`unionid`；
+> 4. 调 `https://api.weixin.qq.com/sns/userinfo?access_token=&openid=` 拿昵称、头像等；
+> 5. 用 `unionid`（多应用统一账号）或 `openid` 查本地用户，没有就注册，最后签发自己的 token 返回前端。
+> 注意点：`code` 只能用一次、5 分钟过期；`access_token` 约 2 小时、`refresh_token` 约 30 天，需要缓存刷新；`AppSecret` 只在服务端；回调域名必须和开放平台配置一致。
+
+### 8.9.11 微信小程序登录流程
+
+> 前端 `wx.login()` 拿临时 `code` → 后端调 `https://api.weixin.qq.com/sns/jscode2session?appid=&secret=&js_code=&grant_type=authorization_code` → 返回 `openid`、`session_key`、`unionid`。
+> `session_key` 用于解密手机号等敏感数据（`wx.getPhoneNumber` 的加密串），**绝不能下发前端**；业务上同样用 `openid/unionid` 建账号，再签发自己的登录态。
+
+### 8.9.12 state 参数是干什么的
+
+> 防 **CSRF / 授权码注入**：发起授权前生成随机 `state` 存到 session 或短期缓存，回调时比对，不一致直接拒绝。顺带还能携带业务上下文（如登录后跳转地址、渠道标识）。
+
+---
+
+## 8.10 微信支付
+
+### 8.10.1 微信扫码支付（Native）完整流程
+
+> 前置：商户号 `mchid`、APIv3 密钥、商户 API 证书（`apiclient_key.pem`）、平台证书/公钥。
+> 1. **下单**：服务端 `POST https://api.mch.weixin.qq.com/v3/pay/transactions/native`，body 传 `appid`、`mchid`、`description`、`out_trade_no`（商户订单号）、`notify_url`、`amount.total`（**单位分**），返回 `code_url`（约 2 小时有效）；
+> 2. **展示**：前端把 `code_url` 生成二维码；
+> 3. **支付**：用户扫码付款，微信向 `notify_url` 发异步通知；
+> 4. **回调处理**：验签 → 解密 `resource` → 校验商户号/AppID/订单号/金额/`trade_state=SUCCESS` → 幂等更新订单 → 返回 `200 + {"code":"SUCCESS","message":"成功"}`；
+> 5. **兜底**：主动查单 `GET /v3/pay/transactions/out-trade-no/{out_trade_no}?mchid=xx`，加定时对账。
+
+### 8.10.2 支付回调怎么保证安全
+
+> - **验签**：用微信平台证书公钥对 `Wechatpay-Timestamp + Wechatpay-Nonce + 请求体` 做 RSA-SHA256 验签，`Wechatpay-Serial` 指定证书序列号；
+> - **解密**：V3 回调的 `resource` 是 AES-256-GCM 密文，用 APIv3 密钥 + `nonce` + `associated_data` 解密；
+> - **业务校验**：`mchid/appid/out_trade_no` 必须和本地订单一致，**金额必须比对**（防止篡改金额），状态必须是 `SUCCESS`；
+> - **时间戳**校验防重放（一般 5 分钟内）；
+> - 回调地址只走 HTTPS，且要防重试风暴。
+
+### 8.10.3 回调幂等和漏单怎么处理
+
+> 幂等：`out_trade_no` 建唯一索引，订单状态机只允许「待支付 → 已支付」单向流转，重复回调直接返回成功；更新用 `update ... where status='待支付'` 条件更新避免并发重复。
+> 漏单：微信回调可能延迟或失败，所以必须有**主动查单**（支付后前端轮询 + 后端定时查）+ **定时对账**（下载微信账单比对本地订单，差异自动补单/告警）。这两条是支付系统的标配。
+
+### 8.10.4 V2 和 V3 的区别
+
+| 维度 | V2 | V3 |
+| --- | --- | --- |
+| 数据格式 | XML | JSON |
+| 签名 | MD5 / HMAC-SHA256（字段拼接） | RSA-SHA256 + 商户私钥，平台证书验签 |
+| 证书 | 商户证书 | 商户证书 + 平台证书（或公钥） |
+| 回调 | 明文 + 签名 | 资源 AES-256-GCM 加密 + 验签 |
+
+> 新项目直接上 V3，安全性和规范都更好。
+
+### 8.10.5 JSAPI / 小程序支付差异
+
+> JSAPI（公众号 H5）：需要用户 `openid`，下单 `trade_type=JSAPI`，返回 `prepay_id`，前端用 `WeixinJSBridge.invoke('getBrandWCPayRequest', ...)` 唤起。
+> 小程序：`wx.login` 拿 `openid`，下单后用 `wx.requestPayment` 唤起，参数包含 `timeStamp/nonceStr/package/signType/paySign`。
+> 扫码 Native 不需要 `openid`，三者下单接口和回调逻辑基本一致，差别在唤起方式和支付参数。
+
+### 8.10.6 退款与对账
+
+> 退款调 `/v3/refund/domestic/refunds`，必须有唯一 `out_refund_no` 做幂等，金额不能超过可退金额；退款是异步的，要听退款回调或主动查退款单。
+> 对账：每天下载交易账单，和本地订单逐笔比对，处理「本地成功微信无记录」「微信成功本地无记录」「金额不一致」，差异走人工或自动补偿。
+
+---
+
+## 8.11 加解密技术
+
+### 8.11.1 三类算法怎么分工
+
+> - **对称加密**（AES、ChaCha20、SM4）：加解密同一把密钥，速度快，用于**大批量数据**和会话传输；
+> - **非对称加密**（RSA、ECC、SM2）：公钥/私钥分离，解决**密钥分发**和**身份认证**，速度慢，只用来加密小数据（如会话密钥）或做签名；
+> - **哈希/摘要**（SHA-256、SM3）：单向不可逆，用于完整性校验、签名前置、密码存储。
+> 实际系统几乎都是组合使用：非对称交换密钥 → 对称加密数据 → 哈希/HMAC 保证完整性。
+
+### 8.11.2 AES 的模式怎么选
+
+> AES 是分组加密（块 128 bit），密钥 128/192/256 位。
+> - **ECB**：相同明文块产出相同密文，会泄露结构，**不要用**；
+> - **CBC**：需要随机 IV，逐块链接，但**不防篡改**，要额外加 HMAC（Encrypt-then-MAC）；IV 不必保密但必须随机且不可复用；
+> - **CTR**：把分组变流式，可并行，同样需要唯一 nonce；
+> - **GCM**：AEAD，加密 + 认证一体，性能好，**推荐**；nonce 绝对不能重复，否则密钥流复用会直接泄露明文。
+> 实践：AES-256-GCM，每次加密随机 nonce，密文和 nonce/tag 一起存；密钥放 KMS 或配置中心并支持轮换。
+
+### 8.11.3 RSA 原理、填充和密钥长度
+
+> 安全性基于**大整数分解难题**：`n = p * q`，公钥 `(n, e)`，私钥 `(n, d)`。公钥加密、私钥解密；私钥签名、公钥验签。
+> - 加密填充用 **OAEP**，签名填充用 **PSS**，不要在新系统用裸 `PKCS#1 v1.5` 加密；
+> - 密钥长度至少 **2048 位**（3072/4096 更稳），RSA 加密的明文长度受密钥长度限制（2048 位大约只能加密 245 字节以内），所以只加密对称密钥；
+> - 同一密钥对不能既当签名密钥又当加密密钥，应按用途分离。
+
+### 8.11.4 ECC 和国密 SM2/SM3/SM4
+
+> **ECC** 基于椭圆曲线离散对数问题，256 位强度约等于 RSA 3072 位，密钥短、运算快，适合移动端和 TLS。`ECDH` 做密钥协商，`ECDSA` 做签名。
+> 国密：**SM2**（椭圆曲线，签名/加密/密钥交换）、**SM3**（哈希，256 位）、**SM4**（分组对称，128 位）。信创、政务、金融合规场景常要求国密改造，Go 可用 `tjfoc/gmsm` 等库。
+
+### 8.11.5 哈希、HMAC 和密码存储
+
+> - 哈希：SHA-256 / SM3 可用于摘要和校验；**MD5/SHA1 有碰撞，不能用于安全场景**；
+> - **HMAC** = 哈希 + 密钥，能防篡改和伪造，常用于 API 签名、支付回调验签、Webhook 校验；
+> - **密码存储**：绝不能存明文，也不能只做一次 SHA-256（可被彩虹表/暴力破解），要用 **bcrypt / scrypt / Argon2** 这类慢哈希，自带盐、成本可调；比对用常量时间比较，防时序攻击。
+
+### 8.11.6 数字签名和证书链
+
+> 签名流程：对内容做哈希 → 用**私钥**对摘要签名 → 对方用**公钥**验签。保证完整性、身份认证、不可否认。
+> 数字证书解决「公钥怎么可信」：CA 用自己私钥给服务器证书签名，证书里含域名、公钥、有效期；客户端用内置根 CA 公钥逐级验证证书链，再校验域名、有效期、吊销状态（CRL/OCSP）。
+> HTTPS 就是「证书验证身份 + 非对称协商密钥 + 对称加密传输」的组合。
+
+### 8.11.7 HTTPS 是怎么组合这些算法的
+
+> 1. 客户端 ClientHello（支持的套件、随机数）；
+> 2. 服务端 ServerHello + 证书链；
+> 3. 客户端验证证书链，双方用 **ECDHE** 协商出预主密钥（前向保密：即使私钥泄露，历史流量也解不开）；
+> 4. 用随机数派生**会话密钥**；
+> 5. 之后用 **AES-GCM / ChaCha20-Poly1305** 对称加密传输，AEAD 同时保证机密性和完整性。
+> 一句话：**非对称只用来协商和认证，真正传数据用对称**。
+
+### 8.11.8 简历里「非对称加密实现登录」具体怎么做，有什么缺陷
+
+> 做法：服务端生成 RSA 密钥对，公钥下发给前端；前端用 `JSEncrypt` 把「密码 + 时间戳 + 随机数」用公钥加密后提交；后端用私钥解密，校验时间戳/nonce 防重放，再走正常登录。
+> 目的：避免密码明文出现在请求体/日志/抓包里，属于纵深防御。
+> **缺陷**：HTTP 下公钥本身可被中间人替换、密文可被原样重放，所以必须配合 HTTPS、时间戳 + nonce + 一次性校验、失败限流；公钥加密不是身份认证，不能替代 TLS。
+> 更稳的方案：全站 HTTPS + 服务端 bcrypt 存密码，前端加密只作为额外一层。
+
+### 8.11.9 加解密实践的坑
+
+> - 不要自己实现算法，用标准库/成熟库；
+> - IV / nonce 不复用，随机生成；
+> - 密钥不硬编码、不进代码仓库，用 KMS / 环境变量 / 配置中心，定期轮换；
+> - **加密 ≠ 完整性**，需要 HMAC 或 AEAD；
+> - Base64 只是编码，不是加密；
+> - 日志不打明文密码、密钥、token；
+> - 错误提示不暴露内部细节（如「签名错误」不要区分哪一步）；
+> - 敏感字段（手机号、身份证）落库加密 + 展示脱敏。
+
+---
+
+## 8.12 Kubernetes 架构与常用命令
+
+### 8.12.1 整体架构
+
+> 分控制面（Control Plane）和工作节点（Node）两层：
+> - 控制面：`kube-apiserver`、`etcd`、`kube-scheduler`、`kube-controller-manager`、`cloud-controller-manager`；
+> - 节点：`kubelet`、`kube-proxy`、容器运行时（containerd / CRI-O）。
+> 三类插件接口：**CRI**（容器运行时）、**CNI**（网络）、**CSI**（存储）。
+
+### 8.12.2 控制面各组件职责
+
+> - **kube-apiserver**：集群唯一入口，负责认证、鉴权、准入控制（Mutating/Validating Admission），提供 REST API，读写 etcd；
+> - **etcd**：分布式 KV，集群**唯一事实源**，存所有对象和状态，通过 watch 通知变更；
+> - **kube-scheduler**：为未调度的 Pod 选节点，先过滤（资源、亲和性、污点）再打分；
+> - **kube-controller-manager**：跑各种控制器（Deployment、ReplicaSet、Node、Job、Endpoint 等），核心是**调谐循环 reconcile**，让实际状态收敛到期望状态；
+> - **cloud-controller-manager**：对接云厂商的节点、路由、存储能力。
+
+### 8.12.3 节点侧组件职责
+
+> - **kubelet**：和控制面通信，管理本节点 Pod 生命周期、探针、卷挂载、上报状态，通过 CRI 调容器运行时；
+> - **kube-proxy**：实现 Service 的流量转发（iptables / IPVS / nftables，部分方案用 eBPF 替代）；
+> - **容器运行时**：真正拉镜像、跑容器（K8s 1.24 起移除了 dockershim，默认推荐 containerd；Docker 需通过 cri-dockerd 适配）。
+
+### 8.12.4 一个 Pod 从 apply 到跑起来经历了什么
+
+> 1. `kubectl apply` → apiserver 鉴权/准入 → 写入 etcd；
+> 2. Deployment 控制器创建 ReplicaSet，ReplicaSet 控制器创建 Pod；
+> 3. scheduler watch 到未绑定节点的 Pod → 过滤 + 打分选出节点 → 写回 `spec.nodeName`（bind）；
+> 4. 目标节点 kubelet watch 到分配给自己的 Pod → 拉镜像、创建容器、配置网络/存储；
+> 5. kubelet 上报状态，探针通过后 Service Endpoints 更新，流量才进来；
+> 6. 控制器持续调谐：副本数不对就扩缩，Pod 挂了就重建。
+
+### 8.12.5 常用命令清单
+
+```bash
+# 查看
+kubectl get pods,deploy,svc,node -n <ns> -o wide
+kubectl describe pod <pod> -n <ns>
+kubectl get events -n <ns> --sort-by=.lastTimestamp
+kubectl top pod / top node
+
+# 日志与进入容器
+kubectl logs -f <pod> -c <container>
+kubectl logs <pod> --previous          # 看崩溃前的日志
+kubectl exec -it <pod> -- sh
+
+# 发布与回滚
+kubectl apply -f app.yaml
+kubectl delete -f app.yaml
+kubectl rollout status deployment/<name>
+kubectl rollout undo deployment/<name>
+kubectl rollout restart deployment/<name>
+kubectl scale deployment/<name> --replicas=3
+
+# 调试与网络
+kubectl port-forward svc/<name> 8080:80
+kubectl create configmap <name> --from-file=...
+kubectl create secret generic <name> --from-literal=key=val
+
+# 节点维护
+kubectl cordon <node>          # 标记不可调度
+kubectl drain <node> --ignore-daemonsets --delete-emptydir-data
+kubectl taint nodes <node> key=value:NoSchedule
+kubectl auth can-i <verb> <resource>
+```
+
+### 8.12.6 排障常用命令与典型状态
+
+> - **Pending**：`describe pod` 看 Events，常见是资源不足、亲和性/污点不满足、PVC 没绑定、镜像拉不下来；
+> - **CrashLoopBackOff**：`logs --previous` 看上次退出原因，常见是配置错、依赖连不上、启动即 panic；
+> - **ImagePullBackOff**：镜像名/tag 错、私有仓库没配 `imagePullSecrets`、网络不通；
+> - **OOMKilled**：超内存 `limits` 被 kill，看 `describe pod` 的 Last State 和监控；
+> - **节点 NotReady**：`describe node` + 登节点看 kubelet/容器运行时日志、磁盘是否满、证书是否过期；
+> - **Service 访问不通**：看 Endpoints 是否有后端、selector 是否匹配、`kube-proxy` 是否正常、NetworkPolicy。
+
+### 8.12.7 client-go 怎么和集群交互（结合算力调度）
+
+> 用 `clientset` 创建/查询/删除 Job、Deployment、Pod，读事件和状态；长驻服务用 **Informer**（List 全量 + Watch 增量）在本地维护缓存，业务读缓存而不是直连 apiserver，配合 workqueue 处理事件，避免把 apiserver 打爆。
+> 任务下发用固定名称 + label 带任务 ID 保证幂等；以 K8s 为事实源，定时 reconcile 修正本地状态。
+
+---
+
+## 8.13 Prometheus 查询语句
+
+### 8.13.1 四种指标类型
+
+> - **Counter**：只增不减（请求数、字节数），用 `rate()/increase()`；
+> - **Gauge**：可增可减（温度、内存、GPU 利用率），直接取值或用 `delta()/avg_over_time()`；
+> - **Histogram**：分桶统计（`_bucket`、`_sum`、`_count`），用 `histogram_quantile()` 算分位数；
+> - **Summary**：客户端算好分位数，**不能跨实例聚合**，多实例场景不如 Histogram。
+
+### 8.13.2 常用 PromQL 函数
+
+> - `rate(m[5m])`：每秒平均速率，适合告警；`irate(m[5m])`：最后两点瞬时速率，更敏感但抖动大；
+> - `increase(m[1h])`：区间增量；
+> - `sum/avg/max/min/count by (label)`：聚合，`by` 保留标签，`without` 排除标签；
+> - `topk(5, ...)`：取 TopN；
+> - `avg_over_time / max_over_time`：区间内平均/最大；
+> - `histogram_quantile(0.99, sum by (le) (rate(..._bucket[5m])))`：P99；
+> - `predict_linear(metric[1h], 4*3600)`：线性预测未来值；
+> - `absent(metric)`：缺失检测；`offset 1d`：同比；`@`：固定时间点。
+
+### 8.13.3 实战查询（GPU / 节点 / 接口）
+
+```promql
+# 各节点 GPU 平均利用率
+avg by (node) (DCGM_FI_DEV_GPU_UTIL)
+
+# 单卡显存使用率
+100 * DCGM_FI_DEV_FB_USED / (DCGM_FI_DEV_FB_USED + DCGM_FI_DEV_FB_FREE)
+
+# 各节点 GPU 总功耗（瓦）
+sum by (node) (DCGM_FI_DEV_POWER_USAGE)
+
+# 节点 CPU 使用率
+100 - avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100
+
+# 节点内存使用率
+100 * (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)
+
+# 磁盘使用率（排除临时文件系统）
+100 * (node_filesystem_size_bytes{fstype!~"tmpfs|overlay"} - node_filesystem_free_bytes{fstype!~"tmpfs|overlay"})
+    / node_filesystem_size_bytes{fstype!~"tmpfs|overlay"}
+
+# 接口 QPS 与 P99 延迟
+sum by (path) (rate(http_requests_total[5m]))
+histogram_quantile(0.99, sum by (le) (rate(http_request_duration_seconds_bucket[5m])))
+
+# 5xx 错误率
+sum(rate(http_requests_total{code=~"5.."}[5m])) / sum(rate(http_requests_total[5m]))
+
+# 实例探活
+up == 0
+```
+
+### 8.13.4 告警和预测
+
+> - 记录规则（recording rule）：把高频复杂查询预计算成新指标，降低查询成本；
+> - 告警规则：`expr` + `for: 5m` 防抖动 + `labels/annotations`；
+> - 磁盘预测：`predict_linear(node_filesystem_free_bytes[1h], 4*3600) < 0` 表示 4 小时内会写满；
+> - Alertmanager 负责分组、抑制、静默和路由。
+
+### 8.13.5 通过 HTTP API 查询（项目里同步资源）
+
+> - 瞬时查询：`GET /api/v1/query?query=<urlencoded>&time=<unix>`
+> - 区间查询：`GET /api/v1/query_range?query=&start=&end=&step=`
+> - 元数据：`/api/v1/labels`、`/api/v1/series`、`/api/v1/targets`
+> 算力调度里我定时调 instant query，按 node/卡型聚合后落库做资源快照，页面展示和调度决策结合快照 + 实时查询，避免每次页面都打 Prometheus。
+
+---
+
+## 8.14 爬虫策略、反爬与 HTTPS 处理
+
+### 8.14.1 爬虫整体策略
+
+> 按链路拆：**目标分析 → 调度 → 抓取 → 去重 → 限速 → 解析 → 清洗入库 → 监控**。
+> - 目标分析：静态页面直接解析 DOM；SPA 优先找 XHR 接口；有签名/加密才考虑逆向或浏览器；
+> - 调度：crontab 定时 + 队列分发，按站点/类型隔离，支持优先级和断点续爬；
+> - 抓取：连接池复用、超时控制、重试退避；
+> - 去重：URL 规范化 + Redis Set/布隆过滤器，内容 hash 二次去重；
+> - 限速：按域名独立限流，控制并发，避免把对方打挂；
+> - 入库：结构化清洗后写库，原始页面可落对象存储备查；
+> - 监控：成功率、耗时、队列积压、被封比例。
+
+### 8.14.2 项目架构回顾
+
+> Beego 服务 + crontab 定时触发 → 投递 RabbitMQ（**direct 交换机**，每类爬虫一个 routing key + 独立队列）→ 消费者独立消费、独立扩容 → 解析清洗入库 → 供其他系统使用。
+> 好处：抓取和解析解耦，单个站点失败不影响其他站点；失败进死信队列重试；按队列长度单独扩容。
+
+### 8.14.3 去重、增量、限速
+
+> - 去重：URL 统一小写、去掉 `#fragment`、参数排序后再 hash；Redis Set 存已抓 URL，量大用布隆过滤器（有假阳性，需配合 DB 兜底）；
+> - 增量：列表页按更新时间/ID 游标只拉新增；详情页对比 `update_time` 或内容 hash，没变就跳过；
+> - 限速：每域名令牌桶/固定间隔，分布式场景用 Redis 计数；失败率升高时自动降速（自适应）。
+
+### 8.14.4 常见反爬手段与应对
+
+| 反爬手段 | 表现 | 应对 |
+| --- | --- | --- |
+| UA / Referer / Header 校验 | 直接 403 | 维护真实浏览器 Header 池，按站点配置 |
+| IP 频率限制、封禁 | 429 / 验证码 / 空数据 | 代理池（质量检测、失败剔除）、降频、多出口 |
+| 登录态 / Cookie 校验 | 未登录返回空 | Cookie 池、账号池、定期刷新会话 |
+| 验证码（图形/滑块） | 拦截页 | 控制频率避免触发；OCR/打码平台；滑块用浏览器自动化 |
+| JS 参数签名 / 加密 | 参数对不上就拒绝 | 逆向 JS（扣代码/补环境），或用 headless 浏览器直接执行 |
+| 字体反爬 | 页面数字是乱码 | 下载字体文件，建立字形到真实字符的映射 |
+| 动态渲染 | HTML 里没有数据 | 找底层接口，或 Playwright/Chrome DevTools Protocol 渲染 |
+| TLS 指纹（JA3/JA4） | 请求直接被拒 | uTLS、curl_cffi、真实浏览器指纹 |
+| 蜜罐 / 假数据 | 数据异常 | 数据合理性校验，不采信异常链接 |
+
+> 原则：优先用官方 API / RSS；能用接口就不解析页面；能降频解决就不硬刚验证码。
+
+### 8.14.5 法律与合规
+
+> 遵守 `robots.txt` 和网站协议；控制频率不影响对方正常服务；不抓取个人信息、隐私、付费内容；不绕过登录/付费墙/技术保护措施；数据使用注意版权，符合《网络安全法》《数据安全法》《个人信息保护法》。面试时主动提合规，是加分项。
+
+### 8.14.6 HTTPS 链接处理（Go）
+
+> Go 的 `net/http` 默认就会做 TLS 握手和证书校验，正常 HTTPS 直接请求即可。特殊场景：
+> - **自签证书/测试环境**：`tls.Config{InsecureSkipVerify: true}`，仅限测试，生产禁止；
+> - **指定 CA**：`RootCAs` 加载 PEM；**双向认证 mTLS**：`Certificates` 加载客户端证书；
+> - **连接池**：自定义 `http.Transport`，设置 `MaxIdleConns`、`MaxIdleConnsPerHost`、`IdleConnTimeout`，并设置 `DialContext`/`ResponseHeaderTimeout` 超时；
+> - **重定向**：默认跟随会丢 Cookie/丢 Header，需要 `CheckRedirect` 手动处理或用 `cookiejar`；
+> - **相对链接**：`url.Parse` + `ResolveReference` 拼成绝对地址。
+
+```go
+tr := &http.Transport{
+    MaxIdleConns:        100,
+    MaxIdleConnsPerHost: 10,
+    IdleConnTimeout:     90 * time.Second,
+    TLSClientConfig:     &tls.Config{MinVersion: tls.VersionTLS12},
+}
+client := &http.Client{
+    Transport: tr,
+    Timeout:   15 * time.Second,
+    CheckRedirect: func(req *http.Request, via []*http.Request) error {
+        if len(via) >= 5 {
+            return errors.New("too many redirects")
+        }
+        return nil
+    },
+}
+```
+
+### 8.14.7 抓包调试与 TLS 指纹
+
+> 调试：把 `Transport.Proxy` 指向本地 mitmproxy/Charles，并在客户端信任其 CA 证书（只在自己环境做）。
+> 有些站点会校验 **TLS 指纹**（JA3/JA4）或 HTTP/2 指纹，标准库请求会被识别为非浏览器。应对：用 uTLS 定制指纹、`curl_cffi`，或直接用真实浏览器（Playwright）。
+
+### 8.14.8 爬虫稳定性设计
+
+> - 超时 + 重试 + 指数退避 + 最大次数，失败进死信队列；
+> - 按域名熔断：连续失败暂停该域名，避免持续被封；
+> - 任务幂等：同一 URL 重复消费不重复入库（唯一索引/去重表）；
+> - 数据校验：字段完整性、数量突变告警（防解析规则失效或拿到假数据）；
+> - 可观测：抓取量、成功率、耗时、队列积压、被封率做成监控面板。
+
+---
+
 ## 9. 面试自查清单
 
 **必须能脱口而出**
@@ -778,7 +1404,14 @@
 - [ ] GMP、GC、slice/map/channel 底层
 - [ ] MySQL 索引、MVCC、锁、慢查询优化
 - [ ] Redis 缓存三兄弟、分布式锁、持久化
+- [ ] Kafka 核心概念、ISR/HW、acks 与 offset、Rebalance、与 RabbitMQ 的对比
 - [ ] 一个完整的「接口变慢排查」和「秒杀设计」回答
+- [ ] OAuth2 授权码流程 + JWT 结构与失效方案
+- [ ] 微信扫码登录 / 小程序登录 / 扫码支付全流程及回调幂等
+- [ ] 对称 / 非对称 / 哈希分工，AES-GCM、RSA、HMAC 的实际用法
+- [ ] K8s 各组件职责 + 常用命令 + Pod 调度流程
+- [ ] PromQL 常用查询（GPU 利用率、P99、错误率、预测）
+- [ ] 爬虫策略、常见反爬与应对话术、Go 抓 HTTPS 的注意点
 - [ ] 离职原因、职业规划、反问问题
 
 **易被追问的坑**
